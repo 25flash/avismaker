@@ -3,20 +3,40 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: ReviewPlate API - Smart NFC/QR review card platform
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication
+  - name: users
+    description: User management
+  - name: business-profiles
+    description: Business profile management
+  - name: cards
+    description: Card management
+  - name: scan-logs
+    description: Scan logs
+  - name: subscriptions
+    description: Subscriptions
+  - name: ai
+    description: AI features
+  - name: support
+    description: Support messages
+  - name: admin
+    description: Admin operations
+  - name: public
+    description: Public endpoints (no auth required)
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +44,780 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # AUTH
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterBody"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginBody"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /auth/me:
+    get:
+      operationId: getCurrentUser
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/forgot-password:
+    post:
+      operationId: forgotPassword
+      tags: [auth]
+      summary: Request password reset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForgotPasswordBody"
+      responses:
+        "200":
+          description: Reset email sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /auth/reset-password:
+    post:
+      operationId: resetPassword
+      tags: [auth]
+      summary: Reset password with token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordBody"
+      responses:
+        "200":
+          description: Password reset successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  # USERS
+  /users/me:
+    patch:
+      operationId: updateCurrentUser
+      tags: [users]
+      summary: Update current user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserBody"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  # BUSINESS PROFILES
+  /business-profiles:
+    get:
+      operationId: listBusinessProfiles
+      tags: [business-profiles]
+      summary: List business profiles for current user
+      responses:
+        "200":
+          description: List of business profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BusinessProfile"
+
+    post:
+      operationId: createBusinessProfile
+      tags: [business-profiles]
+      summary: Create a business profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBusinessProfileBody"
+      responses:
+        "201":
+          description: Created profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BusinessProfile"
+        "400":
+          description: Plan limit reached or bad data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /business-profiles/{id}:
+    get:
+      operationId: getBusinessProfile
+      tags: [business-profiles]
+      summary: Get a business profile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Business profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BusinessProfile"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    patch:
+      operationId: updateBusinessProfile
+      tags: [business-profiles]
+      summary: Update a business profile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateBusinessProfileBody"
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BusinessProfile"
+
+    delete:
+      operationId: deleteBusinessProfile
+      tags: [business-profiles]
+      summary: Delete a business profile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # CARDS
+  /cards:
+    get:
+      operationId: listCards
+      tags: [cards]
+      summary: List cards for current user
+      parameters:
+        - name: businessProfileId
+          in: query
+          required: false
+          schema:
+            type: ["integer", "null"]
+      responses:
+        "200":
+          description: List of cards
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Card"
+
+  /cards/{id}:
+    get:
+      operationId: getCard
+      tags: [cards]
+      summary: Get a card
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Card
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Card"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    patch:
+      operationId: updateCard
+      tags: [cards]
+      summary: Update a card
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCardBody"
+      responses:
+        "200":
+          description: Updated card
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Card"
+
+  /cards/{id}/activate:
+    post:
+      operationId: activateCard
+      tags: [cards]
+      summary: Activate a card
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Card activated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Card"
+
+  /cards/{id}/deactivate:
+    post:
+      operationId: deactivateCard
+      tags: [cards]
+      summary: Deactivate a card
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Card deactivated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Card"
+
+  /cards/activate-by-code:
+    post:
+      operationId: activateCardByCode
+      tags: [cards]
+      summary: Activate a card by its unique code (user claims the card)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActivateByCodeBody"
+      responses:
+        "200":
+          description: Card activated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Card"
+        "404":
+          description: Code not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # SCAN LOGS
+  /scan-logs:
+    get:
+      operationId: listScanLogs
+      tags: [scan-logs]
+      summary: List scan logs for current user's cards
+      parameters:
+        - name: cardId
+          in: query
+          required: false
+          schema:
+            type: ["integer", "null"]
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: ["integer", "null"]
+      responses:
+        "200":
+          description: List of scan logs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ScanLog"
+
+  # ANALYTICS / DASHBOARD SUMMARY (wow endpoints)
+  /analytics/dashboard:
+    get:
+      operationId: getDashboardSummary
+      tags: [scan-logs]
+      summary: Dashboard summary statistics
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /analytics/cards/{id}/stats:
+    get:
+      operationId: getCardStats
+      tags: [scan-logs]
+      summary: Stats for a specific card
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Card stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CardStats"
+
+  # AI REPLY
+  /ai/generate-reply:
+    post:
+      operationId: generateAiReply
+      tags: [ai]
+      summary: Generate an AI reply to a review
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateReplyBody"
+      responses:
+        "200":
+          description: Generated reply
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenerateReplyResponse"
+        "403":
+          description: Plan upgrade required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /ai/reply-history:
+    get:
+      operationId: listReplyHistory
+      tags: [ai]
+      summary: List AI reply history
+      responses:
+        "200":
+          description: List of replies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ReviewReply"
+
+  # SUPPORT
+  /support/messages:
+    get:
+      operationId: listSupportMessages
+      tags: [support]
+      summary: List support messages for current user
+      responses:
+        "200":
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SupportMessage"
+
+    post:
+      operationId: createSupportMessage
+      tags: [support]
+      summary: Send a support message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSupportMessageBody"
+      responses:
+        "201":
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupportMessage"
+
+  # SUBSCRIPTIONS
+  /subscriptions/current:
+    get:
+      operationId: getCurrentSubscription
+      tags: [subscriptions]
+      summary: Get current user subscription
+      responses:
+        "200":
+          description: Current subscription
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+
+  /subscriptions/plans:
+    get:
+      operationId: listPlans
+      tags: [subscriptions]
+      summary: List available subscription plans
+      responses:
+        "200":
+          description: Available plans
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Plan"
+
+  /subscriptions/upgrade:
+    post:
+      operationId: upgradePlan
+      tags: [subscriptions]
+      summary: Upgrade subscription plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpgradePlanBody"
+      responses:
+        "200":
+          description: Upgrade initiated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpgradePlanResponse"
+
+  # PUBLIC ENDPOINTS (no auth)
+  /public/scan:
+    get:
+      operationId: publicScan
+      tags: [public]
+      summary: Public scan redirect - logs scan and returns redirect URL
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Scan result with redirect URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScanResult"
+        "404":
+          description: Card not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /public/card/{code}:
+    get:
+      operationId: getPublicCard
+      tags: [public]
+      summary: Get public card data by code
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Public card data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicCard"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ADMIN
+  /admin/stats:
+    get:
+      operationId: getAdminStats
+      tags: [admin]
+      summary: Admin platform statistics
+      responses:
+        "200":
+          description: Admin stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminStats"
+
+  /admin/users:
+    get:
+      operationId: listAdminUsers
+      tags: [admin]
+      summary: List all users (admin)
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: ["string", "null"]
+        - name: plan
+          in: query
+          required: false
+          schema:
+            type: ["string", "null"]
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminUser"
+
+  /admin/users/{id}:
+    patch:
+      operationId: updateAdminUser
+      tags: [admin]
+      summary: Update a user (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAdminUserBody"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUser"
+
+  /admin/cards:
+    get:
+      operationId: listAdminCards
+      tags: [admin]
+      summary: List all cards (admin)
+      responses:
+        "200":
+          description: List of cards
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Card"
+
+    post:
+      operationId: createAdminCard
+      tags: [admin]
+      summary: Create card codes (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAdminCardBody"
+      responses:
+        "201":
+          description: Cards created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Card"
+
+  /admin/scan-logs:
+    get:
+      operationId: listAdminScanLogs
+      tags: [admin]
+      summary: List all scan logs (admin)
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: ["integer", "null"]
+      responses:
+        "200":
+          description: Scan logs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ScanLog"
+
+  /admin/support-messages:
+    get:
+      operationId: listAdminSupportMessages
+      tags: [admin]
+      summary: List all support messages (admin)
+      responses:
+        "200":
+          description: Support messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SupportMessage"
+
+  /admin/support-messages/{id}/reply:
+    post:
+      operationId: replyToSupportMessage
+      tags: [admin]
+      summary: Reply to a support message (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminReplyBody"
+      responses:
+        "200":
+          description: Reply sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupportMessage"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +828,647 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required:
+        - success
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+        plan:
+          type: string
+        language:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - email
+        - name
+        - role
+        - plan
+        - language
+        - createdAt
+
+    RegisterBody:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        name:
+          type: string
+      required:
+        - email
+        - password
+        - name
+
+    LoginBody:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      required:
+        - email
+        - password
+
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        token:
+          type: string
+      required:
+        - user
+        - token
+
+    ForgotPasswordBody:
+      type: object
+      properties:
+        email:
+          type: string
+      required:
+        - email
+
+    ResetPasswordBody:
+      type: object
+      properties:
+        token:
+          type: string
+        password:
+          type: string
+      required:
+        - token
+        - password
+
+    UpdateUserBody:
+      type: object
+      properties:
+        name:
+          type: ["string", "null"]
+        language:
+          type: ["string", "null"]
+
+    BusinessProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        ownerId:
+          type: integer
+        name:
+          type: string
+        address:
+          type: ["string", "null"]
+        category:
+          type: ["string", "null"]
+        logoUrl:
+          type: ["string", "null"]
+        coverImageUrl:
+          type: ["string", "null"]
+        customBannerText:
+          type: ["string", "null"]
+        customBannerColor:
+          type: ["string", "null"]
+        showPoweredBy:
+          type: boolean
+        cardCount:
+          type: integer
+        totalScans:
+          type: integer
+        createdAt:
+          type: string
+      required:
+        - id
+        - ownerId
+        - name
+        - showPoweredBy
+        - cardCount
+        - totalScans
+        - createdAt
+
+    CreateBusinessProfileBody:
+      type: object
+      properties:
+        name:
+          type: string
+        address:
+          type: ["string", "null"]
+        category:
+          type: ["string", "null"]
+        logoUrl:
+          type: ["string", "null"]
+        coverImageUrl:
+          type: ["string", "null"]
+      required:
+        - name
+
+    UpdateBusinessProfileBody:
+      type: object
+      properties:
+        name:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        category:
+          type: ["string", "null"]
+        logoUrl:
+          type: ["string", "null"]
+        coverImageUrl:
+          type: ["string", "null"]
+        customBannerText:
+          type: ["string", "null"]
+        customBannerColor:
+          type: ["string", "null"]
+        showPoweredBy:
+          type: ["boolean", "null"]
+
+    Card:
+      type: object
+      properties:
+        id:
+          type: integer
+        code:
+          type: string
+        status:
+          type: string
+        platform:
+          type: ["string", "null"]
+        targetUrl:
+          type: ["string", "null"]
+        businessProfileId:
+          type: ["integer", "null"]
+        ownerId:
+          type: ["integer", "null"]
+        scanCount:
+          type: integer
+        smartReviewEnabled:
+          type: boolean
+        negativeAlertEnabled:
+          type: boolean
+        createdAt:
+          type: string
+        activatedAt:
+          type: ["string", "null"]
+      required:
+        - id
+        - code
+        - status
+        - scanCount
+        - smartReviewEnabled
+        - negativeAlertEnabled
+        - createdAt
+
+    UpdateCardBody:
+      type: object
+      properties:
+        platform:
+          type: ["string", "null"]
+        targetUrl:
+          type: ["string", "null"]
+        businessProfileId:
+          type: ["integer", "null"]
+        smartReviewEnabled:
+          type: ["boolean", "null"]
+        negativeAlertEnabled:
+          type: ["boolean", "null"]
+
+    ActivateByCodeBody:
+      type: object
+      properties:
+        code:
+          type: string
+        businessProfileId:
+          type: integer
+      required:
+        - code
+        - businessProfileId
+
+    ScanLog:
+      type: object
+      properties:
+        id:
+          type: integer
+        cardId:
+          type: integer
+        cardCode:
+          type: string
+        timestamp:
+          type: string
+        country:
+          type: ["string", "null"]
+        deviceType:
+          type: ["string", "null"]
+        ratingGiven:
+          type: ["number", "null"]
+        wasNegative:
+          type: boolean
+      required:
+        - id
+        - cardId
+        - cardCode
+        - timestamp
+        - wasNegative
+
+    DashboardSummary:
+      type: object
+      properties:
+        totalCards:
+          type: integer
+        activeCards:
+          type: integer
+        totalScans:
+          type: integer
+        scansThisMonth:
+          type: integer
+        totalProfiles:
+          type: integer
+        recentScans:
+          type: array
+          items:
+            $ref: "#/components/schemas/ScanLog"
+        topCards:
+          type: array
+          items:
+            $ref: "#/components/schemas/Card"
+      required:
+        - totalCards
+        - activeCards
+        - totalScans
+        - scansThisMonth
+        - totalProfiles
+        - recentScans
+        - topCards
+
+    CardStats:
+      type: object
+      properties:
+        cardId:
+          type: integer
+        totalScans:
+          type: integer
+        scansThisMonth:
+          type: integer
+        scansThisWeek:
+          type: integer
+        averageRating:
+          type: ["number", "null"]
+        negativeCount:
+          type: integer
+        scansByDay:
+          type: array
+          items:
+            $ref: "#/components/schemas/DayStat"
+        scansByCountry:
+          type: array
+          items:
+            $ref: "#/components/schemas/CountryStat"
+      required:
+        - cardId
+        - totalScans
+        - scansThisMonth
+        - scansThisWeek
+        - negativeCount
+        - scansByDay
+        - scansByCountry
+
+    DayStat:
+      type: object
+      properties:
+        date:
+          type: string
+        count:
+          type: integer
+      required:
+        - date
+        - count
+
+    CountryStat:
+      type: object
+      properties:
+        country:
+          type: string
+        count:
+          type: integer
+      required:
+        - country
+        - count
+
+    GenerateReplyBody:
+      type: object
+      properties:
+        originalReview:
+          type: string
+        platform:
+          type: string
+        tone:
+          type: string
+      required:
+        - originalReview
+        - platform
+
+    GenerateReplyResponse:
+      type: object
+      properties:
+        reply:
+          type: string
+        wasNegative:
+          type: boolean
+        id:
+          type: integer
+      required:
+        - reply
+        - wasNegative
+        - id
+
+    ReviewReply:
+      type: object
+      properties:
+        id:
+          type: integer
+        originalReview:
+          type: string
+        generatedReply:
+          type: string
+        platform:
+          type: string
+        wasNegative:
+          type: boolean
+        createdAt:
+          type: string
+      required:
+        - id
+        - originalReview
+        - generatedReply
+        - platform
+        - wasNegative
+        - createdAt
+
+    SupportMessage:
+      type: object
+      properties:
+        id:
+          type: integer
+        senderId:
+          type: integer
+        messageText:
+          type: string
+        sentDate:
+          type: string
+        isRead:
+          type: boolean
+        repliedByAdmin:
+          type: ["string", "null"]
+        replyDate:
+          type: ["string", "null"]
+      required:
+        - id
+        - senderId
+        - messageText
+        - sentDate
+        - isRead
+
+    CreateSupportMessageBody:
+      type: object
+      properties:
+        messageText:
+          type: string
+      required:
+        - messageText
+
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        plan:
+          type: string
+        status:
+          type: string
+        renewsAt:
+          type: ["string", "null"]
+        monthlyPrice:
+          type: number
+      required:
+        - id
+        - userId
+        - plan
+        - status
+        - monthlyPrice
+
+    Plan:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        price:
+          type: number
+        features:
+          type: array
+          items:
+            type: string
+        maxProfiles:
+          type: ["integer", "null"]
+        aiReply:
+          type: boolean
+        customBranding:
+          type: boolean
+        advancedAnalytics:
+          type: boolean
+      required:
+        - id
+        - name
+        - price
+        - features
+        - aiReply
+        - customBranding
+        - advancedAnalytics
+
+    UpgradePlanBody:
+      type: object
+      properties:
+        plan:
+          type: string
+      required:
+        - plan
+
+    UpgradePlanResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        plan:
+          type: string
+      required:
+        - success
+        - plan
+
+    ScanResult:
+      type: object
+      properties:
+        redirectUrl:
+          type: string
+        platform:
+          type: string
+        smartReviewEnabled:
+          type: boolean
+        cardCode:
+          type: string
+      required:
+        - redirectUrl
+        - platform
+        - smartReviewEnabled
+        - cardCode
+
+    PublicCard:
+      type: object
+      properties:
+        code:
+          type: string
+        platform:
+          type: string
+        targetUrl:
+          type: string
+        businessName:
+          type: ["string", "null"]
+        businessLogoUrl:
+          type: ["string", "null"]
+        smartReviewEnabled:
+          type: boolean
+        showPoweredBy:
+          type: boolean
+        customBannerText:
+          type: ["string", "null"]
+        customBannerColor:
+          type: ["string", "null"]
+      required:
+        - code
+        - platform
+        - targetUrl
+        - smartReviewEnabled
+        - showPoweredBy
+
+    AdminStats:
+      type: object
+      properties:
+        totalUsers:
+          type: integer
+        totalCards:
+          type: integer
+        activeCards:
+          type: integer
+        totalScans:
+          type: integer
+        scansToday:
+          type: integer
+        usersByPlan:
+          type: object
+          properties:
+            free:
+              type: integer
+            premium:
+              type: integer
+            pro:
+              type: integer
+            business:
+              type: integer
+          required:
+            - free
+            - premium
+            - pro
+            - business
+        revenueMonthly:
+          type: number
+      required:
+        - totalUsers
+        - totalCards
+        - activeCards
+        - totalScans
+        - scansToday
+        - usersByPlan
+        - revenueMonthly
+
+    AdminUser:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+        plan:
+          type: string
+        cardCount:
+          type: integer
+        totalScans:
+          type: integer
+        createdAt:
+          type: string
+      required:
+        - id
+        - email
+        - name
+        - role
+        - plan
+        - cardCount
+        - totalScans
+        - createdAt
+
+    UpdateAdminUserBody:
+      type: object
+      properties:
+        role:
+          type: ["string", "null"]
+        plan:
+          type: ["string", "null"]
+
+    CreateAdminCardBody:
+      type: object
+      properties:
+        count:
+          type: integer
+        platform:
+          type: ["string", "null"]
+      required:
+        - count
+
+    AdminReplyBody:
+      type: object
+      properties:
+        reply:
+          type: string
+      required:
+        - reply

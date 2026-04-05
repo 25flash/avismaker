@@ -58,7 +58,14 @@ export class WebhookHandlers {
     const stripeSubscriptionId =
       typeof session.subscription === 'string' ? session.subscription : null;
 
-    await db.update(usersTable).set({ plan: planId }).where(eq(usersTable.id, userIdNum));
+    // Save Stripe customer ID — collected by Stripe during checkout
+    const stripeCustomerId =
+      typeof session.customer === 'string' ? session.customer : null;
+
+    await db
+      .update(usersTable)
+      .set({ plan: planId, ...(stripeCustomerId ? { stripeCustomerId } : {}) })
+      .where(eq(usersTable.id, userIdNum));
 
     const [existingSub] = await db
       .select()

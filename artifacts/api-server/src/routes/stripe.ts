@@ -32,28 +32,6 @@ router.post("/stripe/checkout", requireAuth, async (req: AuthRequest, res): Prom
       return;
     }
 
-    // Find or create Stripe customer
-    // If stored ID is stale (e.g. from sandbox), create a fresh one
-    let customerId = user.stripeCustomerId;
-    if (customerId) {
-      try {
-        await stripe.customers.retrieve(customerId);
-      } catch {
-        // Customer not found in this Stripe account — clear stale ID and create new
-        customerId = null;
-        await db.update(usersTable).set({ stripeCustomerId: null }).where(eq(usersTable.id, user.id));
-      }
-    }
-    if (!customerId) {
-      const customer = await stripe.customers.create({
-        email: user.email,
-        name: user.name,
-        metadata: { userId: String(user.id) },
-      });
-      await db.update(usersTable).set({ stripeCustomerId: customer.id }).where(eq(usersTable.id, user.id));
-      customerId = customer.id;
-    }
-
     // Find the Stripe price for this plan + billing period
     // Try synced DB tables first, fall back to Stripe API directly
     let priceId: string | null = null;
@@ -104,38 +82,40 @@ router.post("/stripe/checkout", requireAuth, async (req: AuthRequest, res): Prom
       .from(subscriptionsTable)
       .where(eq(subscriptionsTable.userId, user.id));
 
-    if (existingSub?.stripeSubscriptionId) {
+    if (existingSub?.stripeSubscriptionId && user.stripeCustomerId) {
       // Upgrade existing subscription via Stripe API
-      const sub = await stripe.subscriptions.retrieve(existingSub.stripeSubscriptionId);
-      if (sub.status === "active") {
-        const updatedSub = await stripe.subscriptions.update(existingSub.stripeSubscriptionId, {
-          items: [{ id: sub.items.data[0].id, price: priceId }],
-          metadata: { userId: String(user.id), planId, billing },
-          proration_behavior: "create_prorations",
-        });
-        // Trigger plan update immediately
-        const basePrice = planId === "business" ? 49 : 19;
-        const discountFactor = billing === "annual" ? 0.75 : 1;
-        const renewsAt = new Date(updatedSub.current_period_end * 1000);
-        await db.update(usersTable).set({ plan: planId }).where(eq(usersTable.id, user.id));
-        await db
-          .update(subscriptionsTable)
-          .set({
-            plan: planId,
-            monthlyPrice: Number((basePrice * discountFactor).toFixed(2)),
-            renewsAt,
-            status: "active",
-            stripeSubscriptionId: updatedSub.id,
-          })
-          .where(eq(subscriptionsTable.userId, user.id));
-        res.json({ upgraded: true });
-        return;
+      try {
+        const sub = await stripe.subscriptions.retrieve(existingSub.stripeSubscriptionId);
+        if (sub.status === "active") {
+          const updatedSub = await stripe.subscriptions.update(existingSub.stripeSubscriptionId, {
+            items: [{ id: sub.items.data[0].id, price: priceId }],
+            metadata: { userId: String(user.id), planId, billing },
+            proration_behavior: "create_prorations",
+          });
+          const basePrice = planId === "business" ? 49 : 19;
+          const discountFactor = billing === "annual" ? 0.75 : 1;
+          const renewsAt = new Date(updatedSub.current_period_end * 1000);
+          await db.update(usersTable).set({ plan: planId }).where(eq(usersTable.id, user.id));
+          await db
+            .update(subscriptionsTable)
+            .set({
+              plan: planId,
+              monthlyPrice: Number((basePrice * discountFactor).toFixed(2)),
+              renewsAt,
+              status: "active",
+              stripeSubscriptionId: updatedSub.id,
+            })
+            .where(eq(subscriptionsTable.userId, user.id));
+          res.json({ upgraded: true });
+          return;
+        }
+      } catch {
+        // Subscription stale — fall through to create a new checkout session
       }
     }
 
-    // Create new checkout session
-    const session = await stripe.checkout.sessions.create({
-      customer: customerId,
+    // Create new checkout session — no pre-filled customer so user enters their own email
+    const sessionParams: Parameters<typeof stripe.checkout.sessions.create>[0] = {
       payment_method_types: ["card"],
       line_items: [{ price: priceId, quantity: 1 }],
       mode: "subscription",
@@ -148,7 +128,9 @@ router.post("/stripe/checkout", requireAuth, async (req: AuthRequest, res): Prom
       custom_text: {
         submit: { message: "Des questions ? Contactez-nous : contact@avismaker.com" },
       },
-    });
+    };
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     res.json({ url: session.url });
   } catch (error: any) {

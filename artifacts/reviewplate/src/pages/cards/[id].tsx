@@ -1,6 +1,10 @@
 import { AuthLayout } from "@/components/layout/AuthLayout";
-import { useGetCard, useUpdateCard, useActivateCard, useDeactivateCard, getGetCardQueryKey, getListCardsQueryKey } from "@workspace/api-client-react";
-import { ArrowLeft, Power, PowerOff, ExternalLink, Save, BarChart2 } from "lucide-react";
+import {
+  useGetCard, useUpdateCard, useActivateCard, useDeactivateCard,
+  useListBusinessProfiles,
+  getGetCardQueryKey, getListCardsQueryKey,
+} from "@workspace/api-client-react";
+import { ArrowLeft, Power, PowerOff, ExternalLink, Save, BarChart2, Building2, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +24,14 @@ const statusClass: Record<string, string> = {
   disabled: "status-pill-disabled",
 };
 
+interface BusinessProfile {
+  id: number;
+  name: string;
+  address: string | null;
+  website: string | null;
+  googleReviewUrl: string | null;
+}
+
 export default function CardEditorPage() {
   const params = useParams<{ id: string }>();
   const cardId = parseInt(params.id ?? "0");
@@ -29,6 +41,8 @@ export default function CardEditorPage() {
   const { data: card, isLoading } = useGetCard(cardId, {
     query: { enabled: !!cardId, queryKey: getGetCardQueryKey(cardId) },
   });
+
+  const { data: profiles } = useListBusinessProfiles();
 
   const updateMutation = useUpdateCard();
   const activateMutation = useActivateCard();
@@ -41,21 +55,32 @@ export default function CardEditorPage() {
     createdAt: string; activatedAt: string | null;
   } | undefined;
 
-  const [platform, setPlatform] = useState("");
+  const profileList = (profiles as unknown as BusinessProfile[]) ?? [];
+
+  const [businessProfileId, setBusinessProfileId] = useState<string>("");
   const [targetUrl, setTargetUrl] = useState("");
   const [smartReview, setSmartReview] = useState(false);
 
   useEffect(() => {
     if (cardData) {
-      setPlatform(cardData.platform ?? "");
+      setBusinessProfileId(cardData.businessProfileId != null ? String(cardData.businessProfileId) : "");
       setTargetUrl(cardData.targetUrl ?? "");
       setSmartReview(cardData.smartReviewEnabled);
     }
   }, [cardData]);
 
+  const selectedProfile = profileList.find(p => String(p.id) === businessProfileId) ?? null;
+
   const handleSave = () => {
     updateMutation.mutate(
-      { id: cardId, data: { platform: platform || null, targetUrl: targetUrl || null, smartReviewEnabled: smartReview } },
+      {
+        id: cardId,
+        data: {
+          businessProfileId: businessProfileId ? parseInt(businessProfileId) : null,
+          targetUrl: targetUrl || null,
+          smartReviewEnabled: smartReview,
+        },
+      },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getGetCardQueryKey(cardId) });
@@ -166,23 +191,65 @@ export default function CardEditorPage() {
             <CardTitle className="text-base font-semibold text-[#0D1117]">Card Settings</CardTitle>
           </CardHeader>
           <CardContent className="pt-6 space-y-6">
+
+            {/* Business profile selector */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-[#374151]">Platform</Label>
-              <Select value={platform} onValueChange={setPlatform}>
-                <SelectTrigger className="h-11" data-testid="select-platform">
-                  <SelectValue placeholder="Select review platform" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="google">Google</SelectItem>
-                  <SelectItem value="airbnb">Airbnb</SelectItem>
-                  <SelectItem value="tripadvisor">TripAdvisor</SelectItem>
-                  <SelectItem value="trustpilot">Trustpilot</SelectItem>
-                  <SelectItem value="multilink">Multi-link</SelectItem>
-                  <SelectItem value="social">Social Media</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label className="text-sm font-medium text-[#374151]">Business Profile</Label>
+              {profileList.length === 0 ? (
+                <div className="flex items-center gap-3 p-4 bg-[#F8FAFC] rounded-xl border border-dashed border-border">
+                  <div className="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+                    <Building2 className="w-4 h-4 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[#374151]">No business profiles yet</p>
+                    <p className="text-xs text-[#9CA3AF]">Create a profile to attach it to this card</p>
+                  </div>
+                  <Link href="/profiles">
+                    <Button size="sm" variant="outline" className="shrink-0" data-testid="button-create-profile-link">
+                      <Plus className="w-3.5 h-3.5 mr-1.5" />
+                      Create
+                    </Button>
+                  </Link>
+                </div>
+              ) : (
+                <>
+                  <Select value={businessProfileId} onValueChange={setBusinessProfileId}>
+                    <SelectTrigger className="h-11" data-testid="select-business-profile">
+                      <SelectValue placeholder="Select a business profile" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {profileList.map((profile) => (
+                        <SelectItem key={profile.id} value={String(profile.id)}>
+                          <div className="flex items-center gap-2">
+                            <span className="w-5 h-5 bg-[#0D1117] rounded-md flex items-center justify-center text-primary text-[10px] font-bold shrink-0">
+                              {profile.name[0]?.toUpperCase()}
+                            </span>
+                            <span>{profile.name}</span>
+                            {profile.address && (
+                              <span className="text-[#9CA3AF] text-xs truncate max-w-[140px]">— {profile.address}</span>
+                            )}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {/* Selected profile preview */}
+                  {selectedProfile && (
+                    <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg">
+                      <Building2 className="w-4 h-4 text-amber-600 shrink-0" />
+                      <span className="text-xs text-amber-800 font-medium">{selectedProfile.name}</span>
+                      {selectedProfile.address && (
+                        <span className="text-xs text-amber-600 truncate">• {selectedProfile.address}</span>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+              <p className="text-xs text-[#6B7280]">Link this card to one of your business locations.</p>
             </div>
 
+            {/* Target URL */}
             <div className="space-y-2">
               <Label className="text-sm font-medium text-[#374151]">Target URL</Label>
               <div className="flex gap-2">
@@ -204,6 +271,7 @@ export default function CardEditorPage() {
               <p className="text-xs text-[#6B7280]">The URL customers will be redirected to when they scan the card.</p>
             </div>
 
+            {/* Smart Review */}
             <div className="flex items-center justify-between p-4 bg-[#F8FAFC] rounded-xl border border-border">
               <div>
                 <p className="text-sm font-medium text-[#374151]">Smart Review Flow</p>

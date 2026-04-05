@@ -2,7 +2,7 @@ import { AuthLayout } from "@/components/layout/AuthLayout";
 import { useGetDashboardSummary, useListBusinessProfiles } from "@workspace/api-client-react";
 import {
   CreditCard, Activity, TrendingUp, Building2, Star, Zap,
-  ArrowRight, Lock, BarChart2, ChevronRight, ArrowUpRight, ArrowDownRight,
+  ArrowRight, BarChart2, ChevronRight, ArrowUpRight, ArrowDownRight,
   Trophy, AlertTriangle, Users, Target,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -277,8 +277,8 @@ function AnalyticsPreviewCard({
   const [period, setPeriod] = useState<Period>("30j");
 
   const realData = buildAnalyticsData(summary, leastScanned, realAnalytics);
-  const metrics = isBusiness ? realData : DEMO_DATA_ANALYTICS;
-  const chartData = isBusiness && realAnalytics
+  const metrics = realData;
+  const chartData = realAnalytics
     ? buildRealChart(realAnalytics.scanTimeline, period)
     : DEMO_CHART[period];
 
@@ -408,29 +408,6 @@ function AnalyticsPreviewCard({
       </div>
     </div>
   );
-
-  if (!isBusiness) {
-    return (
-      <div className="relative">
-        <div style={{ filter: "blur(5px)", pointerEvents: "none", userSelect: "none" }}>
-          {content}
-        </div>
-        <div className="absolute inset-0 flex flex-col xl:flex-row items-center justify-center bg-white/75 rounded-lg gap-3 px-4">
-          <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-            <Lock className="w-5 h-5 text-gray-500" />
-          </div>
-          <p className="text-sm font-semibold text-[#0D1117] text-center xl:text-left leading-tight">
-            Débloquez les Analytics avancées
-          </p>
-          <Link href="/billing">
-            <Button className="bg-primary text-[#0D1117] font-semibold hover:bg-primary/90 text-sm px-5 shrink-0">
-              Passer à Business
-            </Button>
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   return content;
 }

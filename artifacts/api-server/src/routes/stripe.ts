@@ -145,6 +145,9 @@ router.post("/stripe/checkout", requireAuth, async (req: AuthRequest, res): Prom
       subscription_data: {
         metadata: { userId: String(user.id), planId, billing },
       },
+      custom_text: {
+        submit: { message: "Des questions ? Contactez-nous : contact@avismaker.com" },
+      },
     });
 
     res.json({ url: session.url });

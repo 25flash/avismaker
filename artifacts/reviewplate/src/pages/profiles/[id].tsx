@@ -1,10 +1,10 @@
 import { AuthLayout } from "@/components/layout/AuthLayout";
 import {
   useGetBusinessProfile, useUpdateBusinessProfile, useDeleteBusinessProfile,
-  useListCards,
-  getListBusinessProfilesQueryKey, getGetBusinessProfileQueryKey,
+  useUpdateCard, useListCards,
+  getListBusinessProfilesQueryKey, getGetBusinessProfileQueryKey, getListCardsQueryKey,
 } from "@workspace/api-client-react";
-import { ArrowLeft, Save, Trash2, Globe, MapPin, Star, CreditCard, Activity, ExternalLink, Plus, Upload, X } from "lucide-react";
+import { ArrowLeft, Save, Trash2, Globe, MapPin, Star, CreditCard, Activity, ExternalLink, Plus, Upload, X, Unlink } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -66,6 +66,23 @@ export default function ProfileEditorPage() {
 
   const updateMutation = useUpdateBusinessProfile();
   const deleteMutation = useDeleteBusinessProfile();
+  const detachCardMutation = useUpdateCard();
+
+  const handleDetachCard = (cardId: number, cardCode: string) => {
+    detachCardMutation.mutate(
+      { id: cardId, data: { businessProfileId: null } },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: getListCardsQueryKey() });
+          queryClient.invalidateQueries({ queryKey: getGetBusinessProfileQueryKey(profileId) });
+          toast({ title: "Carte retirée", description: `La carte ${cardCode} n'est plus rattachée à ce profil.` });
+        },
+        onError: () => {
+          toast({ variant: "destructive", title: "Erreur", description: "Impossible de retirer la carte." });
+        },
+      }
+    );
+  };
 
   const profileData = profile as unknown as {
     id: number; name: string; address: string | null; website: string | null;
@@ -350,6 +367,37 @@ export default function ProfileEditorPage() {
                           Configurer
                         </Button>
                       </Link>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-[#9CA3AF] hover:text-red-500 hover:bg-red-50"
+                            data-testid={`button-detach-card-${card.id}`}
+                            title="Retirer du profil"
+                          >
+                            <Unlink className="w-3.5 h-3.5" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Retirer cette carte ?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              La carte <span className="font-mono font-semibold">{card.code}</span> ne sera plus rattachée à ce profil. La carte n'est pas supprimée et peut être réassociée à tout moment.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Annuler</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDetachCard(card.id, card.code)}
+                              className="bg-red-600 hover:bg-red-700"
+                              data-testid={`button-confirm-detach-${card.id}`}
+                            >
+                              Retirer la carte
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </div>
                 ))}

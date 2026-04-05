@@ -515,7 +515,7 @@ export default function DashboardPage() {
           <StatCard title="Nbr Profils" value={summary?.totalProfiles ?? 0} icon={Building2} loading={isLoading} accentColor="#3B82F6" iconBg="bg-blue-50" iconColor="text-blue-500" />
           <StatCard title={t("dashboard.activeCards")} value={summary ? `${summary.activeCards}/${summary.totalCards}` : "–"} icon={Activity} loading={isLoading} accentColor="#10B981" iconBg="bg-emerald-50" iconColor="text-emerald-500" />
           <StatCard title={t("dashboard.totalScans")} value={summary?.totalScans ?? 0} icon={TrendingUp} loading={isLoading} accentColor="#8B5CF6" iconBg="bg-violet-50" iconColor="text-violet-500" />
-          <StatCard title={t("dashboard.thisMonth")} value={summary?.scansThisMonth ?? 0} icon={Star} subtitle={t("dashboard.scansThisMonth")} loading={isLoading} accentColor="#F59E0B" iconBg="bg-amber-50" iconColor="text-amber-500" />
+          <StatCard title="Scans ce mois" value={summary?.scansThisMonth ?? 0} icon={Star} loading={isLoading} accentColor="#F59E0B" iconBg="bg-amber-50" iconColor="text-amber-500" />
         </div>
 
         {/* Main grid — 3 cols on desktop, 2 on tablet, 1 on mobile */}

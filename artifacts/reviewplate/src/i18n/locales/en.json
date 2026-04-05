@@ -1,7 +1,7 @@
 {
   "nav": {
     "dashboard": "Dashboard",
-    "cards": "Cards",
+    "cards": "My Cards",
     "profiles": "Business Profiles",
     "aiReply": "AI Reply",
     "billing": "Billing",
@@ -112,7 +112,7 @@
     "unknown": "Unknown"
   },
   "cards": {
-    "title": "Cards",
+    "title": "My Cards",
     "subtitle": "Manage your NFC and QR review cards",
     "activateCard": "Activate Card",
     "noCards": "No cards yet",

@@ -1,7 +1,7 @@
 {
   "nav": {
     "dashboard": "Tableau de bord",
-    "cards": "Cartes",
+    "cards": "Mes Cartes",
     "profiles": "Profils business",
     "aiReply": "Réponse IA",
     "billing": "Facturation",
@@ -112,7 +112,7 @@
     "unknown": "Inconnu"
   },
   "cards": {
-    "title": "Cartes",
+    "title": "Mes Cartes",
     "subtitle": "Gérez vos cartes NFC et QR de collecte d'avis",
     "activateCard": "Activer une carte",
     "noCards": "Aucune carte",

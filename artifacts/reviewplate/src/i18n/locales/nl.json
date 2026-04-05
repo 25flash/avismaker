@@ -1,7 +1,7 @@
 {
   "nav": {
     "dashboard": "Dashboard",
-    "cards": "Kaarten",
+    "cards": "Mijn Kaarten",
     "profiles": "Bedrijfsprofielen",
     "aiReply": "AI-antwoord",
     "billing": "Facturering",
@@ -112,7 +112,7 @@
     "unknown": "Onbekend"
   },
   "cards": {
-    "title": "Kaarten",
+    "title": "Mijn Kaarten",
     "subtitle": "Beheer je NFC- en QR-beoordelingskaarten",
     "activateCard": "Kaart activeren",
     "noCards": "Geen kaarten",

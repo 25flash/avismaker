@@ -1,7 +1,7 @@
 {
   "nav": {
     "dashboard": "Panel",
-    "cards": "Tarjetas",
+    "cards": "Mis Tarjetas",
     "profiles": "Perfiles de negocio",
     "aiReply": "Respuesta IA",
     "billing": "Facturación",
@@ -112,7 +112,7 @@
     "unknown": "Desconocido"
   },
   "cards": {
-    "title": "Tarjetas",
+    "title": "Mis Tarjetas",
     "subtitle": "Gestiona tus tarjetas NFC y QR de reseñas",
     "activateCard": "Activar tarjeta",
     "noCards": "Sin tarjetas",

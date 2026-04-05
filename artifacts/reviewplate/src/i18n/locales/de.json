@@ -1,7 +1,7 @@
 {
   "nav": {
     "dashboard": "Dashboard",
-    "cards": "Karten",
+    "cards": "Meine Karten",
     "profiles": "Geschäftsprofile",
     "aiReply": "KI-Antwort",
     "billing": "Abrechnung",
@@ -112,7 +112,7 @@
     "unknown": "Unbekannt"
   },
   "cards": {
-    "title": "Karten",
+    "title": "Meine Karten",
     "subtitle": "Verwalte deine NFC- und QR-Bewertungskarten",
     "activateCard": "Karte aktivieren",
     "noCards": "Keine Karten",

@@ -7,10 +7,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 import { cn } from "@/lib/utils";
 
-const statusClass: Record<string, string> = {
-  active: "status-pill-active",
-  inactive: "status-pill-inactive",
-  disabled: "status-pill-disabled",
+const statusConfig: Record<string, { label: string; dot: string; pill: string }> = {
+  active:   { label: "Active",     dot: "bg-[#10B981]", pill: "bg-[#D1FAE5] text-[#065F46]" },
+  inactive: { label: "Inactive",   dot: "bg-[#F59E0B]", pill: "bg-[#FEF3C7] text-[#92400E]" },
+  disabled: { label: "Désactivée", dot: "bg-[#9CA3AF]", pill: "bg-[#F3F4F6] text-[#6B7280]" },
 };
 
 const platformColors: Record<string, string> = {
@@ -112,9 +112,15 @@ export default function CardsPage() {
                             <span className="text-sm font-mono font-bold text-primary">{card.code.slice(0, 3)}</span>
                           </div>
                         )}
-                        <span className={cn("text-xs font-semibold px-2.5 py-1 rounded-full", statusClass[card.status] ?? "status-pill-inactive")}>
-                          {card.status}
-                        </span>
+                        {(() => {
+                          const s = statusConfig[card.status] ?? statusConfig.disabled;
+                          return (
+                            <span className={cn("inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full", s.pill)}>
+                              <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", s.dot)} />
+                              {s.label}
+                            </span>
+                          );
+                        })()}
                       </div>
 
                       {/* Nom principal : nickname > nom profil > fallback */}

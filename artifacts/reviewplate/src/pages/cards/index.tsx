@@ -136,8 +136,8 @@ export default function CardsPage() {
                         <p className="text-xs text-[#9CA3AF] truncate mb-0">{linkedProfile.name}</p>
                       )}
 
-                      {/* Plateforme en secondaire */}
-                      <div className="flex items-center gap-2 mt-1">
+                      {/* Plateforme + code sur la même ligne */}
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
                         {card.smartReviewEnabled && (
                           <span className="text-xs bg-purple-100 text-purple-700 font-medium px-2 py-0.5 rounded">Smart</span>
                         )}
@@ -146,12 +146,10 @@ export default function CardsPage() {
                             {card.platform}
                           </span>
                         ) : (
-                          <span className="text-xs text-[#9CA3AF]">Plateforme non définie</span>
+                          <span className="text-xs text-[#9CA3AF]">—</span>
                         )}
+                        <span className="text-xs font-mono text-[#9CA3AF]">{card.code}</span>
                       </div>
-
-                      {/* Code carte en bas */}
-                      <p className="text-xs font-mono text-[#9CA3AF] mt-1">{card.code}</p>
 
                       <div className="flex items-center justify-between text-sm border-t border-[#F3F4F6] pt-3 mt-3">
                         <div className="flex items-center gap-1.5 text-[#6B7280]">

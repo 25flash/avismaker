@@ -104,22 +104,42 @@ export default function BusinessAnalyticsPage() {
   const [loading, setLoading] = useState(true);
   const [exportLoading, setExportLoading] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [period, setPeriod] = useState<"7j" | "30j" | "90j">("30j");
   const reportRef = useRef<HTMLDivElement>(null);
 
   const isBusiness = user?.plan === "business";
   const displayData = isBusiness ? (data ?? DEMO_DATA) : DEMO_DATA;
+  const PERIOD_DAYS: Record<string, number> = { "7j": 7, "30j": 30, "90j": 90 };
+
+  const PeriodPills = () => (
+    <div className="flex items-center gap-1 shrink-0">
+      {(["7j", "30j", "90j"] as const).map(p => (
+        <button
+          key={p}
+          onClick={() => setPeriod(p)}
+          className={cn(
+            "px-2.5 py-0.5 text-[11px] font-semibold rounded-full transition-colors",
+            period === p ? "bg-primary text-[#0D1117]" : "bg-[#F3F4F6] text-[#6B7280] hover:bg-[#E5E7EB]"
+          )}
+        >
+          {p}
+        </button>
+      ))}
+    </div>
+  );
 
   useEffect(() => {
     if (!isBusiness) { setLoading(false); return; }
     const tk = token ?? localStorage.getItem("reviewplate_token");
     if (!tk) { setLoading(false); return; }
-    fetch(`${API_BASE}/api/business-analytics`, {
+    setLoading(true);
+    fetch(`${API_BASE}/api/business-analytics?days=${PERIOD_DAYS[period]}`, {
       headers: { Authorization: `Bearer ${tk}` },
     })
       .then(r => r.ok ? r.json() : Promise.reject(r))
       .then(d => { setData(d); setLoading(false); })
       .catch(() => setLoading(false));
-  }, [isBusiness, token]);
+  }, [isBusiness, token, period]);
 
   const handleExportPDF = async () => {
     if (!isBusiness) { setShowUpgradeModal(true); return; }
@@ -531,11 +551,12 @@ export default function BusinessAnalyticsPage() {
           {/* Tendances détaillées */}
           <BlurWrapper locked={!isBusiness}>
             <Card className="bg-white border border-border shadow-sm mb-6">
-              <CardHeader className="pb-3 border-b border-border">
+              <CardHeader className="pb-3 border-b border-border flex flex-row items-center justify-between gap-2">
                 <CardTitle className="text-sm font-semibold text-[#0D1117] flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-primary" />
                   Tendances détaillées
                 </CardTitle>
+                <PeriodPills />
               </CardHeader>
               <CardContent className="pt-4">
                 {(() => {
@@ -641,11 +662,12 @@ export default function BusinessAnalyticsPage() {
             <div className="lg:col-span-2">
             <BlurWrapper locked={!isBusiness}>
               <Card className="bg-white border border-border shadow-sm">
-                <CardHeader className="pb-2 border-b border-border flex flex-row items-center justify-between">
+                <CardHeader className="pb-2 border-b border-border flex flex-row items-center justify-between gap-2">
                   <CardTitle className="text-sm font-semibold text-[#0D1117] flex items-center gap-2">
                     <Activity className="w-4 h-4 text-primary" />
-                    Évolution des scans (30 jours)
+                    Évolution des scans ({period})
                   </CardTitle>
+                  <PeriodPills />
                 </CardHeader>
                 <CardContent className="pt-4">
                   <ResponsiveContainer width="100%" height={200}>
@@ -729,11 +751,12 @@ export default function BusinessAnalyticsPage() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Top cartes par scans */}
                 <Card className="bg-white border border-border shadow-sm">
-                  <CardHeader className="pb-2 border-b border-border">
+                  <CardHeader className="pb-2 border-b border-border flex flex-row items-center justify-between gap-2">
                     <CardTitle className="text-sm font-semibold text-[#0D1117] flex items-center gap-2">
                       <TrendingUp className="w-4 h-4 text-primary" />
                       Top cartes par scans
                     </CardTitle>
+                    <PeriodPills />
                   </CardHeader>
                   <CardContent className="pt-4">
                     <ResponsiveContainer width="100%" height={200}>
@@ -753,11 +776,12 @@ export default function BusinessAnalyticsPage() {
 
                 {/* Cartes les moins actives */}
                 <Card className="bg-white border border-border shadow-sm">
-                  <CardHeader className="pb-2 border-b border-border">
+                  <CardHeader className="pb-2 border-b border-border flex flex-row items-center justify-between gap-2">
                     <CardTitle className="text-sm font-semibold text-[#0D1117] flex items-center gap-2">
                       <ArrowDownRight className="w-4 h-4 text-[#6B7280]" />
                       Cartes les moins actives
                     </CardTitle>
+                    <PeriodPills />
                   </CardHeader>
                   <CardContent className="pt-4">
                     <ResponsiveContainer width="100%" height={200}>
@@ -782,11 +806,12 @@ export default function BusinessAnalyticsPage() {
 
               {/* Data table */}
               <Card className="bg-white border border-border shadow-sm">
-                <CardHeader className="pb-2 border-b border-border">
+                <CardHeader className="pb-2 border-b border-border flex flex-row items-center justify-between gap-2">
                   <CardTitle className="text-sm font-semibold text-[#0D1117] flex items-center gap-2">
                     <Download className="w-4 h-4 text-primary" />
                     Tableau de performance
                   </CardTitle>
+                  <PeriodPills />
                 </CardHeader>
                 <CardContent className="p-0">
                   <div className="overflow-x-auto">

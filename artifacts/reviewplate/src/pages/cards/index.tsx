@@ -148,7 +148,7 @@ export default function CardsPage() {
                         ) : (
                           <span className="text-xs text-[#9CA3AF]">—</span>
                         )}
-                        <span className="text-xs font-mono text-[#6B7280] bg-[#F3F4F6] px-2 py-0.5 rounded">{card.code}</span>
+                        <span className={cn("text-xs font-mono px-2 py-0.5 rounded", card.platform ? platformColors[card.platform] ?? "bg-gray-100 text-gray-700" : "bg-[#F3F4F6] text-[#6B7280]")}>{card.code}</span>
                       </div>
 
                       <div className="flex items-center justify-between text-sm border-t border-[#F3F4F6] pt-3 mt-3">

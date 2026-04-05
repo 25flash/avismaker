@@ -127,27 +127,34 @@ export default function AccountPage() {
     if (!token) return;
     setUpgrading(planId);
     try {
-      const res = await fetch(`${API_BASE}/api/subscriptions/upgrade`, {
+      const res = await fetch(`${API_BASE}/api/stripe/checkout`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ plan: planId, billing }),
+        body: JSON.stringify({ planId, billing }),
       });
-      if (!res.ok) throw new Error();
-      // Refresh user + subscription data without full reload
-      await queryClient.invalidateQueries();
-      const meRes = await fetch(`${API_BASE}/api/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (meRes.ok) {
-        const updatedUser = await meRes.json();
-        setAuth(updatedUser, token);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Checkout failed");
+
+      if (data.upgraded) {
+        // Direct upgrade (existing subscription) — refresh UI
+        await queryClient.invalidateQueries();
+        const meRes = await fetch(`${API_BASE}/api/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (meRes.ok) {
+          const updatedUser = await meRes.json();
+          setAuth(updatedUser, token);
+        }
+        toast({
+          title: t("account.planUpdated"),
+          description: t("account.planUpdatedDesc", { plan: planId }),
+        });
+      } else if (data.url) {
+        // Redirect to Stripe checkout
+        window.location.href = data.url;
       }
-      toast({
-        title: t("account.planUpdated"),
-        description: t("account.planUpdatedDesc", { plan: planId }),
-      });
-    } catch {
-      toast({ variant: "destructive", title: t("billing.updateFailed"), description: t("billing.updateFailedDesc") });
+    } catch (err: any) {
+      toast({ variant: "destructive", title: t("billing.updateFailed"), description: err.message ?? t("billing.updateFailedDesc") });
     } finally {
       setUpgrading(null);
     }

@@ -159,7 +159,20 @@
     "totalScansLabel": "Total scans",
     "notFound": "Card not found",
     "backToCards": "Back to cards",
-    "modify": "Edit"
+    "modify": "Edit",
+    "filter": {
+      "searchPlaceholder": "Search by name or code…",
+      "allProfiles": "All profiles",
+      "allPlatforms": "All platforms",
+      "allStatuses": "All statuses",
+      "reset": "Clear filters",
+      "results": "{{count}} card(s)",
+      "noResults": "No cards match your filters",
+      "noResultsDesc": "Try adjusting your search or filters.",
+      "noPlatform": "No platform",
+      "noProfileLinked": "No profile linked",
+      "filtersActive": "Active filters:"
+    }
   },
   "profiles": {
     "title": "Business Profiles",

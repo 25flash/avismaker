@@ -159,7 +159,20 @@
     "totalScansLabel": "Gesamtscans",
     "notFound": "Karte nicht gefunden",
     "backToCards": "Zurück zu Karten",
-    "modify": "Bearbeiten"
+    "modify": "Bearbeiten",
+    "filter": {
+      "searchPlaceholder": "Nach Name oder Code suchen…",
+      "allProfiles": "Alle Profile",
+      "allPlatforms": "Alle Plattformen",
+      "allStatuses": "Alle Status",
+      "reset": "Zurücksetzen",
+      "results": "{{count}} Karte(n)",
+      "noResults": "Keine Karten gefunden",
+      "noResultsDesc": "Versuche, deine Filter oder Suche anzupassen.",
+      "noPlatform": "Keine Plattform",
+      "noProfileLinked": "Kein Profil",
+      "filtersActive": "Aktive Filter:"
+    }
   },
   "profiles": {
     "title": "Geschäftsprofile",

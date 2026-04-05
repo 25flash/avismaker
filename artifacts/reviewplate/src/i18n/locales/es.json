@@ -159,7 +159,20 @@
     "totalScansLabel": "Escaneos totales",
     "notFound": "Tarjeta no encontrada",
     "backToCards": "Volver a las tarjetas",
-    "modify": "Editar"
+    "modify": "Editar",
+    "filter": {
+      "searchPlaceholder": "Buscar por nombre o código…",
+      "allProfiles": "Todos los perfiles",
+      "allPlatforms": "Todas las plataformas",
+      "allStatuses": "Todos los estados",
+      "reset": "Restablecer",
+      "results": "{{count}} tarjeta(s)",
+      "noResults": "Ninguna tarjeta coincide",
+      "noResultsDesc": "Intenta ajustar tus filtros o búsqueda.",
+      "noPlatform": "Sin plataforma",
+      "noProfileLinked": "Sin perfil",
+      "filtersActive": "Filtros activos:"
+    }
   },
   "profiles": {
     "title": "Perfiles de negocio",

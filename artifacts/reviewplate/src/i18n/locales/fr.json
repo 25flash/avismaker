@@ -159,7 +159,20 @@
     "totalScansLabel": "Scans totaux",
     "notFound": "Carte introuvable",
     "backToCards": "Retour aux cartes",
-    "modify": "Modifier"
+    "modify": "Modifier",
+    "filter": {
+      "searchPlaceholder": "Rechercher par nom ou code…",
+      "allProfiles": "Tous les profils",
+      "allPlatforms": "Toutes les plateformes",
+      "allStatuses": "Tous les statuts",
+      "reset": "Réinitialiser",
+      "results": "{{count}} carte(s)",
+      "noResults": "Aucune carte ne correspond",
+      "noResultsDesc": "Essayez d'ajuster vos filtres ou votre recherche.",
+      "noPlatform": "Sans plateforme",
+      "noProfileLinked": "Sans profil",
+      "filtersActive": "Filtres actifs :"
+    }
   },
   "profiles": {
     "title": "Profils business",

@@ -159,7 +159,20 @@
     "totalScansLabel": "Scansioni totali",
     "notFound": "Scheda non trovata",
     "backToCards": "Torna alle schede",
-    "modify": "Modifica"
+    "modify": "Modifica",
+    "filter": {
+      "searchPlaceholder": "Cerca per nome o codice…",
+      "allProfiles": "Tutti i profili",
+      "allPlatforms": "Tutte le piattaforme",
+      "allStatuses": "Tutti gli stati",
+      "reset": "Reimposta",
+      "results": "{{count}} carta(e)",
+      "noResults": "Nessuna carta corrisponde",
+      "noResultsDesc": "Prova ad aggiustare i filtri o la ricerca.",
+      "noPlatform": "Nessuna piattaforma",
+      "noProfileLinked": "Nessun profilo",
+      "filtersActive": "Filtri attivi:"
+    }
   },
   "profiles": {
     "title": "Profili aziendali",

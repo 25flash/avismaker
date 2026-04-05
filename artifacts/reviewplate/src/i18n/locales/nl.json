@@ -159,7 +159,20 @@
     "totalScansLabel": "Totale scans",
     "notFound": "Kaart niet gevonden",
     "backToCards": "Terug naar kaarten",
-    "modify": "Bewerken"
+    "modify": "Bewerken",
+    "filter": {
+      "searchPlaceholder": "Zoek op naam of code…",
+      "allProfiles": "Alle profielen",
+      "allPlatforms": "Alle platforms",
+      "allStatuses": "Alle statussen",
+      "reset": "Filters wissen",
+      "results": "{{count}} kaart(en)",
+      "noResults": "Geen kaarten gevonden",
+      "noResultsDesc": "Pas je filters of zoekopdracht aan.",
+      "noPlatform": "Geen platform",
+      "noProfileLinked": "Geen profiel",
+      "filtersActive": "Actieve filters:"
+    }
   },
   "profiles": {
     "title": "Bedrijfsprofielen",

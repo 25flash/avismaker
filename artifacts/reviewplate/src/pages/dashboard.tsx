@@ -26,21 +26,21 @@ function StatCard({ title, value, icon: Icon, subtitle, loading }: {
 }) {
   return (
     <Card className="bg-white border border-border shadow-sm">
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-sm font-medium text-[#6B7280]">{title}</p>
-          <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-            <Icon className="w-4 h-4 text-primary" />
+      <CardContent className="p-3">
+        <div className="flex items-center justify-between mb-1.5">
+          <p className="text-xs font-medium text-[#6B7280]">{title}</p>
+          <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center">
+            <Icon className="w-3 h-3 text-primary" />
           </div>
         </div>
         {loading ? (
-          <Skeleton className="h-8 w-24" />
+          <Skeleton className="h-5 w-16" />
         ) : (
-          <p className="text-3xl font-bold text-[#0D1117]" data-testid={`stat-${title.toLowerCase().replace(/\s/g, "-")}`}>
+          <p className="text-xl font-bold text-[#0D1117]" data-testid={`stat-${title.toLowerCase().replace(/\s/g, "-")}`}>
             {typeof value === "number" ? value.toLocaleString() : value}
           </p>
         )}
-        {subtitle && <p className="text-xs text-[#6B7280] mt-1">{subtitle}</p>}
+        {subtitle && <p className="text-[10px] text-[#6B7280] mt-0.5">{subtitle}</p>}
       </CardContent>
     </Card>
   );

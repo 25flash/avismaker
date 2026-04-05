@@ -96,8 +96,8 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto px-6 text-center">
           <p className="text-sm text-white/40 mb-6">{t("landing.trustedBy")}</p>
           <div className="flex flex-wrap justify-center gap-8 text-white/50 font-medium text-sm">
-            {["Restaurants", "Hotels", "Cafes", "Retail Shops", "Salons", "Airbnb Hosts"].map(type => (
-              <span key={type}>{type}</span>
+            {([1,2,3,4,5,6] as const).map(i => (
+              <span key={i}>{t(`landing.businessType${i}`)}</span>
             ))}
           </div>
         </div>

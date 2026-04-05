@@ -73,7 +73,13 @@
       "step2Desc": "Connect your Google, Airbnb, or TripAdvisor review page.",
       "step3Title": "Collect reviews",
       "step3Desc": "Customers tap or scan and leave a review instantly."
-    }
+    },
+    "businessType1": "Restaurants",
+    "businessType2": "Hotels",
+    "businessType3": "Cafes",
+    "businessType4": "Retail Shops",
+    "businessType5": "Salons",
+    "businessType6": "Airbnb Hosts"
   },
   "auth": {
     "welcomeBack": "Welcome back",
@@ -107,7 +113,16 @@
     "resetEmailDesc": "If an account exists with that email, you'll receive reset instructions shortly.",
     "passwordRequirements": "Use at least 8 characters with a mix of letters and numbers.",
     "showPassword": "Show password",
-    "hidePassword": "Hide password"
+    "hidePassword": "Hide password",
+    "somethingWentWrong": "Something went wrong",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "confirmPassword": "Confirm password",
+    "checkEmailTitle": "Check your email",
+    "checkEmailDesc": "If an account with that email exists, we sent a password reset link.",
+    "resetYourPassword": "Reset your password",
+    "resetPasswordDesc": "Enter your email and we'll send you a link to reset your password.",
+    "sendingReset": "Sending...",
+    "noCreditCard": "No credit card required for the free plan."
   },
   "dashboard": {
     "title": "Dashboard",
@@ -447,6 +462,35 @@
     "sendFeedback": "Send feedback",
     "thankYou": "Thank you for your feedback!",
     "notFound": "Card not found",
-    "notFoundDesc": "This review card is not configured yet."
+    "notFoundDesc": "This review card is not configured yet.",
+    "loading": "Loading...",
+    "redirectingTitle": "Redirecting...",
+    "thankYouTitle": "Thank you!",
+    "redirectingDesc": "Taking you to leave a review for {{name}}.",
+    "thankYouDesc": "Thank you for your feedback!",
+    "howWas": "How was {{name}}?",
+    "howWasExperience": "How was your experience?",
+    "tapToRate": "Tap a star to rate",
+    "feedbackHelps": "Your feedback helps us improve",
+    "sorryTitle": "We're sorry to hear that",
+    "shareWhatWentWrong": "Please share what went wrong so we can improve",
+    "couldWeDoBetter": "What could we have done better?",
+    "sending": "Sending...",
+    "skipForNow": "Skip for now",
+    "poweredBy": "Powered by AvisMaker",
+    "cardNotFoundDesc2": "This review card doesn't exist or has been deactivated."
+  },
+  "signup": {
+    "step1Title": "Activate your card",
+    "step1Desc": "Enter your unique NFC/QR code to claim your card",
+    "step2Title": "Connect your review platform",
+    "step2Desc": "Link Google, Airbnb, TripAdvisor, or Trustpilot",
+    "step3Title": "Start collecting reviews",
+    "step3Desc": "Customers tap/scan and leave reviews instantly"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "desc": "The page you're looking for doesn't exist or has been moved.",
+    "backHome": "Back to home"
   }
 }

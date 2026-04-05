@@ -73,7 +73,13 @@
       "step2Desc": "Koppel je Google-, Airbnb- of TripAdvisor-beoordelingspagina.",
       "step3Title": "Verzamel beoordelingen",
       "step3Desc": "Klanten tikken of scannen en laten direct een beoordeling achter."
-    }
+    },
+    "businessType1": "Restaurants",
+    "businessType2": "Hotels",
+    "businessType3": "Cafés",
+    "businessType4": "Winkels",
+    "businessType5": "Salons",
+    "businessType6": "Airbnb-hosts"
   },
   "auth": {
     "welcomeBack": "Welkom terug",
@@ -107,7 +113,16 @@
     "resetEmailDesc": "Als er een account bestaat met dat e-mailadres, ontvang je de instructies binnenkort.",
     "passwordRequirements": "Gebruik minimaal 8 tekens met een combinatie van letters en cijfers.",
     "showPassword": "Wachtwoord tonen",
-    "hidePassword": "Wachtwoord verbergen"
+    "hidePassword": "Wachtwoord verbergen",
+    "somethingWentWrong": "Er is iets misgegaan",
+    "passwordsDoNotMatch": "Wachtwoorden komen niet overeen",
+    "confirmPassword": "Bevestig wachtwoord",
+    "checkEmailTitle": "Controleer je e-mail",
+    "checkEmailDesc": "Als er een account bestaat met dat e-mailadres, hebben we een resetlink gestuurd.",
+    "resetYourPassword": "Wachtwoord opnieuw instellen",
+    "resetPasswordDesc": "Voer je e-mail in en we sturen je een link om je wachtwoord te resetten.",
+    "sendingReset": "Versturen...",
+    "noCreditCard": "Geen creditcard vereist voor het gratis plan."
   },
   "dashboard": {
     "title": "Dashboard",
@@ -447,6 +462,35 @@
     "sendFeedback": "Feedback verzenden",
     "thankYou": "Bedankt voor je feedback!",
     "notFound": "Kaart niet gevonden",
-    "notFoundDesc": "Deze beoordelingskaart is nog niet geconfigureerd."
+    "notFoundDesc": "Deze beoordelingskaart is nog niet geconfigureerd.",
+    "loading": "Laden...",
+    "redirectingTitle": "Doorsturen...",
+    "thankYouTitle": "Dank je!",
+    "redirectingDesc": "We sturen je door om een review achter te laten voor {{name}}.",
+    "thankYouDesc": "Bedankt voor je feedback!",
+    "howWas": "Hoe was {{name}}?",
+    "howWasExperience": "Hoe was je ervaring?",
+    "tapToRate": "Tik op een ster om te beoordelen",
+    "feedbackHelps": "Uw feedback helpt ons verbeteren",
+    "sorryTitle": "Het spijt ons dat te horen",
+    "shareWhatWentWrong": "Vertel ons wat er mis ging zodat we kunnen verbeteren",
+    "couldWeDoBetter": "Wat hadden we beter kunnen doen?",
+    "sending": "Versturen...",
+    "skipForNow": "Sla nu over",
+    "poweredBy": "Powered by AvisMaker",
+    "cardNotFoundDesc2": "Deze reviewkaart bestaat niet of is gedeactiveerd."
+  },
+  "signup": {
+    "step1Title": "Activeer je kaart",
+    "step1Desc": "Voer uw unieke NFC/QR-code in om uw kaart te claimen",
+    "step2Title": "Koppel uw platform",
+    "step2Desc": "Koppel Google, Airbnb, TripAdvisor of Trustpilot",
+    "step3Title": "Begin met verzamelen",
+    "step3Desc": "Klanten tikken/scannen en laten direct recensies achter"
+  },
+  "notFound": {
+    "title": "Pagina niet gevonden",
+    "desc": "De pagina die je zoekt bestaat niet of is verplaatst.",
+    "backHome": "Terug naar huis"
   }
 }

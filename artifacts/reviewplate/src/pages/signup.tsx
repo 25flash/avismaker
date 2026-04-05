@@ -10,17 +10,16 @@ import { useToast } from "@/hooks/use-toast";
 import { useRegister } from "@workspace/api-client-react";
 import { useAuth } from "@/lib/auth-context";
 import { useTranslation } from "react-i18next";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export default function SignupPage() {
   const { t } = useTranslation();
   const schema = z.object({
-    name: z.string().min(2, "Name must be at least 2 characters"),
+    name: z.string().min(2, t("auth.namePlaceholder")),
     email: z.string().email(t("auth.validEmail")),
     password: z.string().min(8, t("auth.passwordRequirements")),
     confirmPassword: z.string(),
   }).refine((d) => d.password === d.confirmPassword, {
-    message: "Passwords do not match",
+    message: t("auth.passwordsDoNotMatch"),
     path: ["confirmPassword"],
   });
   type FormData = z.infer<typeof schema>;
@@ -47,8 +46,8 @@ export default function SignupPage() {
           const apiError = err as { data?: { error?: string } };
           toast({
             variant: "destructive",
-            title: "Registration failed",
-            description: apiError?.data?.error ?? "Something went wrong",
+            title: t("auth.registrationFailed"),
+            description: apiError?.data?.error ?? t("auth.somethingWentWrong"),
           });
         },
       }
@@ -66,9 +65,9 @@ export default function SignupPage() {
         </Link>
         <div className="space-y-6">
           {[
-            { icon: "01", title: "Activate your card", desc: "Enter your unique NFC/QR code to claim your card" },
-            { icon: "02", title: "Connect your review platform", desc: "Link Google, Airbnb, TripAdvisor, or Trustpilot" },
-            { icon: "03", title: "Start collecting reviews", desc: "Customers tap/scan and leave reviews instantly" },
+            { icon: "01", title: t("signup.step1Title"), desc: t("signup.step1Desc") },
+            { icon: "02", title: t("signup.step2Title"), desc: t("signup.step2Desc") },
+            { icon: "03", title: t("signup.step3Title"), desc: t("signup.step3Desc") },
           ].map((step) => (
             <div key={step.icon} className="flex items-start gap-4">
               <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
@@ -81,7 +80,7 @@ export default function SignupPage() {
             </div>
           ))}
         </div>
-        <p className="text-white/40 text-sm">No credit card required for the free plan.</p>
+        <p className="text-white/40 text-sm">{t("auth.noCreditCard")}</p>
       </div>
 
       <div className="flex-1 flex items-center justify-center p-8">
@@ -98,7 +97,7 @@ export default function SignupPage() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField control={form.control} name="name" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full name</FormLabel>
+                  <FormLabel>{t("auth.fullName")}</FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="John Smith" data-testid="input-name" className="h-11" />
                   </FormControl>
@@ -107,7 +106,7 @@ export default function SignupPage() {
               )} />
               <FormField control={form.control} name="email" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>{t("auth.email")}</FormLabel>
                   <FormControl>
                     <Input {...field} type="email" placeholder="you@example.com" data-testid="input-email" className="h-11" />
                   </FormControl>
@@ -116,7 +115,7 @@ export default function SignupPage() {
               )} />
               <FormField control={form.control} name="password" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>{t("auth.password")}</FormLabel>
                   <FormControl>
                     <Input {...field} type="password" placeholder="••••••••" data-testid="input-password" className="h-11" />
                   </FormControl>
@@ -125,7 +124,7 @@ export default function SignupPage() {
               )} />
               <FormField control={form.control} name="confirmPassword" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirm password</FormLabel>
+                  <FormLabel>{t("auth.confirmPassword")}</FormLabel>
                   <FormControl>
                     <Input {...field} type="password" placeholder="••••••••" data-testid="input-confirm-password" className="h-11" />
                   </FormControl>

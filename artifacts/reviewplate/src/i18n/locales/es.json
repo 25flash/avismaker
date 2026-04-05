@@ -73,7 +73,13 @@
       "step2Desc": "Conecta tu página de Google, Airbnb o TripAdvisor.",
       "step3Title": "Recopila reseñas",
       "step3Desc": "Los clientes tocan o escanean y dejan una reseña al instante."
-    }
+    },
+    "businessType1": "Restaurantes",
+    "businessType2": "Hoteles",
+    "businessType3": "Cafés",
+    "businessType4": "Tiendas",
+    "businessType5": "Salones",
+    "businessType6": "Anfitriones Airbnb"
   },
   "auth": {
     "welcomeBack": "Bienvenido de vuelta",
@@ -107,7 +113,16 @@
     "resetEmailDesc": "Si existe una cuenta con ese correo, recibirás las instrucciones en breve.",
     "passwordRequirements": "Usa al menos 8 caracteres con una combinación de letras y números.",
     "showPassword": "Mostrar contraseña",
-    "hidePassword": "Ocultar contraseña"
+    "hidePassword": "Ocultar contraseña",
+    "somethingWentWrong": "Algo salió mal",
+    "passwordsDoNotMatch": "Las contraseñas no coinciden",
+    "confirmPassword": "Confirmar contraseña",
+    "checkEmailTitle": "Revisa tu correo",
+    "checkEmailDesc": "Si existe una cuenta con ese correo, hemos enviado un enlace de restablecimiento.",
+    "resetYourPassword": "Restablecer tu contraseña",
+    "resetPasswordDesc": "Ingresa tu correo y te enviaremos un enlace para restablecer tu contraseña.",
+    "sendingReset": "Enviando...",
+    "noCreditCard": "No se requiere tarjeta de crédito para el plan gratuito."
   },
   "dashboard": {
     "title": "Panel",
@@ -447,6 +462,35 @@
     "sendFeedback": "Enviar opinión",
     "thankYou": "¡Gracias por tu opinión!",
     "notFound": "Tarjeta no encontrada",
-    "notFoundDesc": "Esta tarjeta de reseñas aún no está configurada."
+    "notFoundDesc": "Esta tarjeta de reseñas aún no está configurada.",
+    "loading": "Cargando...",
+    "redirectingTitle": "Redirigiendo...",
+    "thankYouTitle": "¡Gracias!",
+    "redirectingDesc": "Te llevamos a dejar una reseña para {{name}}.",
+    "thankYouDesc": "¡Gracias por tu opinión!",
+    "howWas": "¿Cómo estuvo {{name}}?",
+    "howWasExperience": "¿Cómo fue tu experiencia?",
+    "tapToRate": "Toca una estrella para valorar",
+    "feedbackHelps": "Tu opinión nos ayuda a mejorar",
+    "sorryTitle": "Lo sentimos mucho",
+    "shareWhatWentWrong": "Por favor, cuéntanos qué salió mal para que podamos mejorar",
+    "couldWeDoBetter": "¿Qué podríamos haber hecho mejor?",
+    "sending": "Enviando...",
+    "skipForNow": "Omitir por ahora",
+    "poweredBy": "Desarrollado por AvisMaker",
+    "cardNotFoundDesc2": "Esta tarjeta de reseñas no existe o ha sido desactivada."
+  },
+  "signup": {
+    "step1Title": "Activa tu tarjeta",
+    "step1Desc": "Introduce tu código NFC/QR único para reclamar tu tarjeta",
+    "step2Title": "Conecta tu plataforma",
+    "step2Desc": "Vincula Google, Airbnb, TripAdvisor o Trustpilot",
+    "step3Title": "Empieza a recopilar reseñas",
+    "step3Desc": "Los clientes tocan/escanean y dejan reseñas al instante"
+  },
+  "notFound": {
+    "title": "Página no encontrada",
+    "desc": "La página que buscas no existe o ha sido movida.",
+    "backHome": "Volver al inicio"
   }
 }

@@ -11,6 +11,7 @@ import {
   DeactivateCardParams,
   ActivateCardByCodeBody,
 } from "@workspace/api-zod";
+import type { Response } from "express";
 
 const MAX_ACTIVE_CARDS: Record<string, number | null> = {
   free: 1,
@@ -38,6 +39,30 @@ function formatCard(card: typeof cardsTable.$inferSelect) {
   };
 }
 
+// Extracted helper — eliminates duplicated plan limit logic
+async function checkActivationLimit(
+  userId: number,
+  plan: string,
+  res: Response
+): Promise<boolean> {
+  const maxActive = MAX_ACTIVE_CARDS[plan] ?? null;
+  if (maxActive === null) return true;
+
+  const [activeCount] = await db
+    .select({ count: count() })
+    .from(cardsTable)
+    .where(and(eq(cardsTable.ownerId, userId), eq(cardsTable.status, "active")));
+
+  if (Number(activeCount?.count ?? 0) >= maxActive) {
+    res.status(403).json({
+      error: `Your ${plan} plan allows a maximum of ${maxActive} active card(s). Upgrade to activate more cards.`,
+      code: "ACTIVE_CARD_LIMIT_REACHED",
+    });
+    return false;
+  }
+  return true;
+}
+
 router.get("/cards", requireAuth, async (req: AuthRequest, res): Promise<void> => {
   const params = ListCardsQueryParams.safeParse(req.query);
   if (!params.success) {
@@ -45,15 +70,14 @@ router.get("/cards", requireAuth, async (req: AuthRequest, res): Promise<void> =
     return;
   }
 
-  let query = db.select().from(cardsTable).where(eq(cardsTable.ownerId, req.userId!));
+  const whereClause = params.data.businessProfileId != null
+    ? and(
+        eq(cardsTable.ownerId, req.userId!),
+        eq(cardsTable.businessProfileId, params.data.businessProfileId)
+      )
+    : eq(cardsTable.ownerId, req.userId!);
 
-  if (params.data.businessProfileId != null) {
-    query = db.select().from(cardsTable).where(
-      and(eq(cardsTable.ownerId, req.userId!), eq(cardsTable.businessProfileId, params.data.businessProfileId))
-    );
-  }
-
-  const cards = await query;
+  const cards = await db.select().from(cardsTable).where(whereClause);
   res.json(cards.map(formatCard));
 });
 
@@ -117,20 +141,8 @@ router.post("/cards/:id/activate", requireAuth, async (req: AuthRequest, res): P
     return;
   }
 
-  const plan = req.userPlan ?? "free";
-  const maxActive = MAX_ACTIVE_CARDS[plan] ?? null;
-  if (maxActive !== null) {
-    const [activeCount] = await db.select({ count: count() }).from(cardsTable).where(
-      and(eq(cardsTable.ownerId, req.userId!), eq(cardsTable.status, "active"))
-    );
-    if (Number(activeCount?.count ?? 0) >= maxActive) {
-      res.status(403).json({
-        error: `Your ${plan} plan allows a maximum of ${maxActive} active card(s). Upgrade to activate more cards.`,
-        code: "ACTIVE_CARD_LIMIT_REACHED",
-      });
-      return;
-    }
-  }
+  const allowed = await checkActivationLimit(req.userId!, req.userPlan ?? "free", res);
+  if (!allowed) return;
 
   const [card] = await db.update(cardsTable)
     .set({ status: "active", activatedAt: new Date() })
@@ -172,22 +184,12 @@ router.post("/cards/activate-by-code", requireAuth, async (req: AuthRequest, res
     return;
   }
 
-  const plan = req.userPlan ?? "free";
-  const maxActive = MAX_ACTIVE_CARDS[plan] ?? null;
-  if (maxActive !== null) {
-    const [activeCount] = await db.select({ count: count() }).from(cardsTable).where(
-      and(eq(cardsTable.ownerId, req.userId!), eq(cardsTable.status, "active"))
-    );
-    if (Number(activeCount?.count ?? 0) >= maxActive) {
-      res.status(403).json({
-        error: `Your ${plan} plan allows a maximum of ${maxActive} active card(s). Upgrade to activate more cards.`,
-        code: "ACTIVE_CARD_LIMIT_REACHED",
-      });
-      return;
-    }
-  }
+  const allowed = await checkActivationLimit(req.userId!, req.userPlan ?? "free", res);
+  if (!allowed) return;
 
-  const [card] = await db.select().from(cardsTable).where(eq(cardsTable.code, parsed.data.code.toUpperCase()));
+  const [card] = await db.select().from(cardsTable).where(
+    eq(cardsTable.code, parsed.data.code.toUpperCase())
+  );
   if (!card) {
     res.status(404).json({ error: "Card code not found" });
     return;

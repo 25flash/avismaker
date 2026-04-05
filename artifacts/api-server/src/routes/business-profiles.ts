@@ -15,21 +15,26 @@ const router: IRouter = Router();
 const PLAN_LIMITS: Record<string, number | null> = {
   free: 1,
   premium: 3,
-  pro: 10,
   business: null,
 };
 
+// Optimized: 2 queries instead of N+2 (card count + per-card scan count loop)
 async function buildProfile(profile: typeof businessProfilesTable.$inferSelect) {
-  const [cardCountResult] = await db
-    .select({ count: count() })
+  const profileCards = await db
+    .select({ id: cardsTable.id })
     .from(cardsTable)
     .where(eq(cardsTable.businessProfileId, profile.id));
 
-  const cards = await db.select({ id: cardsTable.id }).from(cardsTable).where(eq(cardsTable.businessProfileId, profile.id));
+  const cardCount = profileCards.length;
   let totalScans = 0;
-  for (const card of cards) {
-    const [scanCount] = await db.select({ count: count() }).from(scanLogsTable).where(eq(scanLogsTable.cardId, card.id));
-    totalScans += Number(scanCount?.count ?? 0);
+
+  if (profileCards.length > 0) {
+    const { inArray } = await import("drizzle-orm");
+    const [scanResult] = await db
+      .select({ total: count(scanLogsTable.id) })
+      .from(scanLogsTable)
+      .where(inArray(scanLogsTable.cardId, profileCards.map(c => c.id)));
+    totalScans = Number(scanResult?.total ?? 0);
   }
 
   return {
@@ -43,14 +48,17 @@ async function buildProfile(profile: typeof businessProfilesTable.$inferSelect) 
     customBannerText: profile.customBannerText,
     customBannerColor: profile.customBannerColor,
     showPoweredBy: profile.showPoweredBy,
-    cardCount: Number(cardCountResult?.count ?? 0),
+    cardCount,
     totalScans,
     createdAt: profile.createdAt.toISOString(),
   };
 }
 
 router.get("/business-profiles", requireAuth, async (req: AuthRequest, res): Promise<void> => {
-  const profiles = await db.select().from(businessProfilesTable).where(eq(businessProfilesTable.ownerId, req.userId!));
+  const profiles = await db
+    .select()
+    .from(businessProfilesTable)
+    .where(eq(businessProfilesTable.ownerId, req.userId!));
   const results = await Promise.all(profiles.map(buildProfile));
   res.json(results);
 });
@@ -65,9 +73,14 @@ router.post("/business-profiles", requireAuth, async (req: AuthRequest, res): Pr
   const plan = req.userPlan ?? "free";
   const limit = PLAN_LIMITS[plan];
   if (limit !== null) {
-    const [existing] = await db.select({ count: count() }).from(businessProfilesTable).where(eq(businessProfilesTable.ownerId, req.userId!));
+    const [existing] = await db
+      .select({ count: count() })
+      .from(businessProfilesTable)
+      .where(eq(businessProfilesTable.ownerId, req.userId!));
     if (Number(existing?.count ?? 0) >= limit) {
-      res.status(400).json({ error: `Your ${plan} plan allows a maximum of ${limit} business profile(s). Upgrade to add more.` });
+      res.status(400).json({
+        error: `Your ${plan} plan allows a maximum of ${limit} business profile(s). Upgrade to add more.`,
+      });
       return;
     }
   }
@@ -92,7 +105,10 @@ router.get("/business-profiles/:id", requireAuth, async (req: AuthRequest, res):
   }
 
   const [profile] = await db.select().from(businessProfilesTable).where(
-    and(eq(businessProfilesTable.id, params.data.id), eq(businessProfilesTable.ownerId, req.userId!))
+    and(
+      eq(businessProfilesTable.id, params.data.id),
+      eq(businessProfilesTable.ownerId, req.userId!)
+    )
   );
   if (!profile) {
     res.status(404).json({ error: "Business profile not found" });
@@ -127,7 +143,12 @@ router.patch("/business-profiles/:id", requireAuth, async (req: AuthRequest, res
 
   const [profile] = await db.update(businessProfilesTable)
     .set(updates)
-    .where(and(eq(businessProfilesTable.id, params.data.id), eq(businessProfilesTable.ownerId, req.userId!)))
+    .where(
+      and(
+        eq(businessProfilesTable.id, params.data.id),
+        eq(businessProfilesTable.ownerId, req.userId!)
+      )
+    )
     .returning();
 
   if (!profile) {
@@ -146,7 +167,12 @@ router.delete("/business-profiles/:id", requireAuth, async (req: AuthRequest, re
   }
 
   const [deleted] = await db.delete(businessProfilesTable)
-    .where(and(eq(businessProfilesTable.id, params.data.id), eq(businessProfilesTable.ownerId, req.userId!)))
+    .where(
+      and(
+        eq(businessProfilesTable.id, params.data.id),
+        eq(businessProfilesTable.ownerId, req.userId!)
+      )
+    )
     .returning();
 
   if (!deleted) {

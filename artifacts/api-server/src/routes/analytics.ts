@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq, and, count, gte, sql } from "drizzle-orm";
+import { eq, and, count, gte, inArray } from "drizzle-orm";
 import { db, cardsTable, scanLogsTable, businessProfilesTable } from "@workspace/db";
 import { requireAuth, type AuthRequest } from "../lib/auth";
 import { GetCardStatsParams, ListScanLogsQueryParams } from "@workspace/api-zod";
@@ -15,39 +15,33 @@ router.get("/analytics/dashboard", requireAuth, async (req: AuthRequest, res): P
   const activeCards = cards.filter(c => c.status === "active").length;
   const totalScans = cards.reduce((sum, c) => sum + c.scanCount, 0);
 
-  const now = new Date();
-  const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const firstOfMonth = new Date();
+  firstOfMonth.setDate(1);
+  firstOfMonth.setHours(0, 0, 0, 0);
 
-  let scansThisMonth = 0;
-  const recentScansAll: Array<{ id: number; cardId: number; cardCode: string; timestamp: Date; country: string | null; deviceType: string | null; ratingGiven: number | null; wasNegative: boolean }> = [];
+  // Single query for all scan logs — eliminates N+1
+  const allScanLogs = cardIds.length > 0
+    ? await db.select().from(scanLogsTable).where(inArray(scanLogsTable.cardId, cardIds))
+    : [];
 
-  if (cardIds.length > 0) {
-    for (const cardId of cardIds) {
-      const [monthly] = await db.select({ count: count() }).from(scanLogsTable).where(
-        and(eq(scanLogsTable.cardId, cardId), gte(scanLogsTable.timestamp, firstOfMonth))
-      );
-      scansThisMonth += Number(monthly?.count ?? 0);
-    }
+  const scansThisMonth = allScanLogs.filter(l => l.timestamp >= firstOfMonth).length;
 
-    for (const cardId of cardIds) {
-      const logs = await db.select().from(scanLogsTable).where(eq(scanLogsTable.cardId, cardId));
-      const card = cards.find(c => c.id === cardId);
-      for (const log of logs) {
-        recentScansAll.push({
-          id: log.id,
-          cardId: log.cardId,
-          cardCode: card?.code ?? "",
-          platform: card?.platform ?? null,
-          businessProfileId: card?.businessProfileId ?? null,
-          timestamp: log.timestamp,
-          country: log.country,
-          deviceType: log.deviceType,
-          ratingGiven: log.ratingGiven,
-          wasNegative: log.wasNegative,
-        });
-      }
-    }
-  }
+  const cardMap = new Map(cards.map(c => [c.id, c]));
+  const recentScansAll = allScanLogs.map(log => {
+    const card = cardMap.get(log.cardId);
+    return {
+      id: log.id,
+      cardId: log.cardId,
+      cardCode: card?.code ?? "",
+      platform: card?.platform ?? null,
+      businessProfileId: card?.businessProfileId ?? null,
+      timestamp: log.timestamp,
+      country: log.country,
+      deviceType: log.deviceType,
+      ratingGiven: log.ratingGiven,
+      wasNegative: log.wasNegative,
+    };
+  });
 
   recentScansAll.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
   const recentScans = recentScansAll.slice(0, 10).map(s => ({
@@ -55,23 +49,29 @@ router.get("/analytics/dashboard", requireAuth, async (req: AuthRequest, res): P
     timestamp: s.timestamp.toISOString(),
   }));
 
-  const topCards = cards.sort((a, b) => b.scanCount - a.scanCount).slice(0, 5).map(c => ({
-    id: c.id,
-    code: c.code,
-    nickname: c.nickname ?? null,
-    status: c.status,
-    platform: c.platform,
-    targetUrl: c.targetUrl,
-    businessProfileId: c.businessProfileId,
-    ownerId: c.ownerId,
-    scanCount: c.scanCount,
-    smartReviewEnabled: c.smartReviewEnabled,
-    negativeAlertEnabled: c.negativeAlertEnabled,
-    createdAt: c.createdAt.toISOString(),
-    activatedAt: c.activatedAt?.toISOString() ?? null,
-  }));
+  const topCards = [...cards]
+    .sort((a, b) => b.scanCount - a.scanCount)
+    .slice(0, 5)
+    .map(c => ({
+      id: c.id,
+      code: c.code,
+      nickname: c.nickname ?? null,
+      status: c.status,
+      platform: c.platform,
+      targetUrl: c.targetUrl,
+      businessProfileId: c.businessProfileId,
+      ownerId: c.ownerId,
+      scanCount: c.scanCount,
+      smartReviewEnabled: c.smartReviewEnabled,
+      negativeAlertEnabled: c.negativeAlertEnabled,
+      createdAt: c.createdAt.toISOString(),
+      activatedAt: c.activatedAt?.toISOString() ?? null,
+    }));
 
-  const [profileCount] = await db.select({ count: count() }).from(businessProfilesTable).where(eq(businessProfilesTable.ownerId, userId));
+  const [profileCount] = await db
+    .select({ count: count() })
+    .from(businessProfilesTable)
+    .where(eq(businessProfilesTable.ownerId, userId));
 
   res.json({
     totalCards: cards.length,
@@ -103,7 +103,7 @@ router.get("/analytics/cards/:id/stats", requireAuth, async (req: AuthRequest, r
 
   const now = new Date();
   const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  const firstOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+  const firstOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
 
   const scansThisMonth = allLogs.filter(l => l.timestamp >= firstOfMonth).length;
   const scansThisWeek = allLogs.filter(l => l.timestamp >= firstOfWeek).length;
@@ -119,14 +119,18 @@ router.get("/analytics/cards/:id/stats", requireAuth, async (req: AuthRequest, r
     const day = log.timestamp.toISOString().split("T")[0];
     dayMap.set(day, (dayMap.get(day) ?? 0) + 1);
   }
-  const scansByDay = Array.from(dayMap.entries()).map(([date, count]) => ({ date, count })).sort((a, b) => a.date.localeCompare(b.date));
+  const scansByDay = Array.from(dayMap.entries())
+    .map(([date, count]) => ({ date, count }))
+    .sort((a, b) => a.date.localeCompare(b.date));
 
   const countryMap = new Map<string, number>();
   for (const log of allLogs) {
     const country = log.country ?? "Unknown";
     countryMap.set(country, (countryMap.get(country) ?? 0) + 1);
   }
-  const scansByCountry = Array.from(countryMap.entries()).map(([country, count]) => ({ country, count })).sort((a, b) => b.count - a.count);
+  const scansByCountry = Array.from(countryMap.entries())
+    .map(([country, count]) => ({ country, count }))
+    .sort((a, b) => b.count - a.count);
 
   res.json({
     cardId: card.id,
@@ -147,7 +151,11 @@ router.get("/scan-logs", requireAuth, async (req: AuthRequest, res): Promise<voi
     return;
   }
 
-  const userCards = await db.select({ id: cardsTable.id, code: cardsTable.code }).from(cardsTable).where(eq(cardsTable.ownerId, req.userId!));
+  const userCards = await db
+    .select({ id: cardsTable.id, code: cardsTable.code })
+    .from(cardsTable)
+    .where(eq(cardsTable.ownerId, req.userId!));
+
   const cardIds = userCards.map(c => c.id);
   const codeMap = new Map(userCards.map(c => [c.id, c.code]));
 
@@ -156,24 +164,18 @@ router.get("/scan-logs", requireAuth, async (req: AuthRequest, res): Promise<voi
     return;
   }
 
-  const allLogs: typeof scanLogsTable.$inferSelect[] = [];
+  const limit = params.data.limit ?? 100;
   const targetCardId = params.data.cardId;
 
-  if (targetCardId != null && cardIds.includes(targetCardId)) {
-    const logs = await db.select().from(scanLogsTable).where(eq(scanLogsTable.cardId, targetCardId));
-    allLogs.push(...logs);
-  } else {
-    for (const cardId of cardIds) {
-      const logs = await db.select().from(scanLogsTable).where(eq(scanLogsTable.cardId, cardId));
-      allLogs.push(...logs);
-    }
-  }
+  // Single query — eliminates N+1
+  const whereClause = targetCardId != null && cardIds.includes(targetCardId)
+    ? eq(scanLogsTable.cardId, targetCardId)
+    : inArray(scanLogsTable.cardId, cardIds);
 
+  const allLogs = await db.select().from(scanLogsTable).where(whereClause);
   allLogs.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-  const limit = params.data.limit ?? 100;
-  const sliced = allLogs.slice(0, limit);
 
-  res.json(sliced.map(log => ({
+  res.json(allLogs.slice(0, limit).map(log => ({
     id: log.id,
     cardId: log.cardId,
     cardCode: codeMap.get(log.cardId) ?? "",

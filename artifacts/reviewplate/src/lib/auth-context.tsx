@@ -32,29 +32,30 @@ const AuthContext = createContext<AuthContextType>({
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
   const [initialized, setInitialized] = useState(false);
 
-  const storedToken = typeof window !== "undefined" ? localStorage.getItem("reviewplate_token") : null;
+  // Read token once on mount — avoids localStorage hit on every render
+  const [token, setToken] = useState<string | null>(() =>
+    typeof window !== "undefined" ? localStorage.getItem("reviewplate_token") : null
+  );
 
   const { data: currentUser, isLoading } = useGetCurrentUser({
-    query: { enabled: !!storedToken && !initialized },
+    query: { enabled: !!token && !initialized },
   });
-
-  useEffect(() => {
-    const t = localStorage.getItem("reviewplate_token");
-    if (t) setToken(t);
-    if (!t) setInitialized(true);
-  }, []);
 
   useEffect(() => {
     if (currentUser && !initialized) {
       setUser(currentUser as unknown as User);
       setInitialized(true);
-    } else if (!isLoading && !currentUser && !initialized) {
+    } else if (!isLoading && !initialized) {
       setInitialized(true);
     }
   }, [currentUser, isLoading, initialized]);
+
+  // If no token stored, mark as initialized immediately
+  useEffect(() => {
+    if (!token) setInitialized(true);
+  }, [token]);
 
   const setAuth = (newUser: User, newToken: string) => {
     setUser(newUser);

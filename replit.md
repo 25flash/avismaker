@@ -83,3 +83,8 @@ Redirect URL format: `https://www.avismaker.com/r/{CODE}` (stored as `target_url
 - esbuild bundles the API server; do NOT use `zod/v4` subpath in api-server — use `@workspace/api-zod` schemas instead
 - `businessProfileId` in `activate-by-code` is optional (nullable)
 - Public scan page at `/c/:code` uses `useGetPublicCard()` to fetch card, then auto-redirects
+- Legacy `GET /public/scan` endpoint removed — only `POST /public/scan/:code` is used
+- `scanCount` incremented atomically via SQL expression (`scanCount + 1`) to avoid race conditions
+- All routes in `App.tsx` are lazy-loaded via `React.lazy` for faster initial bundle
+- N+1 DB queries eliminated in `analytics.ts` (inArray) and `business-profiles.ts` (2 queries per profile)
+- `checkActivationLimit` helper in `cards.ts` replaces duplicated plan limit logic

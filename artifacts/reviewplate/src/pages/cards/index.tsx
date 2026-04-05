@@ -123,7 +123,7 @@ export default function CardsPage() {
                         })()}
                       </div>
 
-                      {/* Nom principal : nickname > nom profil > fallback */}
+                      {/* Nom principal */}
                       {card.nickname ? (
                         <p className="text-base font-bold text-[#0D1117] mb-0 truncate">{card.nickname}</p>
                       ) : linkedProfile ? (
@@ -131,9 +131,26 @@ export default function CardsPage() {
                       ) : (
                         <p className="text-base font-bold text-[#9CA3AF] mb-0">Sans nom</p>
                       )}
-                      {/* Profil en secondaire si nickname défini */}
-                      {card.nickname && linkedProfile && (
-                        <p className="text-xs text-[#9CA3AF] truncate mb-0">{linkedProfile.name}</p>
+
+                      {/* Badge profil business */}
+                      {linkedProfile ? (
+                        <div className="inline-flex items-center gap-1.5 mt-1.5 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 max-w-full">
+                          {linkedProfile.logoUrl ? (
+                            <img src={linkedProfile.logoUrl} alt="" className="w-3.5 h-3.5 rounded-full object-cover shrink-0" />
+                          ) : (
+                            <div className="w-3.5 h-3.5 rounded-full bg-amber-400 flex items-center justify-center shrink-0">
+                              <span className="text-[8px] font-bold text-white leading-none">{linkedProfile.name.charAt(0).toUpperCase()}</span>
+                            </div>
+                          )}
+                          <span className="text-xs font-medium text-amber-800 truncate">{linkedProfile.name}</span>
+                        </div>
+                      ) : (
+                        <div className="inline-flex items-center gap-1.5 mt-1.5 px-2 py-0.5 rounded-full bg-[#F3F4F6] border border-[#E5E7EB]">
+                          <div className="w-3.5 h-3.5 rounded-full bg-[#D1D5DB] flex items-center justify-center shrink-0">
+                            <span className="text-[8px] font-bold text-white leading-none">?</span>
+                          </div>
+                          <span className="text-xs font-medium text-[#9CA3AF]">Sans profil</span>
+                        </div>
                       )}
 
                       {/* Plateforme + code sur la même ligne */}

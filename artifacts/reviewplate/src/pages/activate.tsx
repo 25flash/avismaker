@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Zap, CreditCard, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
-import { Link, useLocation } from "wouter";
+import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
 
 export default function ActivatePage() {
@@ -18,7 +18,6 @@ export default function ActivatePage() {
   const activateMutation = useActivateCardByCode();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [, navigate] = useLocation();
 
   const handleActivate = () => {
     if (!code.trim()) return;
@@ -31,16 +30,13 @@ export default function ActivatePage() {
           queryClient.invalidateQueries({ queryKey: getListCardsQueryKey() });
         },
         onError: (err: unknown) => {
-          const body = (err as { response?: { data?: { code?: string; error?: string } }; status?: number })?.response?.data;
-          const status = (err as { status?: number })?.status;
-          if (body?.code === "ACTIVE_CARD_LIMIT_REACHED") {
-            navigate("/billing");
-          } else if (status === 404) {
-            toast({ variant: "destructive", title: "Code introuvable", description: "Ce code d'activation n'existe pas. Vérifiez et réessayez." });
-          } else if (status === 409) {
-            toast({ variant: "destructive", title: "Déjà activée", description: "Cette carte est déjà associée à un autre compte." });
+          const apiError = err as { data?: { error?: string }; status?: number };
+          if (apiError?.status === 404) {
+            toast({ variant: "destructive", title: "Code not found", description: "This activation code doesn't exist. Check and try again." });
+          } else if (apiError?.status === 409) {
+            toast({ variant: "destructive", title: "Already activated", description: "This card is already registered to another account." });
           } else {
-            toast({ variant: "destructive", title: "Échec de l'activation", description: body?.error ?? "Une erreur est survenue." });
+            toast({ variant: "destructive", title: "Activation failed", description: apiError?.data?.error ?? "Something went wrong." });
           }
         },
       }

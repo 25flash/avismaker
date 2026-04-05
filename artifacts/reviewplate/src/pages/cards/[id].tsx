@@ -13,7 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import { Link, useParams, useLocation } from "wouter";
+import { Link, useParams } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
@@ -82,7 +82,6 @@ export default function CardEditorPage() {
   const [businessProfileId, setBusinessProfileId] = useState<string>("");
   const [targetUrl, setTargetUrl] = useState("");
   const [smartReview, setSmartReview] = useState(false);
-  const [, navigate] = useLocation();
 
   useEffect(() => {
     if (cardData) {
@@ -126,14 +125,6 @@ export default function CardEditorPage() {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getGetCardQueryKey(cardId) });
           toast({ title: "Carte activée", description: "La carte est maintenant active et prête à scanner." });
-        },
-        onError: (err: unknown) => {
-          const body = (err as { response?: { data?: { code?: string } } })?.response?.data;
-          if (body?.code === "ACTIVE_CARD_LIMIT_REACHED") {
-            navigate("/billing");
-          } else {
-            toast({ variant: "destructive", title: "Erreur", description: "Impossible d'activer la carte." });
-          }
         },
       }
     );

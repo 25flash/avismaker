@@ -47,6 +47,7 @@ export const PLANS = [
       "billing.features.negativeReviewDetection",
       "billing.features.advancedAnalyticsPdf",
       "billing.features.customBranding",
+      "billing.features.prioritySupport",
     ],
     maxProfiles: null,
     maxActiveCards: null,

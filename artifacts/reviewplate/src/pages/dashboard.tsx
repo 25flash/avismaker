@@ -3,7 +3,7 @@ import { useGetDashboardSummary, useListBusinessProfiles } from "@workspace/api-
 import {
   CreditCard, Activity, TrendingUp, Building2, Star, Zap,
   ArrowRight, BarChart2, ChevronRight, ArrowUpRight, ArrowDownRight,
-  Trophy, AlertTriangle, Users, Target,
+  Trophy, AlertTriangle, Users, Target, Lock,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
@@ -229,7 +229,7 @@ const METRIC_BOX_COLORS: Record<string, { bg: string; icon: string; border: stri
 };
 
 function MetricBox({
-  label, value, icon: Icon, positive, neutral, suffix,
+  label, value, icon: Icon, positive, neutral, suffix, locked = false,
 }: {
   label: string;
   value: string | number;
@@ -237,10 +237,12 @@ function MetricBox({
   positive?: boolean;
   neutral?: boolean;
   suffix?: string;
+  locked?: boolean;
 }) {
   const colorKey = Object.keys(METRIC_BOX_COLORS).find(k => label.startsWith(k)) ?? "";
   const colors = METRIC_BOX_COLORS[colorKey] ?? { bg: "bg-gray-50", icon: "text-gray-500", border: "border-gray-100" };
-  return (
+
+  const inner = (
     <div className={cn("rounded-xl px-3 py-3 border flex flex-col gap-1", colors.bg, colors.border)}>
       <div className={cn("flex items-center gap-1.5", colors.icon)}>
         <Icon className="w-3.5 h-3.5 shrink-0" />
@@ -259,6 +261,26 @@ function MetricBox({
             : <ArrowDownRight className="w-4 h-4 text-red-400 shrink-0" />
         )}
       </div>
+    </div>
+  );
+
+  if (!locked) return inner;
+
+  return (
+    <div className="relative group">
+      {/* Blurred content */}
+      <div className="blur-sm opacity-50 pointer-events-none select-none group-hover:blur-[2px] group-hover:opacity-65 transition-all duration-200">
+        {inner}
+      </div>
+      {/* Lock overlay */}
+      <Link href="/billing">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5 cursor-pointer rounded-xl">
+          <Lock className="w-3.5 h-3.5 text-[#6B7280]" />
+          <span className="text-[9px] font-semibold text-[#6B7280] text-center leading-tight px-1">
+            Business
+          </span>
+        </div>
+      </Link>
     </div>
   );
 }
@@ -290,6 +312,7 @@ function AnalyticsPreviewCard({
       icon: Target,
       positive: metrics.conversionRate >= 50,
       neutral: false,
+      locked: true,
     },
     {
       label: "Moy. scans / carte",
@@ -298,6 +321,7 @@ function AnalyticsPreviewCard({
       icon: BarChart2,
       neutral: true,
       positive: undefined,
+      locked: true,
     },
     {
       label: `Évolution (${period})`,
@@ -306,6 +330,7 @@ function AnalyticsPreviewCard({
       icon: TrendingUp,
       positive: metrics.trend >= 0,
       neutral: false,
+      locked: true,
     },
     {
       label: "Top performer",
@@ -314,6 +339,7 @@ function AnalyticsPreviewCard({
       icon: Trophy,
       positive: true,
       neutral: false,
+      locked: false,
     },
     {
       label: "Moins performante",
@@ -322,6 +348,7 @@ function AnalyticsPreviewCard({
       icon: AlertTriangle,
       positive: false,
       neutral: false,
+      locked: false,
     },
     {
       label: "Nouveaux visiteurs",
@@ -330,27 +357,38 @@ function AnalyticsPreviewCard({
       icon: Users,
       positive: true,
       neutral: false,
+      locked: true,
     },
   ];
 
   const content = (
     <div className="flex flex-col gap-4">
-      {/* Period filter */}
-      <div className="flex items-center gap-1 self-start">
-        {(["7j", "30j", "90j"] as Period[]).map(p => (
-          <button
-            key={p}
-            onClick={() => setPeriod(p)}
-            className={cn(
-              "px-3 py-1 text-xs font-semibold rounded-full transition-colors",
-              period === p
-                ? "bg-primary text-[#0D1117]"
-                : "bg-[#F3F4F6] text-[#6B7280] hover:bg-[#E5E7EB]"
-            )}
-          >
-            {p}
-          </button>
-        ))}
+      {/* Period filter + upgrade CTA */}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1">
+          {(["7j", "30j", "90j"] as Period[]).map(p => (
+            <button
+              key={p}
+              onClick={() => setPeriod(p)}
+              className={cn(
+                "px-3 py-1 text-xs font-semibold rounded-full transition-colors",
+                period === p
+                  ? "bg-primary text-[#0D1117]"
+                  : "bg-[#F3F4F6] text-[#6B7280] hover:bg-[#E5E7EB]"
+              )}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
+        {!isBusiness && (
+          <Link href="/billing">
+            <button className="flex items-center gap-1.5 text-[10px] font-semibold text-primary bg-primary/10 hover:bg-primary/20 px-2.5 py-1 rounded-full transition-colors shrink-0">
+              <Lock className="w-3 h-3" />
+              Passer en Business
+            </button>
+          </Link>
+        )}
       </div>
 
       {/* Metrics grid + chart side by side on desktop */}
@@ -366,6 +404,7 @@ function AnalyticsPreviewCard({
               icon={m.icon}
               positive={m.positive}
               neutral={m.neutral}
+              locked={!isBusiness && m.locked}
             />
           ))}
         </div>

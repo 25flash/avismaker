@@ -12,9 +12,7 @@ export const PLANS = [
     name: "Free",
     price: 0,
     features: [
-      "billing.features.unlimitedScans",
       "billing.features.basicAnalytics",
-      "billing.features.qrGeneration",
     ],
     maxProfiles: 1,
     maxActiveCards: 1,

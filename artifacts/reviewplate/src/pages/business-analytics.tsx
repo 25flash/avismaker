@@ -60,6 +60,46 @@ const DEMO_DATA: AnalyticsData = {
   ],
 };
 
+type Period = "7j" | "30j" | "90j";
+const PERIOD_DAYS: Record<Period, number> = { "7j": 7, "30j": 30, "90j": 90 };
+
+function usePeriodData(period: Period, token: string | null, isBusiness: boolean) {
+  const [data, setData] = useState<AnalyticsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    if (!isBusiness) { setLoading(false); return; }
+    const tk = token ?? localStorage.getItem("reviewplate_token");
+    if (!tk) { setLoading(false); return; }
+    setLoading(true);
+    fetch(`${API_BASE}/api/business-analytics?days=${PERIOD_DAYS[period]}`, {
+      headers: { Authorization: `Bearer ${tk}` },
+    })
+      .then(r => r.ok ? r.json() : Promise.reject(r))
+      .then(d => { setData(d); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, [isBusiness, token, period]);
+  return { data, loading };
+}
+
+function PeriodPills({ period, setPeriod }: { period: Period; setPeriod: (p: Period) => void }) {
+  return (
+    <div className="flex items-center gap-1 shrink-0">
+      {(["7j", "30j", "90j"] as const).map(p => (
+        <button
+          key={p}
+          onClick={() => setPeriod(p)}
+          className={cn(
+            "px-2.5 py-0.5 text-[11px] font-semibold rounded-full transition-colors",
+            period === p ? "bg-primary text-[#0D1117]" : "bg-[#F3F4F6] text-[#6B7280] hover:bg-[#E5E7EB]"
+          )}
+        >
+          {p}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function BlurWrapper({ children, locked }: { children: React.ReactNode; locked: boolean }) {
   const [, navigate] = useLocation();
   if (!locked) return <>{children}</>;
@@ -100,46 +140,46 @@ export default function BusinessAnalyticsPage() {
   const { user, token } = useAuth();
   const { t } = useTranslation();
   const [, navigate] = useLocation();
-  const [data, setData] = useState<AnalyticsData | null>(null);
-  const [loading, setLoading] = useState(true);
   const [exportLoading, setExportLoading] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [period, setPeriod] = useState<"7j" | "30j" | "90j">("30j");
   const reportRef = useRef<HTMLDivElement>(null);
 
   const isBusiness = user?.plan === "business";
-  const displayData = isBusiness ? (data ?? DEMO_DATA) : DEMO_DATA;
-  const PERIOD_DAYS: Record<string, number> = { "7j": 7, "30j": 30, "90j": 90 };
 
-  const PeriodPills = () => (
-    <div className="flex items-center gap-1 shrink-0">
-      {(["7j", "30j", "90j"] as const).map(p => (
-        <button
-          key={p}
-          onClick={() => setPeriod(p)}
-          className={cn(
-            "px-2.5 py-0.5 text-[11px] font-semibold rounded-full transition-colors",
-            period === p ? "bg-primary text-[#0D1117]" : "bg-[#F3F4F6] text-[#6B7280] hover:bg-[#E5E7EB]"
-          )}
-        >
-          {p}
-        </button>
-      ))}
-    </div>
-  );
-
+  // Global data — KPI row + Répartition des sources (no period filter)
+  const [globalData, setGlobalData] = useState<AnalyticsData | null>(null);
+  const [globalLoading, setGlobalLoading] = useState(true);
   useEffect(() => {
-    if (!isBusiness) { setLoading(false); return; }
+    if (!isBusiness) { setGlobalLoading(false); return; }
     const tk = token ?? localStorage.getItem("reviewplate_token");
-    if (!tk) { setLoading(false); return; }
-    setLoading(true);
-    fetch(`${API_BASE}/api/business-analytics?days=${PERIOD_DAYS[period]}`, {
+    if (!tk) { setGlobalLoading(false); return; }
+    fetch(`${API_BASE}/api/business-analytics`, {
       headers: { Authorization: `Bearer ${tk}` },
     })
       .then(r => r.ok ? r.json() : Promise.reject(r))
-      .then(d => { setData(d); setLoading(false); })
-      .catch(() => setLoading(false));
-  }, [isBusiness, token, period]);
+      .then(d => { setGlobalData(d); setGlobalLoading(false); })
+      .catch(() => setGlobalLoading(false));
+  }, [isBusiness, token]);
+
+  // Per-section independent periods + data
+  const [periodTendances, setPeriodTendances] = useState<Period>("30j");
+  const [periodTimeline, setPeriodTimeline] = useState<Period>("30j");
+  const [periodTopCards, setPeriodTopCards] = useState<Period>("30j");
+  const [periodLeast, setPeriodLeast] = useState<Period>("30j");
+  const [periodTable, setPeriodTable] = useState<Period>("30j");
+
+  const { data: rawTendances } = usePeriodData(periodTendances, token, isBusiness);
+  const { data: rawTimeline } = usePeriodData(periodTimeline, token, isBusiness);
+  const { data: rawTopCards } = usePeriodData(periodTopCards, token, isBusiness);
+  const { data: rawLeast } = usePeriodData(periodLeast, token, isBusiness);
+  const { data: rawTable } = usePeriodData(periodTable, token, isBusiness);
+
+  const tendancesData = isBusiness ? (rawTendances ?? DEMO_DATA) : DEMO_DATA;
+  const timelineData  = isBusiness ? (rawTimeline  ?? DEMO_DATA) : DEMO_DATA;
+  const topCardsData  = isBusiness ? (rawTopCards  ?? DEMO_DATA) : DEMO_DATA;
+  const leastData     = isBusiness ? (rawLeast     ?? DEMO_DATA) : DEMO_DATA;
+  const tableData     = isBusiness ? (rawTable     ?? DEMO_DATA) : DEMO_DATA;
+  const displayData   = isBusiness ? (globalData   ?? DEMO_DATA) : DEMO_DATA;
 
   const handleExportPDF = async () => {
     if (!isBusiness) { setShowUpgradeModal(true); return; }
@@ -524,7 +564,7 @@ export default function BusinessAnalyticsPage() {
         <div ref={reportRef}>
           {/* KPI Cards — always visible as teaser */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            {loading ? (
+            {globalLoading ? (
               Array(4).fill(0).map((_, i) => (
                 <div key={i} className="h-12 bg-[#F9FAFB] border border-border rounded-xl animate-pulse" />
               ))
@@ -556,12 +596,12 @@ export default function BusinessAnalyticsPage() {
                   <TrendingUp className="w-4 h-4 text-primary" />
                   Tendances détaillées
                 </CardTitle>
-                <PeriodPills />
+                <PeriodPills period={periodTendances} setPeriod={setPeriodTendances} />
               </CardHeader>
               <CardContent className="pt-4">
                 {(() => {
-                  const kd = displayData?.kpis ?? { totalScans: 0, conversionRate: 0, growth: 0, recentActivity: 0 };
-                  const cards = displayData?.topCards ?? [];
+                  const kd = tendancesData?.kpis ?? { totalScans: 0, conversionRate: 0, growth: 0, recentActivity: 0 };
+                  const cards = tendancesData?.topCards ?? [];
                   const sorted = [...cards].sort((a, b) => b.scans - a.scans);
                   const topCard = sorted[0];
                   const worstCard = [...cards].sort((a, b) => a.scans - b.scans)[0];
@@ -665,13 +705,13 @@ export default function BusinessAnalyticsPage() {
                 <CardHeader className="pb-2 border-b border-border flex flex-row items-center justify-between gap-2">
                   <CardTitle className="text-sm font-semibold text-[#0D1117] flex items-center gap-2">
                     <Activity className="w-4 h-4 text-primary" />
-                    Évolution des scans ({period})
+                    Évolution des scans ({periodTimeline})
                   </CardTitle>
-                  <PeriodPills />
+                  <PeriodPills period={periodTimeline} setPeriod={setPeriodTimeline} />
                 </CardHeader>
                 <CardContent className="pt-4">
                   <ResponsiveContainer width="100%" height={200}>
-                    <LineChart data={displayData?.scanTimeline ?? []}>
+                    <LineChart data={timelineData?.scanTimeline ?? []}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
                       <XAxis
                         dataKey="date"
@@ -756,11 +796,11 @@ export default function BusinessAnalyticsPage() {
                       <TrendingUp className="w-4 h-4 text-primary" />
                       Top cartes par scans
                     </CardTitle>
-                    <PeriodPills />
+                    <PeriodPills period={periodTopCards} setPeriod={setPeriodTopCards} />
                   </CardHeader>
                   <CardContent className="pt-4">
                     <ResponsiveContainer width="100%" height={200}>
-                      <BarChart data={displayData?.topCards ?? []} layout="vertical" margin={{ left: 20 }}>
+                      <BarChart data={topCardsData?.topCards ?? []} layout="vertical" margin={{ left: 20 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" horizontal={false} />
                         <XAxis type="number" tick={{ fontSize: 10, fill: "#9CA3AF" }} />
                         <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: "#374151" }} width={110} />
@@ -781,12 +821,12 @@ export default function BusinessAnalyticsPage() {
                       <ArrowDownRight className="w-4 h-4 text-[#6B7280]" />
                       Cartes les moins actives
                     </CardTitle>
-                    <PeriodPills />
+                    <PeriodPills period={periodLeast} setPeriod={setPeriodLeast} />
                   </CardHeader>
                   <CardContent className="pt-4">
                     <ResponsiveContainer width="100%" height={200}>
                       <BarChart
-                        data={[...(displayData?.topCards ?? [])].sort((a, b) => a.scans - b.scans)}
+                        data={[...(leastData?.topCards ?? [])].sort((a, b) => a.scans - b.scans)}
                         layout="vertical"
                         margin={{ left: 20 }}
                       >
@@ -811,7 +851,7 @@ export default function BusinessAnalyticsPage() {
                     <Download className="w-4 h-4 text-primary" />
                     Tableau de performance
                   </CardTitle>
-                  <PeriodPills />
+                  <PeriodPills period={periodTable} setPeriod={setPeriodTable} />
                 </CardHeader>
                 <CardContent className="p-0">
                   <div className="overflow-x-auto">
@@ -825,7 +865,7 @@ export default function BusinessAnalyticsPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {(displayData?.topCards ?? []).map((card, i) => (
+                        {(tableData?.topCards ?? []).map((card, i) => (
                           <tr key={i} className="border-b border-border last:border-0 hover:bg-[#F9FAFB] transition-colors">
                             <td className="px-4 py-3 font-medium text-[#0D1117] text-sm">{card.name}</td>
                             <td className="px-4 py-3 text-[#374151] font-semibold">{card.scans.toLocaleString()}</td>

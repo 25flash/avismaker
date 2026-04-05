@@ -77,7 +77,7 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
                   "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium cursor-pointer group relative",
                   "transition-colors duration-150",
                   isActive
-                    ? "bg-primary/15 text-primary"
+                    ? "bg-primary/20 text-primary font-semibold"
                     : "text-white/65 hover:text-white hover:bg-white/8"
                 )}
               >

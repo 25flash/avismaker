@@ -86,7 +86,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
         </div>
 
         {/* Page content with fade-in transition */}
-        <main ref={mainRef} className="flex-1 overflow-y-auto scroll-smooth">
+        <main ref={mainRef} className="flex-1 overflow-y-auto scroll-smooth bg-[#F8F9FA]">
           <div
             key={pageKey}
             className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 animate-page-in"

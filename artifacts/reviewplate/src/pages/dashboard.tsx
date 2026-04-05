@@ -17,15 +17,18 @@ import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from "recharts";
 
-function StatCard({ title, value, icon: Icon, subtitle, loading }: {
+function StatCard({ title, value, icon: Icon, subtitle, loading, accentColor = "#F59E0B", iconBg = "bg-primary/10", iconColor = "text-primary" }: {
   title: string;
   value: string | number;
   icon: React.ElementType;
   subtitle?: string;
   loading?: boolean;
+  accentColor?: string;
+  iconBg?: string;
+  iconColor?: string;
 }) {
   return (
-    <Card className="bg-white border border-border shadow-sm" style={{ height: 70 }}>
+    <Card className="bg-white border border-border shadow-sm overflow-hidden" style={{ height: 70, borderLeft: `4px solid ${accentColor}` }}>
       <CardContent className="h-full flex items-center justify-between" style={{ padding: "8px 12px" }}>
         <div className="flex flex-col justify-center">
           <p style={{ fontSize: 11, lineHeight: 1.3 }} className="font-medium text-[#6B7280]">{title}</p>
@@ -38,8 +41,8 @@ function StatCard({ title, value, icon: Icon, subtitle, loading }: {
           )}
           {subtitle && <p style={{ fontSize: 10, lineHeight: 1.2 }} className="text-[#6B7280]">{subtitle}</p>}
         </div>
-        <div className="shrink-0 w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center self-start mt-0.5">
-          <Icon style={{ width: 14, height: 14 }} className="text-primary" />
+        <div className={cn("shrink-0 w-6 h-6 rounded-md flex items-center justify-center self-start mt-0.5", iconBg)}>
+          <Icon style={{ width: 14, height: 14 }} className={iconColor} />
         </div>
       </CardContent>
     </Card>
@@ -83,7 +86,7 @@ function CardRow({
 }) {
   return (
     <Link href={`/cards/${card.id}`}>
-      <div className="flex items-center justify-between p-2.5 rounded-lg hover:bg-[#F8FAFC] transition-colors cursor-pointer">
+      <div className="flex items-center justify-between p-2.5 rounded-lg hover:bg-amber-50 transition-colors cursor-pointer group">
         <div className="flex items-center gap-2.5 min-w-0">
           {profile?.logoUrl ? (
             <img src={profile.logoUrl} alt={profile.name} className="w-7 h-7 rounded-lg object-cover border border-border shrink-0" />
@@ -216,6 +219,15 @@ const DEMO_DATA_ANALYTICS: AnalyticsCardData = {
   newVsReturning: 73,
 };
 
+const METRIC_BOX_COLORS: Record<string, { bg: string; icon: string; border: string }> = {
+  "Taux de conversion": { bg: "bg-blue-50", icon: "text-blue-500", border: "border-blue-100" },
+  "Moy. scans / carte": { bg: "bg-violet-50", icon: "text-violet-500", border: "border-violet-100" },
+  "Évolution": { bg: "bg-emerald-50", icon: "text-emerald-500", border: "border-emerald-100" },
+  "Top performer": { bg: "bg-amber-50", icon: "text-amber-500", border: "border-amber-100" },
+  "Moins performante": { bg: "bg-red-50", icon: "text-red-400", border: "border-red-100" },
+  "Nouveaux visiteurs": { bg: "bg-purple-50", icon: "text-purple-500", border: "border-purple-100" },
+};
+
 function MetricBox({
   label, value, icon: Icon, positive, neutral, suffix,
 }: {
@@ -226,13 +238,15 @@ function MetricBox({
   neutral?: boolean;
   suffix?: string;
 }) {
+  const colorKey = Object.keys(METRIC_BOX_COLORS).find(k => label.startsWith(k)) ?? "";
+  const colors = METRIC_BOX_COLORS[colorKey] ?? { bg: "bg-gray-50", icon: "text-gray-500", border: "border-gray-100" };
   return (
-    <div className="bg-[#F9FAFB] rounded-xl px-3 py-3 border border-[#E5E7EB] flex flex-col gap-1">
-      <div className="flex items-center gap-1.5 text-[#6B7280]">
+    <div className={cn("rounded-xl px-3 py-3 border flex flex-col gap-1", colors.bg, colors.border)}>
+      <div className={cn("flex items-center gap-1.5", colors.icon)}>
         <Icon className="w-3.5 h-3.5 shrink-0" />
-        <p className="text-xs leading-none">{label}</p>
+        <p className="text-[10px] font-semibold uppercase tracking-wide leading-none">{label}</p>
       </div>
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 mt-0.5">
         <p className={cn(
           "text-base font-bold leading-tight",
           neutral ? "text-[#0D1117]" : positive ? "text-emerald-600" : "text-red-500"
@@ -371,8 +385,8 @@ function AnalyticsPreviewCard({
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
-              <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9CA3AF" }} tickLine={false} axisLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: "#9CA3AF" }} tickLine={false} axisLine={false} />
+              <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9CA3AF" }} tickLine={false} axisLine={false} label={{ value: "Dates", position: "insideBottomRight", offset: -4, fontSize: 9, fill: "#C1C9D4" }} />
+              <YAxis tick={{ fontSize: 10, fill: "#9CA3AF" }} tickLine={false} axisLine={false} label={{ value: "Scans", angle: -90, position: "insideLeft", offset: 12, fontSize: 9, fill: "#C1C9D4" }} />
               <Tooltip
                 contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E5E7EB", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
                 labelStyle={{ fontWeight: 600, color: "#0D1117" }}
@@ -471,7 +485,7 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-[#0D1117]">{t("dashboard.title")}</h1>
+            <h1 className="text-3xl font-extrabold text-[#0D1117] tracking-tight">{t("dashboard.title")}</h1>
             <p className="text-sm text-[#6B7280] mt-0.5">{t("dashboard.welcome", { name: user?.name })}</p>
           </div>
           <Link href="/activate">
@@ -484,10 +498,10 @@ export default function DashboardPage() {
 
         {/* Stats KPI grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard title={t("dashboard.totalCards")} value={summary?.totalCards ?? 0} icon={CreditCard} loading={isLoading} />
-          <StatCard title={t("dashboard.activeCards")} value={summary?.activeCards ?? 0} icon={Activity} subtitle={t("dashboard.readyToScan")} loading={isLoading} />
-          <StatCard title={t("dashboard.totalScans")} value={summary?.totalScans ?? 0} icon={TrendingUp} loading={isLoading} />
-          <StatCard title={t("dashboard.thisMonth")} value={summary?.scansThisMonth ?? 0} icon={Star} subtitle={t("dashboard.scansThisMonth")} loading={isLoading} />
+          <StatCard title={t("dashboard.totalCards")} value={summary?.totalCards ?? 0} icon={CreditCard} loading={isLoading} accentColor="#3B82F6" iconBg="bg-blue-50" iconColor="text-blue-500" />
+          <StatCard title={t("dashboard.activeCards")} value={summary?.activeCards ?? 0} icon={Activity} subtitle={t("dashboard.readyToScan")} loading={isLoading} accentColor="#10B981" iconBg="bg-emerald-50" iconColor="text-emerald-500" />
+          <StatCard title={t("dashboard.totalScans")} value={summary?.totalScans ?? 0} icon={TrendingUp} loading={isLoading} accentColor="#8B5CF6" iconBg="bg-violet-50" iconColor="text-violet-500" />
+          <StatCard title={t("dashboard.thisMonth")} value={summary?.scansThisMonth ?? 0} icon={Star} subtitle={t("dashboard.scansThisMonth")} loading={isLoading} accentColor="#F59E0B" iconBg="bg-amber-50" iconColor="text-amber-500" />
         </div>
 
         {/* Main grid — 3 cols on desktop, 2 on tablet, 1 on mobile */}
@@ -499,7 +513,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-semibold text-[#0D1117]">{t("dashboard.topCards")}</CardTitle>
                 <Link href="/cards">
-                  <button className="text-xs text-primary hover:underline flex items-center gap-1">
+                  <button className="text-xs font-semibold text-primary bg-primary/10 hover:bg-primary/20 px-2.5 py-1 rounded-full flex items-center gap-1 transition-colors">
                     {t("dashboard.viewAll")} <ArrowRight className="w-3 h-3" />
                   </button>
                 </Link>
@@ -531,7 +545,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-semibold text-[#0D1117]">Cartes peu scannées</CardTitle>
                 <Link href="/cards">
-                  <button className="text-xs text-primary hover:underline flex items-center gap-1">
+                  <button className="text-xs font-semibold text-primary bg-primary/10 hover:bg-primary/20 px-2.5 py-1 rounded-full flex items-center gap-1 transition-colors">
                     Voir tout <ArrowRight className="w-3 h-3" />
                   </button>
                 </Link>
@@ -642,17 +656,17 @@ export default function DashboardPage() {
           <CardContent>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { href: "/activate", label: t("dashboard.activateCardAction"), icon: Zap, color: "bg-amber-50 text-amber-700 hover:bg-amber-100", testId: "button-quick-activate-card" },
-                { href: "/profiles", label: t("dashboard.addBusiness"), icon: Building2, color: "bg-blue-50 text-blue-700 hover:bg-blue-100", testId: "button-quick-add-business" },
-                { href: "/ai-reply", label: t("dashboard.aiReply"), icon: Star, color: "bg-purple-50 text-purple-700 hover:bg-purple-100", testId: "button-quick-ai-reply" },
-                { href: "/billing", label: t("dashboard.upgradePlan"), icon: TrendingUp, color: "bg-green-50 text-green-700 hover:bg-green-100", testId: "button-quick-upgrade-plan" },
+                { href: "/activate", label: t("dashboard.activateCardAction"), icon: Zap, bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200", hover: "hover:bg-amber-100 hover:border-amber-300", testId: "button-quick-activate-card" },
+                { href: "/profiles", label: t("dashboard.addBusiness"), icon: Building2, bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-200", hover: "hover:bg-blue-100 hover:border-blue-300", testId: "button-quick-add-business" },
+                { href: "/ai-reply", label: t("dashboard.aiReply"), icon: Star, bg: "bg-purple-50", text: "text-purple-700", border: "border-purple-200", hover: "hover:bg-purple-100 hover:border-purple-300", testId: "button-quick-ai-reply" },
+                { href: "/billing", label: t("dashboard.upgradePlan"), icon: TrendingUp, bg: "bg-green-50", text: "text-green-700", border: "border-green-200", hover: "hover:bg-green-100 hover:border-green-300", testId: "button-quick-upgrade-plan" },
               ].map((action) => (
                 <Link key={action.href} href={action.href}>
                   <button
-                    className={cn("w-full flex flex-col items-center gap-2 p-4 rounded-xl transition-colors text-sm font-medium", action.color)}
+                    className={cn("w-full flex flex-col items-center gap-2 p-4 rounded-xl transition-all text-sm font-bold border", action.bg, action.text, action.border, action.hover)}
                     data-testid={action.testId}
                   >
-                    <action.icon className="w-5 h-5" />
+                    <action.icon className="w-6 h-6" />
                     {action.label}
                   </button>
                 </Link>

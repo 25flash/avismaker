@@ -33,7 +33,17 @@ router.post("/stripe/checkout", requireAuth, async (req: AuthRequest, res): Prom
     }
 
     // Find or create Stripe customer
+    // If stored ID is stale (e.g. from sandbox), create a fresh one
     let customerId = user.stripeCustomerId;
+    if (customerId) {
+      try {
+        await stripe.customers.retrieve(customerId);
+      } catch {
+        // Customer not found in this Stripe account — clear stale ID and create new
+        customerId = null;
+        await db.update(usersTable).set({ stripeCustomerId: null }).where(eq(usersTable.id, user.id));
+      }
+    }
     if (!customerId) {
       const customer = await stripe.customers.create({
         email: user.email,

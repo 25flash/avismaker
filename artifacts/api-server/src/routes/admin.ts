@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import { eq, count, gte, sql } from "drizzle-orm";
 import { db, usersTable, cardsTable, scanLogsTable, businessProfilesTable, supportMessagesTable } from "@workspace/db";
 import { requireAdmin, type AuthRequest } from "../lib/auth";
+import { sendAdminReplyEmail } from "../lib/email";
 import {
   ListAdminUsersQueryParams,
   UpdateAdminUserParams,
@@ -270,14 +271,34 @@ router.post("/admin/support-messages/:id/reply", requireAdmin, async (req: AuthR
     return;
   }
 
+  // Fetch sender info for email notification
+  const [sender] = await db.select({ name: usersTable.name, email: usersTable.email })
+    .from(usersTable)
+    .where(eq(usersTable.id, msg.senderId));
+
+  let emailSent = false;
+  if (sender?.email) {
+    const result = await sendAdminReplyEmail({
+      toName: sender.name ?? "Utilisateur",
+      toEmail: sender.email,
+      subject: msg.subject ?? "",
+      originalMessage: msg.messageText,
+      adminReply: parsed.data.reply,
+    });
+    emailSent = result.sent;
+  }
+
   res.json({
     id: msg.id,
     senderId: msg.senderId,
+    subject: msg.subject,
+    category: msg.category,
     messageText: msg.messageText,
     sentDate: msg.sentDate.toISOString(),
     isRead: msg.isRead,
     repliedByAdmin: msg.repliedByAdmin,
     replyDate: msg.replyDate?.toISOString() ?? null,
+    emailSent,
   });
 });
 

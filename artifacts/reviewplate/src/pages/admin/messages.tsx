@@ -82,10 +82,15 @@ export default function AdminMessagesPage() {
         body: JSON.stringify({ reply }),
       });
       if (!res.ok) throw new Error();
-      const updated: SupportMsg = await res.json();
+      const updated: SupportMsg & { emailSent?: boolean } = await res.json();
       setMessages(msgs => msgs.map(m => m.id === id ? { ...m, ...updated } : m));
       setReplies(r => ({ ...r, [id]: "" }));
-      toast({ title: "Réponse envoyée", description: "Le message a été marqué comme traité." });
+      toast({
+        title: "Réponse envoyée",
+        description: updated.emailSent
+          ? `Email de notification envoyé à ${messages.find(m => m.id === id)?.senderEmail ?? "l'utilisateur"}.`
+          : "Réponse enregistrée. (Email non configuré — configurez SMTP pour notifier l'utilisateur.)",
+      });
     } catch {
       toast({ variant: "destructive", title: "Erreur", description: "Impossible d'envoyer la réponse." });
     } finally {

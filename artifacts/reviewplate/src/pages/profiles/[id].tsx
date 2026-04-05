@@ -4,7 +4,7 @@ import {
   useListCards,
   getListBusinessProfilesQueryKey, getGetBusinessProfileQueryKey,
 } from "@workspace/api-client-react";
-import { ArrowLeft, Save, Trash2, Globe, MapPin, Star, CreditCard, Activity, ExternalLink, Plus } from "lucide-react";
+import { ArrowLeft, Save, Trash2, Globe, MapPin, Star, CreditCard, Activity, ExternalLink, Plus, Upload, X } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Link, useLocation, useParams } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -53,6 +53,7 @@ export default function ProfileEditorPage() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: profile, isLoading } = useGetBusinessProfile(profileId, {
     query: { enabled: !!profileId, queryKey: getGetBusinessProfileQueryKey(profileId) },
@@ -74,7 +75,16 @@ export default function ProfileEditorPage() {
 
   const cardList = (cards as unknown as CardItem[]) ?? [];
 
-  const [form, setForm] = useState({ name: "", address: "", website: "", googleReviewUrl: "", description: "" });
+  const [form, setForm] = useState({
+    name: "",
+    address: "",
+    website: "",
+    googleReviewUrl: "",
+    description: "",
+    logoUrl: "",
+  });
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [logoChanged, setLogoChanged] = useState(false);
 
   useEffect(() => {
     if (profileData) {
@@ -84,17 +94,56 @@ export default function ProfileEditorPage() {
         website: profileData.website ?? "",
         googleReviewUrl: profileData.googleReviewUrl ?? "",
         description: profileData.description ?? "",
+        logoUrl: profileData.logoUrl ?? "",
       });
+      setLogoPreview(profileData.logoUrl ?? null);
+      setLogoChanged(false);
     }
   }, [profileData]);
 
+  const handleLogoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast({ variant: "destructive", title: "Format invalide", description: "Veuillez choisir une image (PNG, JPG, SVG…)" });
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast({ variant: "destructive", title: "Fichier trop lourd", description: "Le logo ne doit pas dépasser 2 Mo." });
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const dataUrl = ev.target?.result as string;
+      setLogoPreview(dataUrl);
+      setForm(f => ({ ...f, logoUrl: dataUrl }));
+      setLogoChanged(true);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveLogo = () => {
+    setLogoPreview(null);
+    setForm(f => ({ ...f, logoUrl: "" }));
+    setLogoChanged(true);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   const handleSave = () => {
     updateMutation.mutate(
-      { id: profileId, data: { name: form.name, address: form.address || null, website: form.website || null, googleReviewUrl: form.googleReviewUrl || null, description: form.description || null } },
+      {
+        id: profileId,
+        data: {
+          name: form.name,
+          address: form.address || null,
+          logoUrl: logoChanged ? (form.logoUrl || null) : undefined,
+        },
+      },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getGetBusinessProfileQueryKey(profileId) });
           queryClient.invalidateQueries({ queryKey: getListBusinessProfilesQueryKey() });
+          setLogoChanged(false);
           toast({ title: "Profil mis à jour", description: "Les informations ont été sauvegardées." });
         },
         onError: () => {
@@ -153,22 +202,35 @@ export default function ProfileEditorPage() {
               <ArrowLeft className="w-5 h-5 text-[#6B7280]" />
             </button>
           </Link>
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold text-[#0D1117]">{profileData.name}</h1>
-            <div className="flex items-center gap-3 mt-1">
-              <span className="text-sm text-[#6B7280] flex items-center gap-1">
-                <CreditCard className="w-3.5 h-3.5" />
-                {cardList.length} carte{cardList.length !== 1 ? "s" : ""} rattachée{cardList.length !== 1 ? "s" : ""}
-              </span>
-              <span className="text-sm text-[#6B7280] flex items-center gap-1">
-                <Activity className="w-3.5 h-3.5" />
-                {profileData.totalScans} scan{profileData.totalScans !== 1 ? "s" : ""}
-              </span>
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            {logoPreview ? (
+              <img
+                src={logoPreview}
+                alt={profileData.name}
+                className="w-12 h-12 rounded-xl object-cover border border-border shrink-0"
+              />
+            ) : (
+              <div className="w-12 h-12 bg-[#0D1117] rounded-xl flex items-center justify-center shrink-0">
+                <span className="text-lg font-bold text-primary">{profileData.name[0]?.toUpperCase()}</span>
+              </div>
+            )}
+            <div>
+              <h1 className="text-2xl font-bold text-[#0D1117]">{profileData.name}</h1>
+              <div className="flex items-center gap-3 mt-1">
+                <span className="text-sm text-[#6B7280] flex items-center gap-1">
+                  <CreditCard className="w-3.5 h-3.5" />
+                  {cardList.length} carte{cardList.length !== 1 ? "s" : ""} rattachée{cardList.length !== 1 ? "s" : ""}
+                </span>
+                <span className="text-sm text-[#6B7280] flex items-center gap-1">
+                  <Activity className="w-3.5 h-3.5" />
+                  {profileData.totalScans} scan{profileData.totalScans !== 1 ? "s" : ""}
+                </span>
+              </div>
             </div>
           </div>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50" data-testid="button-delete">
+              <Button variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50 shrink-0" data-testid="button-delete">
                 <Trash2 className="w-4 h-4 mr-1.5" />
                 Supprimer
               </Button>
@@ -235,10 +297,18 @@ export default function ProfileEditorPage() {
               <div className="divide-y divide-border">
                 {cardList.map((card) => (
                   <div key={card.id} className="flex items-center gap-4 px-5 py-4 hover:bg-[#F8FAFC] transition-colors" data-testid={`card-row-${card.id}`}>
-                    {/* Code badge */}
-                    <div className="w-10 h-10 bg-[#0D1117] rounded-xl flex items-center justify-center shrink-0">
-                      <span className="text-xs font-mono font-bold text-primary">{card.code.slice(0, 2)}</span>
-                    </div>
+                    {/* Logo or code badge */}
+                    {logoPreview ? (
+                      <img
+                        src={logoPreview}
+                        alt={profileData.name}
+                        className="w-10 h-10 rounded-xl object-cover border border-border shrink-0"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 bg-[#0D1117] rounded-xl flex items-center justify-center shrink-0">
+                        <span className="text-xs font-mono font-bold text-primary">{card.code.slice(0, 2)}</span>
+                      </div>
+                    )}
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
@@ -294,6 +364,68 @@ export default function ProfileEditorPage() {
             <CardTitle className="text-base font-semibold text-[#0D1117]">Informations du profil</CardTitle>
           </CardHeader>
           <CardContent className="pt-6 space-y-5">
+
+            {/* Logo upload */}
+            <div className="space-y-2">
+              <Label className="flex items-center gap-1.5">
+                <Upload className="w-3.5 h-3.5" />
+                Logo de l'établissement
+              </Label>
+              <div className="flex items-center gap-4">
+                {logoPreview ? (
+                  <div className="relative shrink-0">
+                    <img
+                      src={logoPreview}
+                      alt="Logo"
+                      className="w-20 h-20 rounded-xl object-cover border border-border shadow-sm"
+                    />
+                    <button
+                      onClick={handleRemoveLogo}
+                      className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white shadow transition-colors"
+                      data-testid="button-remove-logo"
+                      title="Supprimer le logo"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="w-20 h-20 rounded-xl border-2 border-dashed border-border flex items-center justify-center bg-[#F8FAFC] shrink-0">
+                    <div className="text-center">
+                      <div className="w-8 h-8 bg-[#0D1117] rounded-lg flex items-center justify-center mx-auto mb-1">
+                        <span className="text-sm font-bold text-primary">{profileData.name[0]?.toUpperCase()}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div className="flex-1">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    id="logo-upload"
+                    onChange={handleLogoFileChange}
+                    data-testid="input-logo-file"
+                  />
+                  <label htmlFor="logo-upload">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="cursor-pointer w-full"
+                      asChild
+                      data-testid="button-upload-logo"
+                    >
+                      <span>
+                        <Upload className="w-3.5 h-3.5 mr-1.5" />
+                        {logoPreview ? "Changer le logo" : "Importer un logo"}
+                      </span>
+                    </Button>
+                  </label>
+                  <p className="text-xs text-[#9CA3AF] mt-1.5">PNG, JPG ou SVG · max 2 Mo</p>
+                </div>
+              </div>
+            </div>
+
             <div className="space-y-1.5">
               <Label>Nom de l'établissement *</Label>
               <Input

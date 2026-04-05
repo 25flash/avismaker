@@ -1,7 +1,7 @@
 import { AuthLayout } from "@/components/layout/AuthLayout";
 import { useListBusinessProfiles, useCreateBusinessProfile, getListBusinessProfilesQueryKey } from "@workspace/api-client-react";
-import { Building2, Plus, Globe, MapPin, Star, Trash2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Building2, Plus, Globe, MapPin, Star } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +21,25 @@ interface ProfileForm {
   description: string;
 }
 
+function ProfileAvatar({ name, logoUrl, size = "md" }: { name: string; logoUrl: string | null; size?: "sm" | "md" }) {
+  const dim = size === "sm" ? "w-9 h-9" : "w-12 h-12";
+  const textSize = size === "sm" ? "text-sm" : "text-lg";
+  if (logoUrl) {
+    return (
+      <img
+        src={logoUrl}
+        alt={name}
+        className={`${dim} rounded-xl object-cover border border-border shrink-0`}
+      />
+    );
+  }
+  return (
+    <div className={`${dim} bg-[#0D1117] rounded-xl flex items-center justify-center shrink-0`}>
+      <span className={`${textSize} font-bold text-primary`}>{name[0]?.toUpperCase()}</span>
+    </div>
+  );
+}
+
 export default function ProfilesPage() {
   const { data: profiles, isLoading } = useListBusinessProfiles();
   const createMutation = useCreateBusinessProfile();
@@ -38,17 +57,17 @@ export default function ProfilesPage() {
   const handleCreate = () => {
     if (!form.name.trim()) return;
     createMutation.mutate(
-      { data: { name: form.name, address: form.address || null, website: form.website || null, googleReviewUrl: form.googleReviewUrl || null, description: form.description || null } },
+      { data: { name: form.name, address: form.address || null, logoUrl: null } },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getListBusinessProfilesQueryKey() });
           setShowDialog(false);
           setForm({ name: "", address: "", website: "", googleReviewUrl: "", description: "" });
-          toast({ title: "Profile created", description: "Your business profile has been saved." });
+          toast({ title: "Profil créé", description: "Votre profil business a été sauvegardé." });
         },
         onError: (err: unknown) => {
           const apiError = err as { data?: { error?: string } };
-          toast({ variant: "destructive", title: "Error", description: apiError?.data?.error ?? "Failed to create profile." });
+          toast({ variant: "destructive", title: "Erreur", description: apiError?.data?.error ?? "Impossible de créer le profil." });
         },
       }
     );
@@ -59,8 +78,8 @@ export default function ProfilesPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-[#0D1117]">Business Profiles</h1>
-            <p className="text-sm text-[#6B7280] mt-0.5">Manage your business information and review links</p>
+            <h1 className="text-2xl font-bold text-[#0D1117]">Profils Business</h1>
+            <p className="text-sm text-[#6B7280] mt-0.5">Gérez vos établissements et leurs liens d'avis</p>
           </div>
           <Button
             onClick={() => setShowDialog(true)}
@@ -68,7 +87,7 @@ export default function ProfilesPage() {
             data-testid="button-add-profile"
           >
             <Plus className="w-4 h-4 mr-2" />
-            Add Profile
+            Ajouter un profil
           </Button>
         </div>
 
@@ -82,9 +101,9 @@ export default function ProfilesPage() {
               <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Building2 className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="text-lg font-semibold text-[#0D1117] mb-2">No business profiles</h3>
+              <h3 className="text-lg font-semibold text-[#0D1117] mb-2">Aucun profil business</h3>
               <p className="text-sm text-[#6B7280] mb-6 max-w-xs mx-auto">
-                Create a profile for each business location to organize your review cards.
+                Créez un profil pour chaque établissement afin d'organiser vos cartes d'avis.
               </p>
               <Button
                 onClick={() => setShowDialog(true)}
@@ -92,7 +111,7 @@ export default function ProfilesPage() {
                 data-testid="button-create-first-profile"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                Create your first profile
+                Créer mon premier profil
               </Button>
             </CardContent>
           </Card>
@@ -106,11 +125,7 @@ export default function ProfilesPage() {
                 >
                   <CardContent className="p-5">
                     <div className="flex items-start gap-3 mb-3">
-                      <div className="w-12 h-12 bg-[#0D1117] rounded-xl flex items-center justify-center shrink-0">
-                        <span className="text-lg font-bold text-primary">
-                          {profile.name[0]?.toUpperCase()}
-                        </span>
-                      </div>
+                      <ProfileAvatar name={profile.name} logoUrl={profile.logoUrl} />
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-[#0D1117] truncate" data-testid={`text-profile-name-${profile.id}`}>{profile.name}</p>
                         {profile.address && (
@@ -129,7 +144,7 @@ export default function ProfilesPage() {
                     <div className="flex gap-2 flex-wrap">
                       {profile.website && (
                         <span className="flex items-center gap-1 text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded">
-                          <Globe className="w-3 h-3" /> Website
+                          <Globe className="w-3 h-3" /> Site web
                         </span>
                       )}
                       {profile.googleReviewUrl && (
@@ -140,7 +155,7 @@ export default function ProfilesPage() {
                     </div>
 
                     <p className="text-xs text-[#9CA3AF] mt-3">
-                      Created {new Date(profile.createdAt).toLocaleDateString()}
+                      Créé le {new Date(profile.createdAt).toLocaleDateString("fr-FR")}
                     </p>
                   </CardContent>
                 </Card>
@@ -154,38 +169,38 @@ export default function ProfilesPage() {
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent className="max-w-md" data-testid="dialog-create-profile">
           <DialogHeader>
-            <DialogTitle className="text-[#0D1117]">Create Business Profile</DialogTitle>
+            <DialogTitle className="text-[#0D1117]">Créer un profil business</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <Label>Business Name *</Label>
+              <Label>Nom de l'établissement *</Label>
               <Input
                 value={form.name}
                 onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))}
-                placeholder="e.g. The Grand Hotel"
+                placeholder="ex. Le Grand Hôtel"
                 data-testid="input-profile-name"
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Address</Label>
+              <Label>Adresse</Label>
               <Input
                 value={form.address}
                 onChange={(e) => setForm(f => ({ ...f, address: e.target.value }))}
-                placeholder="123 Main St, London"
+                placeholder="12 Rue de la Paix, Paris"
                 data-testid="input-profile-address"
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Website</Label>
+              <Label>Site web</Label>
               <Input
                 value={form.website}
                 onChange={(e) => setForm(f => ({ ...f, website: e.target.value }))}
-                placeholder="https://example.com"
+                placeholder="https://monrestaurant.fr"
                 data-testid="input-profile-website"
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Google Review URL</Label>
+              <Label>Lien Google Avis</Label>
               <Input
                 value={form.googleReviewUrl}
                 onChange={(e) => setForm(f => ({ ...f, googleReviewUrl: e.target.value }))}
@@ -198,21 +213,21 @@ export default function ProfilesPage() {
               <Textarea
                 value={form.description}
                 onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
-                placeholder="A short description of your business..."
+                placeholder="Courte description de votre établissement…"
                 rows={3}
                 data-testid="input-profile-description"
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDialog(false)} data-testid="button-cancel-profile">Cancel</Button>
+            <Button variant="outline" onClick={() => setShowDialog(false)} data-testid="button-cancel-profile">Annuler</Button>
             <Button
               onClick={handleCreate}
               disabled={!form.name.trim() || createMutation.isPending}
               className="bg-primary text-[#0D1117] font-semibold hover:bg-primary/90"
               data-testid="button-save-profile"
             >
-              {createMutation.isPending ? "Creating..." : "Create Profile"}
+              {createMutation.isPending ? "Création…" : "Créer le profil"}
             </Button>
           </DialogFooter>
         </DialogContent>

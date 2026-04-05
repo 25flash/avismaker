@@ -40,6 +40,8 @@ const planIconColor: Record<string, string> = {
   business: "text-primary",
 };
 
+const planOrder: Record<string, number> = { free: 0, premium: 1, business: 2 };
+
 interface Plan {
   id: string;
   name: string;
@@ -312,6 +314,7 @@ export default function AccountPage() {
                 const Icon = planIcons[plan.id] ?? Zap;
                 const isCurrentPlan = plan.id === currentPlan;
                 const isHighlight = plan.id === "business";
+                const isDowngrade = (planOrder[plan.id] ?? 0) < (planOrder[currentPlan] ?? 0);
                 const price = getPrice(plan.price);
 
                 return (
@@ -367,24 +370,24 @@ export default function AccountPage() {
                       )}
                     </ul>
 
-                    <Button
-                      onClick={() => handleUpgrade(plan.id)}
-                      disabled={isCurrentPlan || !!upgrading}
-                      size="sm"
-                      className={cn("w-full text-xs font-semibold", isCurrentPlan ? "bg-transparent border border-border text-[#6B7280]" : (planBtnColor[plan.id] ?? ""))}
-                      variant={isCurrentPlan ? "outline" : "default"}
-                      data-testid={`button-plan-${plan.id}`}
-                    >
-                      {upgrading === plan.id ? (
-                        <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />{t("billing.upgrading")}</>
-                      ) : isCurrentPlan ? (
-                        t("billing.currentPlanBtn")
-                      ) : plan.id === "free" ? (
-                        t("billing.downgrade")
-                      ) : (
-                        t("billing.upgrade")
-                      )}
-                    </Button>
+                    {!isDowngrade && (
+                      <Button
+                        onClick={() => handleUpgrade(plan.id)}
+                        disabled={isCurrentPlan || !!upgrading}
+                        size="sm"
+                        className={cn("w-full text-xs font-semibold", isCurrentPlan ? "bg-transparent border border-border text-[#6B7280]" : (planBtnColor[plan.id] ?? ""))}
+                        variant={isCurrentPlan ? "outline" : "default"}
+                        data-testid={`button-plan-${plan.id}`}
+                      >
+                        {upgrading === plan.id ? (
+                          <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />{t("billing.upgrading")}</>
+                        ) : isCurrentPlan ? (
+                          t("billing.currentPlanBtn")
+                        ) : (
+                          t("billing.upgrade")
+                        )}
+                      </Button>
+                    )}
                   </div>
                 );
               })}

@@ -43,6 +43,8 @@ const planIconColor: Record<string, string> = {
   business: "text-primary",
 };
 
+const planOrder: Record<string, number> = { free: 0, premium: 1, business: 2 };
+
 interface Plan {
   id: string;
   name: string;
@@ -178,6 +180,7 @@ export default function BillingPage() {
             const Icon = planIcons[plan.id] ?? Zap;
             const isCurrentPlan = plan.id === currentPlan;
             const isHighlight = plan.id === "business";
+            const isDowngrade = (planOrder[plan.id] ?? 0) < (planOrder[currentPlan] ?? 0);
             const price = getPrice(plan.price);
 
             return (
@@ -254,21 +257,21 @@ export default function BillingPage() {
                     ))}
                   </ul>
 
-                  <Button
-                    onClick={() => handleUpgrade(plan.id)}
-                    disabled={isCurrentPlan || !!upgrading}
-                    className={cn("w-full font-semibold", planBtnColor[plan.id] ?? "")}
-                    variant={isCurrentPlan ? "outline" : "default"}
-                    data-testid={`button-plan-${plan.id}`}
-                  >
-                    {upgrading === plan.id
-                      ? t("billing.upgrading")
-                      : isCurrentPlan
-                      ? t("billing.currentPlanBtn")
-                      : plan.id === "free"
-                      ? t("billing.downgrade")
-                      : t("billing.upgrade")}
-                  </Button>
+                  {!isDowngrade && (
+                    <Button
+                      onClick={() => handleUpgrade(plan.id)}
+                      disabled={isCurrentPlan || !!upgrading}
+                      className={cn("w-full font-semibold", planBtnColor[plan.id] ?? "")}
+                      variant={isCurrentPlan ? "outline" : "default"}
+                      data-testid={`button-plan-${plan.id}`}
+                    >
+                      {upgrading === plan.id
+                        ? t("billing.upgrading")
+                        : isCurrentPlan
+                        ? t("billing.currentPlanBtn")
+                        : t("billing.upgrade")}
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             );

@@ -1,12 +1,7 @@
 import { Router, type IRouter } from "express";
 import { eq } from "drizzle-orm";
 import { db, supportMessagesTable } from "@workspace/db";
-import { requireAuth, requireAdmin, type AuthRequest } from "../lib/auth";
-import {
-  CreateSupportMessageBody,
-  ReplyToSupportMessageParams,
-  ReplyToSupportMessageBody,
-} from "@workspace/api-zod";
+import { requireAuth, type AuthRequest } from "../lib/auth";
 
 const router: IRouter = Router();
 
@@ -14,6 +9,8 @@ function formatMessage(msg: typeof supportMessagesTable.$inferSelect) {
   return {
     id: msg.id,
     senderId: msg.senderId,
+    subject: msg.subject,
+    category: msg.category,
     messageText: msg.messageText,
     sentDate: msg.sentDate.toISOString(),
     isRead: msg.isRead,
@@ -29,15 +26,18 @@ router.get("/support/messages", requireAuth, async (req: AuthRequest, res): Prom
 });
 
 router.post("/support/messages", requireAuth, async (req: AuthRequest, res): Promise<void> => {
-  const parsed = CreateSupportMessageBody.safeParse(req.body);
-  if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.message });
+  const body = req.body ?? {};
+  const text = ((body.message ?? body.messageText ?? "") as string).trim();
+  if (!text) {
+    res.status(400).json({ error: "Message text is required" });
     return;
   }
 
   const [msg] = await db.insert(supportMessagesTable).values({
     senderId: req.userId!,
-    messageText: parsed.data.messageText,
+    subject: ((body.subject ?? "") as string).trim(),
+    category: (body.category as string) || "general",
+    messageText: text,
   }).returning();
 
   res.status(201).json(formatMessage(msg));

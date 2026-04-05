@@ -214,11 +214,31 @@ router.get("/admin/scan-logs", requireAdmin, async (req: AuthRequest, res): Prom
 });
 
 router.get("/admin/support-messages", requireAdmin, async (req: AuthRequest, res): Promise<void> => {
-  const messages = await db.select().from(supportMessagesTable);
-  messages.sort((a, b) => b.sentDate.getTime() - a.sentDate.getTime());
-  res.json(messages.map(msg => ({
+  const rows = await db
+    .select({
+      id: supportMessagesTable.id,
+      senderId: supportMessagesTable.senderId,
+      senderName: usersTable.name,
+      senderEmail: usersTable.email,
+      subject: supportMessagesTable.subject,
+      category: supportMessagesTable.category,
+      messageText: supportMessagesTable.messageText,
+      sentDate: supportMessagesTable.sentDate,
+      isRead: supportMessagesTable.isRead,
+      repliedByAdmin: supportMessagesTable.repliedByAdmin,
+      replyDate: supportMessagesTable.replyDate,
+    })
+    .from(supportMessagesTable)
+    .leftJoin(usersTable, eq(supportMessagesTable.senderId, usersTable.id));
+
+  rows.sort((a, b) => b.sentDate.getTime() - a.sentDate.getTime());
+  res.json(rows.map(msg => ({
     id: msg.id,
     senderId: msg.senderId,
+    senderName: msg.senderName ?? "Utilisateur inconnu",
+    senderEmail: msg.senderEmail ?? "",
+    subject: msg.subject,
+    category: msg.category,
     messageText: msg.messageText,
     sentDate: msg.sentDate.toISOString(),
     isRead: msg.isRead,

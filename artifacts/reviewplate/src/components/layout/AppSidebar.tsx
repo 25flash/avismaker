@@ -99,7 +99,7 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
           );
         })}
 
-        {/* Admin link */}
+        {/* Admin links */}
         {user?.role === "admin" && (
           <>
             <div className="my-2 border-t border-white/10" />
@@ -108,16 +108,33 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium cursor-pointer relative",
                   "transition-colors duration-150",
-                  location.startsWith("/admin")
+                  location === "/admin"
                     ? "bg-amber-500/15 text-amber-400"
                     : "text-amber-400/60 hover:text-amber-400 hover:bg-white/8"
                 )}
               >
-                {location.startsWith("/admin") && (
+                {location === "/admin" && (
                   <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-amber-400 rounded-r-full" />
                 )}
                 <Shield className="w-4 h-4 shrink-0" />
                 <span>{t("nav.admin")}</span>
+              </div>
+            </Link>
+            <Link href="/admin/messages" data-testid="nav-admin-messages" onClick={handleNavClick}>
+              <div
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium cursor-pointer relative",
+                  "transition-colors duration-150",
+                  location === "/admin/messages"
+                    ? "bg-amber-500/15 text-amber-400"
+                    : "text-amber-400/60 hover:text-amber-400 hover:bg-white/8"
+                )}
+              >
+                {location === "/admin/messages" && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-amber-400 rounded-r-full" />
+                )}
+                <MessageCircle className="w-4 h-4 shrink-0" />
+                <span>Messages Support</span>
               </div>
             </Link>
           </>

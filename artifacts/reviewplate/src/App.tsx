@@ -24,6 +24,7 @@ const ActivatePage = lazy(() => import("@/pages/activate"));
 
 const AccountPage = lazy(() => import("@/pages/account"));
 const AdminPage = lazy(() => import("@/pages/admin/index"));
+const AdminMessagesPage = lazy(() => import("@/pages/admin/messages"));
 const CardAnalyticsPage = lazy(() => import("@/pages/analytics/cards/[id]"));
 const BusinessAnalyticsPage = lazy(() => import("@/pages/business-analytics"));
 const ScanPage = lazy(() => import("@/pages/scan"));
@@ -79,6 +80,7 @@ function Router() {
 
         {/* Admin */}
         <Route path="/admin" component={AdminPage} />
+        <Route path="/admin/messages" component={AdminMessagesPage} />
 
         {/* 404 */}
         <Route component={NotFound} />

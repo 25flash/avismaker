@@ -1,6 +1,5 @@
 import { AuthLayout } from "@/components/layout/AuthLayout";
-import { useCreateSupportMessage } from "@workspace/api-client-react";
-import { MessageCircle, Send, CheckCircle, Mail } from "lucide-react";
+import { MessageCircle, Send, CheckCircle, Mail, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,26 +10,32 @@ import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+const API_BASE = import.meta.env.VITE_API_URL ?? "";
+
 export default function SupportPage() {
   const { t } = useTranslation();
-  const createMutation = useCreateSupportMessage();
   const { toast } = useToast();
   const [sent, setSent] = useState(false);
+  const [isPending, setIsPending] = useState(false);
   const [form, setForm] = useState({ subject: "", category: "general", message: "" });
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!form.subject.trim() || !form.message.trim()) return;
-    createMutation.mutate(
-      { data: { subject: form.subject, category: form.category, message: form.message } },
-      {
-        onSuccess: () => {
-          setSent(true);
-        },
-        onError: () => {
-          toast({ variant: "destructive", title: t('common.error'), description: t('support.sendError') });
-        },
-      }
-    );
+    const token = localStorage.getItem("reviewplate_token");
+    setIsPending(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/support/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ subject: form.subject, category: form.category, message: form.message }),
+      });
+      if (!res.ok) throw new Error();
+      setSent(true);
+    } catch {
+      toast({ variant: "destructive", title: t("common.error"), description: t("support.sendError") });
+    } finally {
+      setIsPending(false);
+    }
   };
 
   return (
@@ -111,12 +116,15 @@ export default function SupportPage() {
 
                 <Button
                   onClick={handleSubmit}
-                  disabled={!form.subject.trim() || !form.message.trim() || createMutation.isPending}
+                  disabled={!form.subject.trim() || !form.message.trim() || isPending}
                   className="w-full bg-primary text-[#0D1117] font-semibold hover:bg-primary/90"
                   data-testid="button-submit"
                 >
-                  <Send className="w-4 h-4 mr-2" />
-                  {createMutation.isPending ? t('support.sending') : t('support.send')}
+                  {isPending ? (
+                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t("support.sending")}</>
+                  ) : (
+                    <><Send className="w-4 h-4 mr-2" />{t("support.send")}</>
+                  )}
                 </Button>
               </CardContent>
             </Card>

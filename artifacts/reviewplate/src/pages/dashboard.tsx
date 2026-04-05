@@ -229,7 +229,7 @@ const METRIC_BOX_COLORS: Record<string, { bg: string; icon: string; border: stri
 };
 
 function MetricBox({
-  label, value, icon: Icon, positive, neutral, suffix,
+  label, value, icon: Icon, positive, neutral, suffix, locked = false,
 }: {
   label: string;
   value: string | number;
@@ -237,10 +237,12 @@ function MetricBox({
   positive?: boolean;
   neutral?: boolean;
   suffix?: string;
+  locked?: boolean;
 }) {
   const colorKey = Object.keys(METRIC_BOX_COLORS).find(k => label.startsWith(k)) ?? "";
   const colors = METRIC_BOX_COLORS[colorKey] ?? { bg: "bg-gray-50", icon: "text-gray-500", border: "border-gray-100" };
-  return (
+
+  const inner = (
     <div className={cn("rounded-xl px-3 py-3 border flex flex-col gap-1", colors.bg, colors.border)}>
       <div className={cn("flex items-center gap-1.5", colors.icon)}>
         <Icon className="w-3.5 h-3.5 shrink-0" />
@@ -261,64 +263,22 @@ function MetricBox({
       </div>
     </div>
   );
-}
 
-function FakeChartSVG() {
+  if (!locked) return inner;
+
   return (
-    <svg viewBox="0 0 320 90" preserveAspectRatio="none" className="w-full h-full" aria-hidden="true">
-      <defs>
-        <linearGradient id="fg1" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.25" />
-          <stop offset="100%" stopColor="#F59E0B" stopOpacity="0" />
-        </linearGradient>
-        <linearGradient id="fg2" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.2" />
-          <stop offset="100%" stopColor="#3B82F6" stopOpacity="0" />
-        </linearGradient>
-        <linearGradient id="fg3" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#10B981" stopOpacity="0.2" />
-          <stop offset="100%" stopColor="#10B981" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      {/* Area fills */}
-      <path d="M0,70 C40,60 80,30 120,40 C160,50 200,20 240,25 C280,30 310,45 320,40 L320,90 L0,90 Z" fill="url(#fg1)" />
-      <path d="M0,55 C50,45 90,65 140,50 C180,38 220,55 270,45 C295,40 310,52 320,48 L320,90 L0,90 Z" fill="url(#fg2)" />
-      <path d="M0,75 C60,68 100,50 150,60 C190,68 230,38 280,42 C300,44 312,56 320,52 L320,90 L0,90 Z" fill="url(#fg3)" />
-      {/* Lines */}
-      <path d="M0,70 C40,60 80,30 120,40 C160,50 200,20 240,25 C280,30 310,45 320,40" fill="none" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" />
-      <path d="M0,55 C50,45 90,65 140,50 C180,38 220,55 270,45 C295,40 310,52 320,48" fill="none" stroke="#3B82F6" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M0,75 C60,68 100,50 150,60 C190,68 230,38 280,42 C300,44 312,56 320,52" fill="none" stroke="#10B981" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-type MetricRowItem = { label: string; value: string | number; suffix: string; icon: React.ElementType; positive?: boolean; neutral?: boolean; locked: boolean };
-
-function LockedMetricsZone({ rows }: { rows: MetricRowItem[] }) {
-  return (
-    <div className="relative rounded-xl overflow-hidden border border-[#E5E7EB]" style={{ minHeight: 110 }}>
-      {/* Fake chart background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-gray-100">
-        <FakeChartSVG />
+    <div className="relative group">
+      <div className="blur-sm opacity-50 pointer-events-none select-none group-hover:blur-[2px] group-hover:opacity-65 transition-all duration-200">
+        {inner}
       </div>
-      {/* Blurred metric tiles behind overlay */}
-      <div className="relative grid grid-cols-2 sm:grid-cols-4 gap-2 p-2 pointer-events-none select-none" style={{ filter: "blur(3px)", opacity: 0.55 }}>
-        {rows.map(m => (
-          <MetricBox key={m.label} label={m.label} value={m.value} suffix={m.suffix} icon={m.icon} positive={m.positive} neutral={m.neutral} />
-        ))}
-      </div>
-      {/* Blur + white overlay */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-xl" style={{ backdropFilter: "blur(6px)", background: "rgba(255,255,255,0.50)" }}>
-        <Lock className="w-6 h-6 text-[#374151]" />
-        <p className="text-xs font-semibold text-[#374151] text-center px-4 leading-tight">
-          Fonctionnalité réservée au plan Business
-        </p>
-        <Link href="/billing">
-          <Button className="bg-primary text-[#0D1117] font-semibold hover:bg-primary/90 text-xs h-7 px-3 mt-0.5">
-            Passer au plan Business
-          </Button>
-        </Link>
-      </div>
+      <Link href="/billing">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5 cursor-pointer rounded-xl">
+          <Lock className="w-3.5 h-3.5 text-[#6B7280]" />
+          <span className="text-[9px] font-semibold text-[#6B7280] text-center leading-tight px-1">
+            Business
+          </span>
+        </div>
+      </Link>
     </div>
   );
 }
@@ -431,26 +391,20 @@ function AnalyticsPreviewCard({
 
       {/* Metrics grid + chart side by side on desktop */}
       <div className="flex flex-col xl:flex-row gap-4">
-        {/* Metrics section */}
-        <div className="flex flex-col gap-2 xl:w-[52%]">
-          {isBusiness ? (
-            /* Business: full 6-tile grid */
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-              {metricRows.map(m => (
-                <MetricBox key={m.label} label={m.label} value={m.value} suffix={m.suffix} icon={m.icon} positive={m.positive} neutral={m.neutral} />
-              ))}
-            </div>
-          ) : (
-            <>
-              {/* Non-Business: locked zone (4 metrics) + free tiles below */}
-              <LockedMetricsZone rows={metricRows.filter(m => m.locked)} />
-              <div className="grid grid-cols-2 gap-3">
-                {metricRows.filter(m => !m.locked).map(m => (
-                  <MetricBox key={m.label} label={m.label} value={m.value} suffix={m.suffix} icon={m.icon} positive={m.positive} neutral={m.neutral} />
-                ))}
-              </div>
-            </>
-          )}
+        {/* 6 metrics in 2x3 grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 xl:w-[52%]">
+          {metricRows.map(m => (
+            <MetricBox
+              key={m.label}
+              label={m.label}
+              value={m.value}
+              suffix={m.suffix}
+              icon={m.icon}
+              positive={m.positive}
+              neutral={m.neutral}
+              locked={!isBusiness && m.locked}
+            />
+          ))}
         </div>
 
         {/* AreaChart */}

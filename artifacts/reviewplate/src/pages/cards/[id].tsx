@@ -4,7 +4,7 @@ import {
   useListBusinessProfiles,
   getGetCardQueryKey, getListCardsQueryKey,
 } from "@workspace/api-client-react";
-import { ArrowLeft, Power, PowerOff, ExternalLink, Save, BarChart2, Building2, Plus } from "lucide-react";
+import { ArrowLeft, Power, PowerOff, ExternalLink, Save, BarChart2, Building2, Plus, Zap } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,9 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
+} from "@/components/ui/dialog";
 import { Link, useParams } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -81,6 +84,7 @@ export default function CardEditorPage() {
   const [businessProfileId, setBusinessProfileId] = useState<string>("");
   const [targetUrl, setTargetUrl] = useState("");
   const [smartReview, setSmartReview] = useState(false);
+  const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
 
   useEffect(() => {
     if (cardData) {
@@ -124,6 +128,14 @@ export default function CardEditorPage() {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getGetCardQueryKey(cardId) });
           toast({ title: "Carte activée", description: "La carte est maintenant active et prête à scanner." });
+        },
+        onError: (err: unknown) => {
+          const body = (err as { response?: { data?: { code?: string } } })?.response?.data;
+          if (body?.code === "ACTIVE_CARD_LIMIT_REACHED") {
+            setShowUpgradeDialog(true);
+          } else {
+            toast({ variant: "destructive", title: "Erreur", description: "Impossible d'activer la carte." });
+          }
         },
       }
     );
@@ -370,6 +382,70 @@ export default function CardEditorPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Dialog upgrade plan */}
+      <Dialog open={showUpgradeDialog} onOpenChange={setShowUpgradeDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-amber-100 mx-auto mb-3">
+              <Zap className="w-6 h-6 text-amber-500" />
+            </div>
+            <DialogTitle className="text-center text-lg font-bold text-[#0D1117]">
+              Limite de cartes atteinte
+            </DialogTitle>
+            <DialogDescription className="text-center text-[#6B7280]">
+              Le plan <span className="font-semibold text-[#374151]">Free</span> permet d'activer <span className="font-semibold text-[#374151]">1 carte</span> à la fois. Passez au plan supérieur pour en activer davantage.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="mt-2 rounded-xl border border-amber-200 bg-amber-50 p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <p className="font-bold text-[#0D1117]">Premium</p>
+                <p className="text-xs text-[#6B7280]">3 cartes actives simultanées</p>
+              </div>
+              <div className="text-right">
+                <p className="text-2xl font-bold text-[#0D1117]">19 €</p>
+                <p className="text-xs text-[#9CA3AF]">/mois</p>
+              </div>
+            </div>
+            <ul className="space-y-1 text-xs text-[#374151]">
+              <li className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] shrink-0" />
+                3 cartes actives
+              </li>
+              <li className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] shrink-0" />
+                Générateur de réponses IA
+              </li>
+              <li className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] shrink-0" />
+                Analytics avancés
+              </li>
+            </ul>
+          </div>
+
+          <div className="flex flex-col gap-2 mt-2">
+            <Link href="/billing">
+              <Button
+                className="w-full bg-[#F59E0B] hover:bg-[#D97706] text-white font-semibold"
+                onClick={() => setShowUpgradeDialog(false)}
+                data-testid="button-upgrade-premium"
+              >
+                <Zap className="w-4 h-4 mr-2" />
+                Passer au Premium
+              </Button>
+            </Link>
+            <Button
+              variant="ghost"
+              className="w-full text-[#6B7280]"
+              onClick={() => setShowUpgradeDialog(false)}
+            >
+              Plus tard
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </AuthLayout>
   );
 }

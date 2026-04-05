@@ -114,43 +114,49 @@ function CardRow({
   );
 }
 
-const DEMO_SPARKLINE = [4, 7, 5, 9, 6, 11, 8, 13, 10, 14, 12, 16];
+const DEMO_SPARKLINE = [4, 7, 5, 9, 6, 11, 8, 13, 10, 14, 12, 16, 11, 15, 13, 17, 14, 18, 16, 20];
 
 function AnalyticsPreviewCard({ isBusiness }: { isBusiness: boolean }) {
   const max = Math.max(...DEMO_SPARKLINE);
 
+  const kpis = [
+    { label: "Total scans", value: "1 248", color: "text-[#0D1117]" },
+    { label: "Croissance", value: "+12 %", color: "text-emerald-600" },
+    { label: "Ce mois", value: "342", color: "text-[#0D1117]" },
+    { label: "Satisfaction", value: "94 %", color: "text-emerald-600" },
+  ];
+
   const content = (
-    <div className="flex flex-col justify-between h-full gap-3">
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-[#6B7280]">Total scans</span>
-          <span className="text-sm font-bold text-[#0D1117]">1 248</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-[#6B7280]">Croissance</span>
-          <span className="text-sm font-bold text-emerald-600">+12 %</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-[#6B7280]">Ce mois</span>
-          <span className="text-sm font-bold text-[#0D1117]">342</span>
-        </div>
+    <div className="flex flex-col xl:flex-row xl:items-center gap-4 h-full">
+      {/* KPIs */}
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 xl:flex-1">
+        {kpis.map((k) => (
+          <div key={k.label} className="bg-[#F9FAFB] rounded-lg px-3 py-2.5 border border-[#E5E7EB]">
+            <p className="text-xs text-[#6B7280] mb-0.5">{k.label}</p>
+            <p className={cn("text-base font-bold", k.color)}>{k.value}</p>
+          </div>
+        ))}
       </div>
 
-      <div className="flex items-end gap-0.5 h-10">
+      {/* Sparkline */}
+      <div className="flex items-end gap-0.5 h-10 xl:flex-1 xl:h-12">
         {DEMO_SPARKLINE.map((v, i) => (
           <div
             key={i}
-            className="flex-1 bg-amber-300 rounded-sm"
+            className="flex-1 bg-amber-300 rounded-sm hover:bg-amber-400 transition-colors"
             style={{ height: `${(v / max) * 100}%` }}
           />
         ))}
       </div>
 
-      <Link href="/business-analytics">
-        <Button size="sm" className="w-full bg-primary text-[#0D1117] font-semibold hover:bg-primary/90 text-xs">
-          Voir plus <ChevronRight className="w-3 h-3 ml-1" />
-        </Button>
-      </Link>
+      {/* CTA */}
+      <div className="xl:shrink-0">
+        <Link href="/business-analytics">
+          <Button className="w-full xl:w-auto bg-primary text-[#0D1117] font-semibold hover:bg-primary/90 text-sm px-5">
+            Voir les analytics <ChevronRight className="w-4 h-4 ml-1" />
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 
@@ -160,15 +166,15 @@ function AnalyticsPreviewCard({ isBusiness }: { isBusiness: boolean }) {
         <div className="flex-1" style={{ filter: "blur(5px)", pointerEvents: "none", userSelect: "none" }}>
           {content}
         </div>
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/70 rounded-lg gap-2 px-2">
-          <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center">
-            <Lock className="w-4 h-4 text-gray-500" />
+        <div className="absolute inset-0 flex flex-col xl:flex-row items-center justify-center bg-white/75 rounded-lg gap-3 px-4">
+          <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+            <Lock className="w-5 h-5 text-gray-500" />
           </div>
-          <p className="text-xs font-semibold text-[#0D1117] text-center leading-tight">
+          <p className="text-sm font-semibold text-[#0D1117] text-center xl:text-left leading-tight">
             Débloquez les Analytics avancées
           </p>
           <Link href="/billing">
-            <Button size="sm" className="bg-primary text-[#0D1117] font-semibold hover:bg-primary/90 text-xs px-3">
+            <Button className="bg-primary text-[#0D1117] font-semibold hover:bg-primary/90 text-sm px-5 shrink-0">
               Passer à Business
             </Button>
           </Link>
@@ -236,8 +242,8 @@ export default function DashboardPage() {
           <StatCard title={t("dashboard.thisMonth")} value={summary?.scansThisMonth ?? 0} icon={Star} subtitle={t("dashboard.scansThisMonth")} loading={isLoading} />
         </div>
 
-        {/* 4-block main grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+        {/* Main grid — 3 cols on desktop, 2 on tablet, 1 on mobile */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
 
           {/* 1. Meilleures cartes */}
           <Card className="bg-white border border-border shadow-sm flex flex-col">
@@ -361,8 +367,8 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* 4. Analytics avancées */}
-          <Card className="bg-white border border-border shadow-sm flex flex-col">
+          {/* 4. Analytics avancées — full width on tablet (md) and desktop (xl) */}
+          <Card className="bg-white border border-border shadow-sm flex flex-col md:col-span-2 xl:col-span-3">
             <CardHeader className="pb-3 border-b border-border shrink-0">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
@@ -374,7 +380,7 @@ export default function DashboardPage() {
                 )}
               </div>
             </CardHeader>
-            <CardContent className="pt-3 flex-1 flex flex-col" style={{ minHeight: 200 }}>
+            <CardContent className="pt-3 flex-1 flex flex-col" style={{ minHeight: 90 }}>
               <AnalyticsPreviewCard isBusiness={isBusiness} />
             </CardContent>
           </Card>

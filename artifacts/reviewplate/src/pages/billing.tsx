@@ -249,7 +249,7 @@ export default function BillingPage() {
                     {(plan.features ?? []).map((feature, i) => (
                       <li key={i} className="flex items-center gap-2 text-sm text-[#374151]">
                         <Check className="w-4 h-4 text-[#10B981] shrink-0" />
-                        {feature}
+                        {t(feature, feature)}
                       </li>
                     ))}
                   </ul>

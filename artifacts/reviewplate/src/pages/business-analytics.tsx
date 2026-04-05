@@ -185,7 +185,7 @@ export default function BusinessAnalyticsPage() {
       trend: null,
     },
     {
-      label: "Taux de conversion",
+      label: "Taux de satisfaction",
       value: `${kpis.conversionRate}%`,
       icon: TrendingUp,
       color: "bg-green-50 text-green-600",

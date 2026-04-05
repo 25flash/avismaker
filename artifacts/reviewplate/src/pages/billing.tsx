@@ -18,8 +18,7 @@ const planIcons: Record<string, React.ElementType> = {
 const planColors: Record<string, string> = {
   free: "border-border",
   premium: "border-amber-300",
-  pro: "border-purple-400 ring-2 ring-purple-200",
-  business: "border-[#0D1117]",
+  business: "border-[#0D1117] ring-2 ring-[#0D1117]/10",
 };
 
 const planBtnColor: Record<string, string> = {
@@ -168,15 +167,15 @@ export default function BillingPage() {
         )}
 
         {/* Plans grid */}
-        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-5 sm:grid-cols-3">
           {plansLoading ? (
-            Array(4).fill(0).map((_, i) => (
+            Array(3).fill(0).map((_, i) => (
               <div key={i} className="h-96 bg-white border border-border rounded-xl animate-pulse" />
             ))
           ) : planList.map((plan) => {
             const Icon = planIcons[plan.id] ?? Zap;
             const isCurrentPlan = plan.id === currentPlan;
-            const isHighlight = plan.id === "pro";
+            const isHighlight = plan.id === "business";
             const price = getPrice(plan.price);
 
             return (
@@ -190,7 +189,7 @@ export default function BillingPage() {
                 data-testid={`card-plan-${plan.id}`}
               >
                 {isHighlight && (
-                  <div className="absolute top-0 left-0 right-0 bg-purple-600 text-white text-xs font-semibold text-center py-1.5">
+                  <div className="absolute top-0 left-0 right-0 bg-[#0D1117] text-primary text-xs font-semibold text-center py-1.5">
                     Le plus populaire
                   </div>
                 )}

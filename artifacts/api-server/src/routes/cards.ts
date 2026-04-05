@@ -14,8 +14,7 @@ import {
 
 const MAX_ACTIVE_CARDS: Record<string, number | null> = {
   free: 1,
-  premium: null,
-  pro: null,
+  premium: 3,
   business: null,
 };
 

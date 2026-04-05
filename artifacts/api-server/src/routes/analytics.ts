@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { eq, and, count, gte, inArray } from "drizzle-orm";
-import { db, cardsTable, scanLogsTable, businessProfilesTable } from "@workspace/db";
+import { db, cardsTable, scanLogsTable, businessProfilesTable, usersTable } from "@workspace/db";
 import { requireAuth, type AuthRequest } from "../lib/auth";
 import { GetCardStatsParams, ListScanLogsQueryParams } from "@workspace/api-zod";
 
@@ -185,6 +185,86 @@ router.get("/scan-logs", requireAuth, async (req: AuthRequest, res): Promise<voi
     ratingGiven: log.ratingGiven,
     wasNegative: log.wasNegative,
   })));
+});
+
+// ── Business Analytics (Business plan only) ────────────────────────────────
+router.get("/business-analytics", requireAuth, async (req: AuthRequest, res): Promise<void> => {
+  const userId = req.userId!;
+
+  // Enforce Business plan
+  const [user] = await db.select().from(usersTable).where(eq(usersTable.id, userId));
+  if (!user || user.plan !== "business") {
+    res.status(403).json({ error: "Business plan required", code: "PLAN_REQUIRED" });
+    return;
+  }
+
+  const cards = await db.select().from(cardsTable).where(eq(cardsTable.ownerId, userId));
+  const cardIds = cards.map(c => c.id);
+
+  const allLogs = cardIds.length > 0
+    ? await db.select().from(scanLogsTable).where(inArray(scanLogsTable.cardId, cardIds))
+    : [];
+
+  const now = new Date();
+  const last30 = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+  const prev30 = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+
+  const recentLogs = allLogs.filter(l => l.timestamp >= last30);
+  const prevLogs = allLogs.filter(l => l.timestamp >= prev30 && l.timestamp < last30);
+
+  const totalScans = allLogs.length;
+  const recentScans = recentLogs.length;
+  const prevScans = prevLogs.length;
+  const growth = prevScans > 0 ? Math.round(((recentScans - prevScans) / prevScans) * 100) : (recentScans > 0 ? 100 : 0);
+  const positiveScans = allLogs.filter(l => !l.wasNegative).length;
+  const conversionRate = totalScans > 0 ? Math.round((positiveScans / totalScans) * 100) : 0;
+  const recentActivity = recentLogs.length;
+
+  // Scan timeline — last 30 days by day
+  const dayMap = new Map<string, number>();
+  for (let i = 0; i < 30; i++) {
+    const d = new Date(last30.getTime() + i * 24 * 60 * 60 * 1000);
+    dayMap.set(d.toISOString().split("T")[0], 0);
+  }
+  for (const log of recentLogs) {
+    const day = log.timestamp.toISOString().split("T")[0];
+    if (dayMap.has(day)) dayMap.set(day, (dayMap.get(day) ?? 0) + 1);
+  }
+  const scanTimeline = Array.from(dayMap.entries())
+    .map(([date, count]) => ({ date, count }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  // Source distribution (platform)
+  const cardMap = new Map(cards.map(c => [c.id, c]));
+  const sourceMap = new Map<string, number>();
+  for (const log of allLogs) {
+    const card = cardMap.get(log.cardId);
+    const platform = card?.platform ?? "other";
+    sourceMap.set(platform, (sourceMap.get(platform) ?? 0) + 1);
+  }
+  const sourceDistribution = Array.from(sourceMap.entries())
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value);
+
+  // Top cards
+  const topCards = [...cards]
+    .sort((a, b) => b.scanCount - a.scanCount)
+    .slice(0, 10)
+    .map(c => ({
+      id: c.id,
+      name: c.nickname ?? c.code,
+      platform: c.platform ?? "other",
+      scans: c.scanCount,
+      status: c.status,
+      performance: c.scanCount > 50 ? "high" : c.scanCount > 10 ? "medium" : "low",
+    }));
+
+  res.json({
+    kpis: { totalScans, conversionRate, growth, recentActivity },
+    scanTimeline,
+    sourceDistribution,
+    topCards,
+  });
 });
 
 export default router;

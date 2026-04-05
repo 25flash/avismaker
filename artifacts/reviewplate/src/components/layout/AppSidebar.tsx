@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import {
   LayoutDashboard, CreditCard, Building2, Bot, Receipt, MessageCircle,
-  Shield, LogOut, Star, X, Settings
+  Shield, LogOut, Star, X, Settings, BarChart2, Lock
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
@@ -24,11 +24,14 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
 
+  const isBusiness = user?.plan === "business";
+
   const navItems = [
     { href: "/dashboard", label: t("nav.dashboard"), icon: LayoutDashboard, testId: "nav-dashboard" },
     { href: "/cards", label: t("nav.cards"), icon: CreditCard, testId: "nav-cards" },
     { href: "/profiles", label: t("nav.profiles"), icon: Building2, testId: "nav-business-profiles" },
     { href: "/ai-reply", label: t("nav.aiReply"), icon: Bot, testId: "nav-ai-reply" },
+    { href: "/business-analytics", label: "Analytics avancées", icon: BarChart2, testId: "nav-business-analytics", badge: "Business", locked: !isBusiness },
     { href: "/billing", label: t("nav.billing"), icon: Receipt, testId: "nav-billing" },
     { href: "/support", label: t("nav.support"), icon: MessageCircle, testId: "nav-support" },
   ];
@@ -59,6 +62,8 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = location === item.href || location.startsWith(item.href + "/");
+          const hasBadge = "badge" in item && item.badge;
+          const isLocked = "locked" in item && item.locked;
           return (
             <Link
               key={item.href}
@@ -80,7 +85,15 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
                   <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-primary rounded-r-full" />
                 )}
                 <Icon className={cn("w-4 h-4 shrink-0 transition-colors", isActive ? "text-primary" : "text-white/50 group-hover:text-white/80")} />
-                <span>{item.label}</span>
+                <span className="flex-1">{item.label}</span>
+                {hasBadge && (
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-primary/20 text-primary leading-none">
+                    {item.badge}
+                  </span>
+                )}
+                {isLocked && (
+                  <Lock className="w-3 h-3 text-white/30 shrink-0" />
+                )}
               </div>
             </Link>
           );

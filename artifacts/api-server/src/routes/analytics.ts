@@ -190,7 +190,6 @@ router.get("/scan-logs", requireAuth, async (req: AuthRequest, res): Promise<voi
 // ── Business Analytics (all authenticated users — plan check on frontend) ──
 router.get("/business-analytics", requireAuth, async (req: AuthRequest, res): Promise<void> => {
   const userId = req.userId!;
-  const days = Math.min(Math.max(Number(req.query.days) || 30, 1), 365);
 
   const cards = await db.select().from(cardsTable).where(eq(cardsTable.ownerId, userId));
   const cardIds = cards.map(c => c.id);
@@ -200,11 +199,11 @@ router.get("/business-analytics", requireAuth, async (req: AuthRequest, res): Pr
     : [];
 
   const now = new Date();
-  const periodStart = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
-  const prevStart = new Date(now.getTime() - days * 2 * 24 * 60 * 60 * 1000);
+  const last30 = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+  const prev30 = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
 
-  const recentLogs = allLogs.filter(l => l.timestamp >= periodStart);
-  const prevLogs = allLogs.filter(l => l.timestamp >= prevStart && l.timestamp < periodStart);
+  const recentLogs = allLogs.filter(l => l.timestamp >= last30);
+  const prevLogs = allLogs.filter(l => l.timestamp >= prev30 && l.timestamp < last30);
 
   const totalScans = allLogs.length;
   const recentScans = recentLogs.length;
@@ -214,10 +213,10 @@ router.get("/business-analytics", requireAuth, async (req: AuthRequest, res): Pr
   const conversionRate = totalScans > 0 ? Math.round((positiveScans / totalScans) * 100) : 0;
   const recentActivity = recentLogs.length;
 
-  // Scan timeline — last N days by day
+  // Scan timeline — last 30 days by day
   const dayMap = new Map<string, number>();
-  for (let i = 0; i < days; i++) {
-    const d = new Date(periodStart.getTime() + i * 24 * 60 * 60 * 1000);
+  for (let i = 0; i < 30; i++) {
+    const d = new Date(last30.getTime() + i * 24 * 60 * 60 * 1000);
     dayMap.set(d.toISOString().split("T")[0], 0);
   }
   for (const log of recentLogs) {

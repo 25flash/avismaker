@@ -11,8 +11,10 @@ import { useAuth } from "@/lib/auth-context";
 import { useState } from "react";
 import { Link } from "wouter";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 export default function AiReplyPage() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const generateMutation = useGenerateAiReply();
@@ -58,9 +60,9 @@ export default function AiReplyPage() {
         <div>
           <h1 className="text-2xl font-bold text-[#0D1117] flex items-center gap-2">
             <Bot className="w-6 h-6 text-primary" />
-            AI Reply Generator
+            {t("aiReply.title")}
           </h1>
-          <p className="text-sm text-[#6B7280] mt-0.5">Generate professional responses to customer reviews</p>
+          <p className="text-sm text-[#6B7280] mt-0.5">{t("aiReply.subtitle")}</p>
         </div>
 
         {!canUseAI && (
@@ -69,13 +71,13 @@ export default function AiReplyPage() {
               <Lock className="w-5 h-5 text-purple-600" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-purple-900 mb-1">Premium feature</p>
+              <p className="text-sm font-semibold text-purple-900 mb-1">{t("aiReply.premiumFeature")}</p>
               <p className="text-sm text-purple-700 mb-3">
-                AI Reply Generator is available on Premium, Pro, and Business plans. Upgrade to unlock this feature.
+                {t("aiReply.premiumDesc")}
               </p>
               <Link href="/billing">
                 <Button size="sm" className="bg-purple-600 text-white hover:bg-purple-700" data-testid="button-upgrade-ai">
-                  Upgrade now
+                  {t("aiReply.upgradeNow")}
                 </Button>
               </Link>
             </div>
@@ -86,11 +88,11 @@ export default function AiReplyPage() {
           {/* Input */}
           <Card className={cn("bg-white border border-border shadow-sm", !canUseAI && "opacity-60 pointer-events-none")}>
             <CardHeader className="border-b border-border pb-4">
-              <CardTitle className="text-base font-semibold text-[#0D1117]">Customer Review</CardTitle>
+              <CardTitle className="text-base font-semibold text-[#0D1117]">{t("aiReply.customerReview")}</CardTitle>
             </CardHeader>
             <CardContent className="pt-5 space-y-4">
               <div className="space-y-1.5">
-                <Label>Platform</Label>
+                <Label>{t("aiReply.platformLabel")}</Label>
                 <Select value={platform} onValueChange={setPlatform}>
                   <SelectTrigger data-testid="select-platform">
                     <SelectValue />
@@ -105,7 +107,7 @@ export default function AiReplyPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label>Reply Tone</Label>
+                <Label>{t("aiReply.toneLabel")}</Label>
                 <Select value={tone} onValueChange={setTone}>
                   <SelectTrigger data-testid="select-tone">
                     <SelectValue />
@@ -120,16 +122,16 @@ export default function AiReplyPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label>Review Text</Label>
+                <Label>{t("aiReply.reviewText")}</Label>
                 <Textarea
                   value={review}
                   onChange={(e) => setReview(e.target.value)}
-                  placeholder="Paste the customer review here..."
+                  placeholder={t("aiReply.reviewPlaceholder")}
                   rows={6}
                   data-testid="input-review-text"
                   className="resize-none"
                 />
-                <p className="text-xs text-right text-[#9CA3AF]">{review.length}/1500 chars</p>
+                <p className="text-xs text-right text-[#9CA3AF]">{t("aiReply.charsLeft", { count: review.length })}</p>
               </div>
 
               <Button
@@ -139,7 +141,7 @@ export default function AiReplyPage() {
                 data-testid="button-generate"
               >
                 <Sparkles className="w-4 h-4 mr-2" />
-                {generateMutation.isPending ? "Generating..." : "Generate Reply"}
+                {generateMutation.isPending ? t("aiReply.generating") : t("aiReply.generate")}
               </Button>
             </CardContent>
           </Card>
@@ -148,7 +150,7 @@ export default function AiReplyPage() {
           <Card className="bg-white border border-border shadow-sm">
             <CardHeader className="border-b border-border pb-4">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base font-semibold text-[#0D1117]">Generated Reply</CardTitle>
+                <CardTitle className="text-base font-semibold text-[#0D1117]">{t("aiReply.generatedReply")}</CardTitle>
                 {reply && (
                   <Button
                     size="sm"
@@ -158,7 +160,7 @@ export default function AiReplyPage() {
                     className="h-8 text-xs"
                   >
                     {copied ? <CheckCheck className="w-3.5 h-3.5 mr-1.5 text-[#10B981]" /> : <Copy className="w-3.5 h-3.5 mr-1.5" />}
-                    {copied ? "Copied!" : "Copy"}
+                    {copied ? t("aiReply.copied") : t("aiReply.copy")}
                   </Button>
                 )}
               </div>
@@ -178,13 +180,13 @@ export default function AiReplyPage() {
                   >
                     {reply}
                   </div>
-                  <p className="text-xs text-[#9CA3AF]">AI-generated. Review before posting.</p>
+                  <p className="text-xs text-[#9CA3AF]">{t("aiReply.aiDisclaimer")}</p>
                 </div>
               ) : (
                 <div className="text-center py-12">
                   <Bot className="w-12 h-12 text-[#D1D5DB] mx-auto mb-3" />
-                  <p className="text-sm text-[#6B7280]">Your generated reply will appear here</p>
-                  <p className="text-xs text-[#9CA3AF] mt-1">Paste a review and click Generate</p>
+                  <p className="text-sm text-[#6B7280]">{t("aiReply.emptyState")}</p>
+                  <p className="text-xs text-[#9CA3AF] mt-1">{t("aiReply.emptyStateDesc")}</p>
                 </div>
               )}
             </CardContent>
@@ -194,19 +196,19 @@ export default function AiReplyPage() {
         {/* Tips */}
         <Card className="bg-[#F8FAFC] border border-border">
           <CardContent className="p-5">
-            <h3 className="text-sm font-semibold text-[#374151] mb-3">Tips for great responses</h3>
+            <h3 className="text-sm font-semibold text-[#374151] mb-3">{t("aiReply.tipsTitle")}</h3>
             <div className="grid sm:grid-cols-3 gap-4 text-sm text-[#6B7280]">
               <div className="flex items-start gap-2">
                 <span className="text-primary font-bold">01.</span>
-                Always thank the customer for their time
+                {t("aiReply.tip1")}
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-primary font-bold">02.</span>
-                Address specific points from their review
+                {t("aiReply.tip2")}
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-primary font-bold">03.</span>
-                Keep replies concise, 3-4 sentences max
+                {t("aiReply.tip3")}
               </div>
             </div>
           </CardContent>

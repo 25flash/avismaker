@@ -9,8 +9,10 @@ import { Zap, CreditCard, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 
 export default function ActivatePage() {
+  const { t } = useTranslation();
   const [code, setCode] = useState("");
   const [activated, setActivated] = useState<{ id: number; code: string } | null>(null);
   const activateMutation = useActivateCardByCode();
@@ -48,17 +50,17 @@ export default function ActivatePage() {
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="w-10 h-10 text-[#10B981]" />
           </div>
-          <h1 className="text-2xl font-bold text-[#0D1117] mb-2">Card Activated!</h1>
+          <h1 className="text-2xl font-bold text-[#0D1117] mb-2">{t("activate.success")}</h1>
           <p className="text-[#6B7280] mb-2">
-            Your card <span className="font-mono font-bold text-[#0D1117]">{activated.code}</span> has been successfully activated.
+            {t("activate.successDesc")}
           </p>
-          <p className="text-sm text-[#6B7280] mb-8">
-            Now set up your target URL and platform to start collecting reviews.
+          <p className="text-sm font-mono font-bold text-[#0D1117] mb-8">
+            {activated.code}
           </p>
           <div className="flex gap-3 justify-center">
             <Link href={`/cards/${activated.id}`}>
               <Button className="bg-primary text-[#0D1117] font-semibold hover:bg-primary/90" data-testid="button-setup-card">
-                Set up card
+                {t("cards.editCard")}
               </Button>
             </Link>
             <Button
@@ -66,7 +68,7 @@ export default function ActivatePage() {
               onClick={() => { setActivated(null); setCode(""); }}
               data-testid="button-activate-another"
             >
-              Activate another
+              {t("activate.activate")}
             </Button>
           </div>
         </div>
@@ -78,8 +80,8 @@ export default function ActivatePage() {
     <AuthLayout>
       <div className="max-w-lg mx-auto space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-[#0D1117]">Activate Card</h1>
-          <p className="text-sm text-[#6B7280] mt-0.5">Enter the activation code printed on your NFC/QR card</p>
+          <h1 className="text-2xl font-bold text-[#0D1117]">{t("activate.title")}</h1>
+          <p className="text-sm text-[#6B7280] mt-0.5">{t("activate.subtitle")}</p>
         </div>
 
         <Card className="bg-white border border-border shadow-sm">
@@ -113,7 +115,7 @@ export default function ActivatePage() {
               data-testid="button-activate"
             >
               <Zap className="w-5 h-5 mr-2" />
-              {activateMutation.isPending ? "Activating..." : "Activate Card"}
+              {activateMutation.isPending ? t("activate.activating") : t("activate.activate")}
             </Button>
           </CardContent>
         </Card>

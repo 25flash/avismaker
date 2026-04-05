@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const planIcons: Record<string, React.ElementType> = {
   free: Zap,
@@ -53,6 +54,7 @@ interface Plan {
 }
 
 export default function BillingPage() {
+  const { t } = useTranslation();
   const { data: plans, isLoading: plansLoading } = useListPlans();
   const { data: subscription } = useGetCurrentSubscription();
 
@@ -90,10 +92,10 @@ export default function BillingPage() {
         body: JSON.stringify({ plan: planId, billing }),
       });
       if (!res.ok) throw new Error();
-      toast({ title: "Plan mis à jour !", description: `Vous êtes maintenant sur le plan ${planId} (${billing === "annual" ? "annuel" : "mensuel"}).` });
+      toast({ title: t("billing.planUpdated"), description: t("billing.planUpdatedDesc", { plan: planId, billing: billing === "annual" ? t("billing.annualLabel") : t("billing.monthly") }) });
       window.location.reload();
     } catch {
-      toast({ variant: "destructive", title: "Erreur", description: "Impossible de changer de plan. Réessayez." });
+      toast({ variant: "destructive", title: t("billing.updateFailed"), description: t("billing.updateFailedDesc") });
     } finally {
       setUpgrading(null);
     }
@@ -103,8 +105,8 @@ export default function BillingPage() {
     <AuthLayout>
       <div className="space-y-8">
         <div>
-          <h1 className="text-2xl font-bold text-[#0D1117]">Facturation & Plans</h1>
-          <p className="text-sm text-[#6B7280] mt-0.5">Choisissez le plan adapté à votre activité</p>
+          <h1 className="text-2xl font-bold text-[#0D1117]">{t("billing.title")}</h1>
+          <p className="text-sm text-[#6B7280] mt-0.5">{t("billing.subtitle")}</p>
         </div>
 
         {/* Current plan banner */}
@@ -114,14 +116,14 @@ export default function BillingPage() {
           </div>
           <div className="flex-1">
             <p className="text-sm font-semibold text-[#92400E]">
-              Plan actuel : <span className="capitalize">{currentPlan}</span>
+              {t("billing.currentPlan", { plan: currentPlan })}
               {currentSubscription?.billingPeriod === "annual" && (
-                <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Annuel</span>
+                <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">{t("billing.annualLabel")}</span>
               )}
             </p>
             {currentSubscription?.renewsAt && (
               <p className="text-xs text-[#92400E]/70 mt-0.5">
-                Renouvellement le {new Date(currentSubscription.renewsAt).toLocaleDateString("fr-FR")}
+                {t("billing.renewsOn", { date: new Date(currentSubscription.renewsAt).toLocaleDateString() })}
               </p>
             )}
           </div>
@@ -140,7 +142,7 @@ export default function BillingPage() {
               )}
               data-testid="toggle-monthly"
             >
-              Mensuel
+              {t("billing.monthly")}
             </button>
             <button
               onClick={() => setBilling("annual")}
@@ -152,9 +154,9 @@ export default function BillingPage() {
               )}
               data-testid="toggle-annual"
             >
-              Annuel
+              {t("billing.annual")}
               <span className="text-xs font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
-                -25%
+                {t("billing.annualDiscount")}
               </span>
             </button>
           </div>
@@ -162,7 +164,7 @@ export default function BillingPage() {
 
         {billing === "annual" && (
           <p className="text-center text-sm text-green-700 font-medium -mt-4">
-            Économisez 3 mois en passant à la facturation annuelle
+            {t("billing.annualSavings", "Save 3 months by switching to annual billing")}
           </p>
         )}
 
@@ -190,7 +192,7 @@ export default function BillingPage() {
               >
                 {isHighlight && (
                   <div className="absolute top-0 left-0 right-0 bg-[#0D1117] text-primary text-xs font-semibold text-center py-1.5">
-                    Le plus populaire
+                    {t("billing.mostPopular")}
                   </div>
                 )}
                 <CardContent className={cn("p-6", isHighlight && "pt-10")}>
@@ -207,19 +209,19 @@ export default function BillingPage() {
                   <div className="mt-2 mb-1">
                     {plan.price === 0 ? (
                       <div className="flex items-baseline gap-1">
-                        <span className="text-3xl font-bold text-[#0D1117]">Gratuit</span>
+                        <span className="text-3xl font-bold text-[#0D1117]">Free</span>
                       </div>
                     ) : (
                       <div>
                         <div className="flex items-baseline gap-1">
                           <span className="text-3xl font-bold text-[#0D1117]">€{price}</span>
-                          <span className="text-sm text-[#6B7280]">/mois</span>
+                          <span className="text-sm text-[#6B7280]">{t("billing.perMonth")}</span>
                         </div>
                         {billing === "annual" && (
                           <div className="flex items-center gap-2 mt-1">
-                            <span className="text-xs text-[#9CA3AF] line-through">€{plan.price}/mois</span>
+                            <span className="text-xs text-[#9CA3AF] line-through">€{plan.price}{t("billing.perMonth")}</span>
                             <span className="text-xs font-semibold text-green-600">
-                              €{getAnnualTotal(plan.price)}/an
+                              {t("billing.annualTotal", { total: getAnnualTotal(plan.price) })}
                             </span>
                           </div>
                         )}
@@ -233,15 +235,15 @@ export default function BillingPage() {
                     <li className="flex items-center gap-2 text-sm text-[#374151]">
                       <Check className="w-4 h-4 text-[#10B981] shrink-0" />
                       {plan.maxActiveCards === null
-                        ? "Cartes actives illimitées"
-                        : `${plan.maxActiveCards} carte active`}
+                        ? t("billing.unlimitedCards", "Unlimited active cards")
+                        : t("billing.activeCardsCount", "{{count}} active card(s)", { count: plan.maxActiveCards })}
                     </li>
                     {/* Business profiles limit */}
                     <li className="flex items-center gap-2 text-sm text-[#374151]">
                       <Check className="w-4 h-4 text-[#10B981] shrink-0" />
                       {plan.maxProfiles === null
-                        ? "Profils illimités"
-                        : `${plan.maxProfiles} profil${plan.maxProfiles > 1 ? "s" : ""} business`}
+                        ? t("billing.unlimitedProfiles", "Unlimited profiles")
+                        : t("billing.profilesCount", "{{count}} business profile(s)", { count: plan.maxProfiles })}
                     </li>
                     {/* Other features */}
                     {(plan.features ?? []).map((feature, i) => (
@@ -260,14 +262,12 @@ export default function BillingPage() {
                     data-testid={`button-plan-${plan.id}`}
                   >
                     {upgrading === plan.id
-                      ? "En cours..."
+                      ? t("billing.upgrading")
                       : isCurrentPlan
-                      ? "Plan actuel"
+                      ? t("billing.currentPlanBtn")
                       : plan.id === "free"
-                      ? "Rétrograder"
-                      : billing === "annual"
-                      ? "Passer annuel"
-                      : "Mettre à niveau"}
+                      ? t("billing.downgrade")
+                      : t("billing.upgrade")}
                   </Button>
                 </CardContent>
               </Card>
@@ -276,8 +276,8 @@ export default function BillingPage() {
         </div>
 
         <p className="text-xs text-center text-[#9CA3AF]">
-          Tous les prix en EUR. Facturation {billing === "annual" ? "annuelle" : "mensuelle"}. Annulable à tout moment.{" "}
-          <a href="/support" className="text-primary hover:underline">Contactez-nous</a> pour un plan sur mesure.
+          {t("billing.footer", "All prices in EUR. Cancel anytime.")}{" "}
+          <a href="/support" className="text-primary hover:underline">{t("billing.contactUs", "Contact us")}</a>
         </p>
       </div>
     </AuthLayout>

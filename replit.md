@@ -69,6 +69,16 @@ Redirect URL format: `https://www.avismaker.com/r/{CODE}` (stored as `target_url
 - Pro: 10 profiles, AI Reply enabled
 - Business: unlimited profiles, AI Reply enabled
 
+### Internationalization (i18n)
+- Library: `i18next` + `react-i18next` + `i18next-browser-languagedetector`
+- Config: `artifacts/reviewplate/src/i18n/index.ts`
+- Supported languages: en, fr, es, de, it, nl (defaulting to en)
+- Lang stored in `localStorage` key `avismakers_lang`
+- Translation files: `artifacts/reviewplate/src/i18n/locales/{lang}.json`
+- `LanguageSwitcher` component: available as `variant="dark"` or `"light"` — placed in navbar (landing/auth pages) and sidebar bottom
+- All main pages use `useTranslation()` hook: landing, login, signup, dashboard, billing, ai-reply, activate, AppSidebar
+- i18n initialized in `main.tsx` via `import "./i18n"`
+
 ### Important Notes
 - esbuild bundles the API server; do NOT use `zod/v4` subpath in api-server — use `@workspace/api-zod` schemas instead
 - `businessProfileId` in `activate-by-code` is optional (nullable)

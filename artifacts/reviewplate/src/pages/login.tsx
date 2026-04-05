@@ -10,15 +10,16 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useLogin } from "@workspace/api-client-react";
 import { useAuth } from "@/lib/auth-context";
-
-const schema = z.object({
-  email: z.string().email("Valid email required"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
-
-type FormData = z.infer<typeof schema>;
+import { useTranslation } from "react-i18next";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export default function LoginPage() {
+  const { t } = useTranslation();
+  const schema = z.object({
+    email: z.string().email(t("auth.validEmail")),
+    password: z.string().min(6, t("auth.passwordMin")),
+  });
+  type FormData = z.infer<typeof schema>;
   const [showPassword, setShowPassword] = useState(false);
   const [, setLocation] = useLocation();
   const { setAuth } = useAuth();
@@ -93,8 +94,8 @@ export default function LoginPage() {
             <span className="text-lg font-bold text-[#0D1117]">AvisMakers</span>
           </div>
 
-          <h1 className="text-2xl font-bold text-[#0D1117] mb-2">Welcome back</h1>
-          <p className="text-sm text-[#6B7280] mb-8">Sign in to your account to continue</p>
+          <h1 className="text-2xl font-bold text-[#0D1117] mb-2">{t("auth.welcomeBack")}</h1>
+          <p className="text-sm text-[#6B7280] mb-8">{t("auth.signInToContinue")}</p>
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -103,7 +104,7 @@ export default function LoginPage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-[#374151]">Email</FormLabel>
+                    <FormLabel className="text-[#374151]">{t("auth.email")}</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -123,9 +124,9 @@ export default function LoginPage() {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center justify-between">
-                      <FormLabel className="text-[#374151]">Password</FormLabel>
+                      <FormLabel className="text-[#374151]">{t("auth.password")}</FormLabel>
                       <Link href="/forgot-password" className="text-xs text-primary hover:underline">
-                        Forgot password?
+                        {t("auth.forgotPassword")}
                       </Link>
                     </div>
                     <FormControl>
@@ -157,15 +158,15 @@ export default function LoginPage() {
                 disabled={loginMutation.isPending}
                 className="w-full h-11 bg-primary text-[#0D1117] font-semibold hover:bg-primary/90"
               >
-                {loginMutation.isPending ? "Signing in..." : "Sign in"}
+                {loginMutation.isPending ? t("auth.signingIn") : t("auth.signIn")}
               </Button>
             </form>
           </Form>
 
           <p className="text-sm text-center text-[#6B7280] mt-6">
-            Don't have an account?{" "}
+            {t("auth.noAccount")}{" "}
             <Link href="/signup" className="text-primary font-medium hover:underline">
-              Sign up
+              {t("auth.signUp")}
             </Link>
           </p>
         </div>

@@ -1,19 +1,12 @@
 import { Link, useLocation } from "wouter";
 import {
   LayoutDashboard, CreditCard, Building2, Bot, Receipt, MessageCircle,
-  Shield, LogOut, Star, Settings, ChevronRight
+  Shield, LogOut, Star, ChevronRight
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
-
-const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/cards", label: "Cards", icon: CreditCard },
-  { href: "/profiles", label: "Business Profiles", icon: Building2 },
-  { href: "/ai-reply", label: "AI Reply", icon: Bot },
-  { href: "/billing", label: "Billing", icon: Receipt },
-  { href: "/support", label: "Support", icon: MessageCircle },
-];
+import { useTranslation } from "react-i18next";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 const planBadgeClass: Record<string, string> = {
   free: "plan-badge-free",
@@ -25,6 +18,16 @@ const planBadgeClass: Record<string, string> = {
 export function AppSidebar() {
   const [location] = useLocation();
   const { user, logout } = useAuth();
+  const { t } = useTranslation();
+
+  const navItems = [
+    { href: "/dashboard", label: t("nav.dashboard"), icon: LayoutDashboard, testId: "nav-dashboard" },
+    { href: "/cards", label: t("nav.cards"), icon: CreditCard, testId: "nav-cards" },
+    { href: "/profiles", label: t("nav.profiles"), icon: Building2, testId: "nav-business-profiles" },
+    { href: "/ai-reply", label: t("nav.aiReply"), icon: Bot, testId: "nav-ai-reply" },
+    { href: "/billing", label: t("nav.billing"), icon: Receipt, testId: "nav-billing" },
+    { href: "/support", label: t("nav.support"), icon: MessageCircle, testId: "nav-support" },
+  ];
 
   return (
     <div className="flex flex-col h-full w-64 bg-[#0D1117] text-white border-r border-white/10">
@@ -45,7 +48,7 @@ export function AppSidebar() {
             <Link
               key={item.href}
               href={item.href}
-              data-testid={`nav-${item.label.toLowerCase().replace(/\s/g, "-")}`}
+              data-testid={item.testId}
             >
               <div
                 className={cn(
@@ -75,7 +78,7 @@ export function AppSidebar() {
               )}
             >
               <Shield className="w-4 h-4 shrink-0" />
-              <span>Admin Panel</span>
+              <span>{t("nav.admin")}</span>
             </div>
           </Link>
         )}
@@ -103,14 +106,17 @@ export function AppSidebar() {
             {user?.plan?.charAt(0).toUpperCase() + (user?.plan?.slice(1) ?? "")}
           </span>
         </div>
-        <button
-          onClick={logout}
-          data-testid="button-logout"
-          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/10 transition-colors"
-        >
-          <LogOut className="w-4 h-4" />
-          <span>Sign out</span>
-        </button>
+        <div className="flex items-center justify-between">
+          <button
+            onClick={logout}
+            data-testid="button-logout"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>{t("nav.logout")}</span>
+          </button>
+          <LanguageSwitcher variant="dark" />
+        </div>
       </div>
     </div>
   );

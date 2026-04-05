@@ -11,4 +11,6 @@ export interface UpdateUserBody {
   name?: string | null;
   /** @nullable */
   language?: string | null;
+  /** @nullable */
+  avatarUrl?: string | null;
 }

@@ -96,6 +96,7 @@ export const ResetPasswordResponse = zod.object({
 export const UpdateCurrentUserBody = zod.object({
   name: zod.string().nullish(),
   language: zod.string().nullish(),
+  avatarUrl: zod.string().nullish(),
 });
 
 export const UpdateCurrentUserResponse = zod.object({

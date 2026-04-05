@@ -13,5 +13,6 @@ export interface User {
   role: string;
   plan: string;
   language: string;
+  avatarUrl: string | null;
   createdAt: string;
 }

@@ -20,6 +20,7 @@ import BillingPage from "@/pages/billing";
 import SupportPage from "@/pages/support";
 import ActivatePage from "@/pages/activate";
 
+import AccountPage from "@/pages/account";
 import AdminPage from "@/pages/admin/index";
 import CardAnalyticsPage from "@/pages/analytics/cards/[id]";
 import ScanPage from "@/pages/scan";
@@ -58,6 +59,7 @@ function Router() {
       <Route path="/ai-reply" component={AiReplyPage} />
       <Route path="/billing" component={BillingPage} />
       <Route path="/support" component={SupportPage} />
+      <Route path="/account" component={AccountPage} />
 
       {/* Analytics */}
       <Route path="/analytics/cards/:id" component={CardAnalyticsPage} />

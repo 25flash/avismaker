@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import {
   LayoutDashboard, CreditCard, Building2, Bot, Receipt, MessageCircle,
-  Shield, LogOut, Star, X
+  Shield, LogOut, Star, X, Settings
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
@@ -115,26 +115,37 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
 
       {/* User section */}
       <div className="border-t border-white/10 px-4 py-4">
-        <div className="flex items-center gap-3 mb-3 min-w-0">
-          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
-            <span className="text-sm font-bold text-[#0D1117]">
-              {user?.name?.[0]?.toUpperCase() ?? "U"}
+        <Link href="/account" onClick={handleNavClick}>
+          <div className={cn(
+            "flex items-center gap-3 mb-3 min-w-0 rounded-lg px-2 py-1.5 -mx-2 cursor-pointer transition-colors",
+            location === "/account" ? "bg-white/10" : "hover:bg-white/8"
+          )}>
+            <div className="w-8 h-8 rounded-full shrink-0 overflow-hidden border border-white/20">
+              {user?.avatarUrl ? (
+                <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-primary flex items-center justify-center">
+                  <span className="text-sm font-bold text-[#0D1117]">
+                    {user?.name?.[0]?.toUpperCase() ?? "U"}
+                  </span>
+                </div>
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-white truncate" data-testid="text-username">{user?.name}</p>
+              <p className="text-xs text-white/45 truncate">{user?.email}</p>
+            </div>
+            <span
+              className={cn(
+                "text-xs font-semibold px-2 py-0.5 rounded-full shrink-0",
+                planBadgeClass[user?.plan ?? "free"] ?? "plan-badge-free"
+              )}
+              data-testid="text-plan-badge"
+            >
+              {user?.plan?.charAt(0).toUpperCase() + (user?.plan?.slice(1) ?? "")}
             </span>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white truncate" data-testid="text-username">{user?.name}</p>
-            <p className="text-xs text-white/45 truncate">{user?.email}</p>
-          </div>
-          <span
-            className={cn(
-              "text-xs font-semibold px-2 py-0.5 rounded-full shrink-0",
-              planBadgeClass[user?.plan ?? "free"] ?? "plan-badge-free"
-            )}
-            data-testid="text-plan-badge"
-          >
-            {user?.plan?.charAt(0).toUpperCase() + (user?.plan?.slice(1) ?? "")}
-          </span>
-        </div>
+        </Link>
         <div className="flex items-center justify-between">
           <button
             onClick={() => { logout(); handleNavClick(); }}
@@ -145,7 +156,20 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
             <LogOut className="w-3.5 h-3.5" />
             <span>{t("nav.logout")}</span>
           </button>
-          <LanguageSwitcher variant="dark" />
+          <div className="flex items-center gap-1">
+            <Link href="/account" onClick={handleNavClick}>
+              <button
+                aria-label={t("nav.account")}
+                className={cn(
+                  "w-7 h-7 flex items-center justify-center rounded-md transition-colors",
+                  location === "/account" ? "text-primary bg-primary/15" : "text-white/45 hover:text-white hover:bg-white/10"
+                )}
+              >
+                <Settings className="w-3.5 h-3.5" />
+              </button>
+            </Link>
+            <LanguageSwitcher variant="dark" />
+          </div>
         </div>
       </div>
     </div>

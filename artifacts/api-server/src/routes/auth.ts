@@ -14,7 +14,7 @@ import crypto from "crypto";
 
 const router: IRouter = Router();
 
-function formatUser(user: { id: number; email: string; name: string; role: string; plan: string; language: string; createdAt: Date }) {
+function formatUser(user: { id: number; email: string; name: string; role: string; plan: string; language: string; avatarUrl?: string | null; createdAt: Date }) {
   return {
     id: user.id,
     email: user.email,
@@ -22,6 +22,7 @@ function formatUser(user: { id: number; email: string; name: string; role: strin
     role: user.role,
     plan: user.plan,
     language: user.language,
+    avatarUrl: user.avatarUrl ?? null,
     createdAt: user.createdAt.toISOString(),
   };
 }
@@ -143,9 +144,10 @@ router.patch("/users/me", requireAuth, async (req: AuthRequest, res): Promise<vo
     return;
   }
 
-  const updates: Record<string, string> = {};
+  const updates: Record<string, string | null> = {};
   if (parsed.data.name) updates.name = parsed.data.name;
   if (parsed.data.language) updates.language = parsed.data.language;
+  if (parsed.data.avatarUrl !== undefined) updates.avatarUrl = parsed.data.avatarUrl ?? null;
 
   const [user] = await db.update(usersTable).set(updates).where(eq(usersTable.id, req.userId!)).returning();
   res.json(formatUser(user));

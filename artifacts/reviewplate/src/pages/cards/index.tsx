@@ -1,8 +1,7 @@
 import { AuthLayout } from "@/components/layout/AuthLayout";
-import { useListCards, useListBusinessProfiles, getListCardsQueryKey } from "@workspace/api-client-react";
-import { CreditCard, Plus, ExternalLink, Activity, Building2 } from "lucide-react";
+import { useListCards, useListBusinessProfiles } from "@workspace/api-client-react";
+import { CreditCard, Plus, Activity } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
@@ -27,25 +26,6 @@ interface BusinessProfile {
   id: number;
   name: string;
   logoUrl: string | null;
-}
-
-function ProfileBadge({ profile }: { profile: BusinessProfile }) {
-  return (
-    <div className="flex items-center gap-1.5 mt-2">
-      {profile.logoUrl ? (
-        <img
-          src={profile.logoUrl}
-          alt={profile.name}
-          className="w-4 h-4 rounded object-cover border border-border shrink-0"
-        />
-      ) : (
-        <span className="w-4 h-4 bg-[#0D1117] rounded flex items-center justify-center text-primary font-bold text-[8px] shrink-0">
-          {profile.name[0]?.toUpperCase()}
-        </span>
-      )}
-      <span className="text-xs text-[#6B7280] truncate">{profile.name}</span>
-    </div>
-  );
 }
 
 export default function CardsPage() {
@@ -137,17 +117,15 @@ export default function CardsPage() {
                         </span>
                       </div>
 
-                      <p className="text-lg font-bold font-mono text-[#0D1117] mb-1">{card.code}</p>
-
-                      {/* Profile name below code */}
+                      {/* Nom de l'établissement en principal */}
                       {linkedProfile ? (
-                        <ProfileBadge profile={linkedProfile} />
+                        <p className="text-base font-bold text-[#0D1117] mb-0.5 truncate">{linkedProfile.name}</p>
                       ) : (
-                        <div className="flex items-center gap-1 mt-1">
-                          <Building2 className="w-3.5 h-3.5 text-[#D1D5DB]" />
-                          <span className="text-xs text-[#D1D5DB]">Aucun profil associé</span>
-                        </div>
+                        <p className="text-base font-bold text-[#9CA3AF] mb-0.5">Sans profil</p>
                       )}
+
+                      {/* Code carte en secondaire */}
+                      <p className="text-xs font-mono text-[#6B7280]">{card.code}</p>
 
                       <div className="flex items-center gap-2 mt-3">
                         {card.platform ? (

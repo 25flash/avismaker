@@ -146,14 +146,15 @@ export default function DashboardPage() {
                               </div>
                             )}
                             <div>
-                              <p className="text-sm font-medium text-[#0D1117]">{card.code}</p>
+                              {/* Nom de l'établissement en principal */}
+                              <p className="text-sm font-semibold text-[#0D1117]">
+                                {profile ? profile.name : card.code}
+                              </p>
                               <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                                {profile ? (
-                                  <span className="text-xs text-[#6B7280] flex items-center gap-1">
-                                    <Building2 className="w-3 h-3" />
-                                    {profile.name}
-                                  </span>
-                                ) : null}
+                                {/* Code carte en secondaire */}
+                                {profile && (
+                                  <span className="text-xs font-mono text-[#9CA3AF]">{card.code}</span>
+                                )}
                                 {card.platform && (
                                   <span className={cn("text-xs px-1.5 py-0.5 rounded font-medium", platformColors[card.platform] ?? "bg-gray-100 text-gray-700")}>
                                     {card.platform}

@@ -1,32 +1,9 @@
 import Stripe from 'stripe';
 
-async function getCredentials() {
-  const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME;
-  const xReplitToken = process.env.REPL_IDENTITY
-    ? 'repl ' + process.env.REPL_IDENTITY
-    : process.env.WEB_REPL_RENEWAL
-      ? 'depl ' + process.env.WEB_REPL_RENEWAL
-      : null;
-
-  if (!xReplitToken) throw new Error('X-Replit-Token not found');
-
-  const url = new URL(`https://${hostname}/api/v2/connection`);
-  url.searchParams.set('include_secrets', 'true');
-  url.searchParams.set('connector_names', 'stripe');
-  url.searchParams.set('environment', 'development');
-
-  const response = await fetch(url.toString(), {
-    headers: { 'Accept': 'application/json', 'X-Replit-Token': xReplitToken },
-  });
-
-  const data = await response.json();
-  const conn = data.items?.[0];
-  if (!conn?.settings?.secret) throw new Error('Stripe connection not found');
-  return conn.settings.secret as string;
-}
-
 async function seedProducts() {
-  const secretKey = await getCredentials();
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  if (!secretKey) throw new Error('STRIPE_SECRET_KEY environment variable is not set');
+
   const stripe = new Stripe(secretKey, { apiVersion: '2025-08-27.basil' as any });
 
   console.log('Seeding AvisMaker subscription plans...\n');
@@ -35,7 +12,7 @@ async function seedProducts() {
     {
       planId: 'premium',
       name: 'AvisMaker Premium',
-      description: '3 cartes, 1 profil business, Scans illimités, Réponses IA aux avis',
+      description: '3 cartes actives, 1 profil business, Scans illimités, Réponses IA aux avis',
       monthlyAmount: 1900,
       annualAmount: 17100,
     },
@@ -49,7 +26,6 @@ async function seedProducts() {
   ];
 
   for (const plan of plans) {
-    // Check if product already exists
     const existing = await stripe.products.search({
       query: `metadata['planId']:'${plan.planId}'`,
     });
@@ -67,12 +43,9 @@ async function seedProducts() {
       console.log(`✓ Created product: ${product.name} (${product.id})`);
     }
 
-    // Monthly price
-    const existingMonthly = await stripe.prices.list({
-      product: product.id,
-      active: true,
-    });
-    const hasMonthly = existingMonthly.data.some(p => p.metadata?.billing === 'monthly');
+    const existingPrices = await stripe.prices.list({ product: product.id, active: true });
+
+    const hasMonthly = existingPrices.data.some(p => p.metadata?.billing === 'monthly');
     if (!hasMonthly) {
       const monthlyPrice = await stripe.prices.create({
         product: product.id,
@@ -86,8 +59,7 @@ async function seedProducts() {
       console.log(`  ✓ Monthly price already exists`);
     }
 
-    // Annual price
-    const hasAnnual = existingMonthly.data.some(p => p.metadata?.billing === 'annual');
+    const hasAnnual = existingPrices.data.some(p => p.metadata?.billing === 'annual');
     if (!hasAnnual) {
       const annualPrice = await stripe.prices.create({
         product: product.id,
@@ -102,7 +74,7 @@ async function seedProducts() {
     }
   }
 
-  console.log('\n✅ Done! Webhooks will sync these products to the database automatically.');
+  console.log('\n✅ Done!');
 }
 
 seedProducts().catch(err => {

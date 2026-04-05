@@ -61,13 +61,23 @@ Redirect URL format: `https://www.avismaker.com/r/{CODE}` (stored as `target_url
 - `GET  /api/analytics/summary` — Analytics dashboard
 - `POST /api/ai/reply` — Generate AI review reply (Premium+)
 - `GET  /api/subscriptions/plans` — List plans
-- `POST /api/subscriptions/upgrade` — Upgrade plan
+- `POST /api/stripe/checkout` — Create Stripe checkout session (returns `{ url }`)
+- `POST /api/stripe/portal` — Open Stripe billing portal (returns `{ url }`)
+- `POST /api/stripe/webhook` — Stripe webhook endpoint (raw body, before express.json)
+
+### Stripe Setup (COMPLETED & VERIFIED)
+- Connection: `conn_stripe_01KNEDTY1T4MAZ4YAAMKFMP166` (sandbox)
+- Products seeded: AvisMaker Premium (€19/mo, €171/yr), AvisMaker Business (€49/mo, €441/yr)
+- Price metadata: `planId` (premium|business) + `billing` (monthly|annual)
+- `stripe-replit-sync` externalized in esbuild (build.mjs) — CRITICAL for `runMigrations` to work
+- `syncBackfill({ object: "all" })` called on startup to populate stripe.* tables
+- Checkout route falls back to Stripe API if `stripe.products`/`stripe.prices` not yet synced
+- Webhook handles: `checkout.session.completed`, `customer.subscription.deleted`
 
 ### Subscription Plans
-- Free: 1 profile, no AI Reply
-- Premium: 3 profiles, AI Reply enabled
-- Pro: 10 profiles, AI Reply enabled
-- Business: unlimited profiles, AI Reply enabled
+- Free: 1 profile, 1 active card, no AI Reply
+- Premium (€19/mo): 3 active cards, 1 profile, AI Reply enabled
+- Business (€49/mo): unlimited, AI Reply enabled
 
 ### Internationalization (i18n)
 - Library: `i18next` + `react-i18next` + `i18next-browser-languagedetector`

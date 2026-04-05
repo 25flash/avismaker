@@ -294,6 +294,8 @@
     "upgrading": "Updating...",
     "planUpdated": "Plan updated!",
     "planUpdatedDesc": "You are now on the {{plan}} plan ({{billing}}).",
+    "paymentSuccess": "Payment successful!",
+    "paymentSuccessDesc": "Your {{plan}} subscription is now active.",
     "updateFailed": "Error",
     "updateFailedDesc": "Unable to change plan. Please try again.",
     "mostPopular": "Most popular",

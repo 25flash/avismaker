@@ -294,6 +294,8 @@
     "upgrading": "Bijwerken...",
     "planUpdated": "Plan bijgewerkt!",
     "planUpdatedDesc": "Je zit nu op het {{plan}} plan ({{billing}}).",
+    "paymentSuccess": "Betaling geslaagd!",
+    "paymentSuccessDesc": "Je {{plan}}-abonnement is nu actief.",
     "updateFailed": "Fout",
     "updateFailedDesc": "Kan plan niet wijzigen. Probeer het opnieuw.",
     "mostPopular": "Meest populair",

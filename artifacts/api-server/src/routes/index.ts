@@ -9,6 +9,7 @@ import supportRouter from "./support";
 import subscriptionsRouter from "./subscriptions";
 import publicRouter from "./public";
 import adminRouter from "./admin";
+import stripeRouter from "./stripe";
 
 const router: IRouter = Router();
 
@@ -22,5 +23,6 @@ router.use(supportRouter);
 router.use(subscriptionsRouter);
 router.use(publicRouter);
 router.use(adminRouter);
+router.use(stripeRouter);
 
 export default router;

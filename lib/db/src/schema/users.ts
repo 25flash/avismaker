@@ -11,6 +11,7 @@ export const usersTable = pgTable("users", {
   plan: text("plan").notNull().default("free"),
   language: text("language").notNull().default("fr"),
   avatarUrl: text("avatar_url"),
+  stripeCustomerId: text("stripe_customer_id"),
   resetToken: text("reset_token"),
   resetTokenExpiry: timestamp("reset_token_expiry", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

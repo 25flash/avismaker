@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useSearch } from "wouter";
 
 const planIcons: Record<string, React.ElementType> = {
   free: Zap,
@@ -72,6 +73,20 @@ export default function BillingPage() {
 
   const currentPlan = user?.plan ?? "free";
   const [upgrading, setUpgrading] = useState<string | null>(null);
+  const search = useSearch();
+
+  useEffect(() => {
+    const params = new URLSearchParams(search);
+    if (params.get("success") === "1") {
+      const plan = params.get("plan") ?? "";
+      toast({
+        title: t("billing.paymentSuccess"),
+        description: t("billing.paymentSuccessDesc", { plan }),
+      });
+      window.history.replaceState(null, "", window.location.pathname);
+      window.location.reload();
+    }
+  }, []);
 
   const getPrice = (basePrice: number) => {
     if (basePrice === 0) return 0;
@@ -88,16 +103,24 @@ export default function BillingPage() {
     if (!token) return;
     setUpgrading(planId);
     try {
-      const res = await fetch("/api/subscriptions/upgrade", {
+      const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ plan: planId, billing }),
+        body: JSON.stringify({ planId, billing }),
       });
-      if (!res.ok) throw new Error();
-      toast({ title: t("billing.planUpdated"), description: t("billing.planUpdatedDesc", { plan: planId, billing: billing === "annual" ? t("billing.annualLabel") : t("billing.monthly") }) });
-      window.location.reload();
-    } catch {
-      toast({ variant: "destructive", title: t("billing.updateFailed"), description: t("billing.updateFailedDesc") });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error((err as any).error ?? "Checkout failed");
+      }
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else if (data.upgraded) {
+        toast({ title: t("billing.planUpdated"), description: t("billing.planUpdatedDesc", { plan: planId, billing: billing === "annual" ? t("billing.annualLabel") : t("billing.monthly") }) });
+        window.location.reload();
+      }
+    } catch (err: any) {
+      toast({ variant: "destructive", title: t("billing.updateFailed"), description: err.message ?? t("billing.updateFailedDesc") });
     } finally {
       setUpgrading(null);
     }

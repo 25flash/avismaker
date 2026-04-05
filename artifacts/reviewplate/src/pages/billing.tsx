@@ -234,19 +234,19 @@ export default function BillingPage() {
 
                   {/* Limits */}
                   <ul className="space-y-2 my-5">
-                    {/* Active cards limit */}
-                    <li className="flex items-center gap-2 text-sm text-[#374151]">
-                      <Check className="w-4 h-4 text-[#10B981] shrink-0" />
-                      {plan.maxActiveCards === null
-                        ? t("billing.unlimitedCards", "Unlimited active cards")
-                        : t("billing.activeCardsCount", "{{count}} active card(s)", { count: plan.maxActiveCards })}
-                    </li>
                     {/* Business profiles limit */}
                     <li className="flex items-center gap-2 text-sm text-[#374151]">
                       <Check className="w-4 h-4 text-[#10B981] shrink-0" />
                       {plan.maxProfiles === null
                         ? t("billing.unlimitedProfiles", "Unlimited profiles")
                         : t("billing.profilesCount", "{{count}} business profile(s)", { count: plan.maxProfiles })}
+                    </li>
+                    {/* Active cards limit */}
+                    <li className="flex items-center gap-2 text-sm text-[#374151]">
+                      <Check className="w-4 h-4 text-[#10B981] shrink-0" />
+                      {plan.maxActiveCards === null
+                        ? t("billing.unlimitedCards", "Unlimited active cards")
+                        : t("billing.activeCardsCount", "{{count}} active card(s)", { count: plan.maxActiveCards })}
                     </li>
                     {/* Other features */}
                     {(plan.features ?? []).map((feature, i) => (

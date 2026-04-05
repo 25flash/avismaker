@@ -302,7 +302,7 @@
     "annualSavings": "Ahorra 3 meses cambiando a facturación anual",
     "unlimitedCards": "Tarjetas activas ilimitadas",
     "activeCardsCount_one": "{{count}} tarjeta",
-    "activeCardsCount_other": "{{count}} tarjetas activas",
+    "activeCardsCount_other": "{{count}} tarjetas",
     "activeCardsCount": "{{count}} tarjeta(s) activa(s)",
     "unlimitedProfiles": "Perfiles de negocio ilimitados",
     "profilesCount_one": "{{count}} perfil de negocio",

@@ -339,34 +339,27 @@ function AnalyticsPreviewCard({
         ))}
       </div>
 
-      {/* Compact layout: metrics + chart + CTA all in one row on desktop */}
-      <div className="flex flex-col xl:flex-row xl:items-center gap-3">
-        {/* 6 metrics in 2x3 grid (compact) */}
-        <div className="grid grid-cols-3 xl:grid-cols-6 gap-2 xl:flex-1">
+      {/* Metrics grid + chart side by side on desktop */}
+      <div className="flex flex-col xl:flex-row gap-4">
+        {/* 6 metrics in 2x3 grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 xl:w-[52%]">
           {metricRows.map(m => (
-            <div key={m.label} className="bg-[#F9FAFB] rounded-lg px-2 py-2 border border-[#E5E7EB] flex flex-col gap-0.5">
-              <p className="text-[10px] text-[#6B7280] leading-tight truncate">{m.label}</p>
-              <div className="flex items-center gap-0.5">
-                <p className={cn(
-                  "text-sm font-bold leading-tight",
-                  m.neutral ? "text-[#0D1117]" : m.positive ? "text-emerald-600" : "text-red-500"
-                )}>
-                  {m.value}{m.suffix}
-                </p>
-                {!m.neutral && (
-                  m.positive
-                    ? <ArrowUpRight className="w-3 h-3 text-emerald-500 shrink-0" />
-                    : <ArrowDownRight className="w-3 h-3 text-red-400 shrink-0" />
-                )}
-              </div>
-            </div>
+            <MetricBox
+              key={m.label}
+              label={m.label}
+              value={m.value}
+              suffix={m.suffix}
+              icon={m.icon}
+              positive={m.positive}
+              neutral={m.neutral}
+            />
           ))}
         </div>
 
-        {/* AreaChart — compact */}
-        <div className="h-24 xl:w-[32%] xl:shrink-0">
+        {/* AreaChart */}
+        <div className="xl:flex-1 h-44 xl:h-48">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData} margin={{ top: 2, right: 4, left: -28, bottom: 0 }}>
+            <AreaChart data={chartData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="grad-curr" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.35} />
@@ -378,26 +371,26 @@ function AnalyticsPreviewCard({
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
-              <XAxis dataKey="date" tick={{ fontSize: 9, fill: "#9CA3AF" }} tickLine={false} axisLine={false} interval="preserveStartEnd" />
-              <YAxis tick={{ fontSize: 9, fill: "#9CA3AF" }} tickLine={false} axisLine={false} />
+              <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9CA3AF" }} tickLine={false} axisLine={false} />
+              <YAxis tick={{ fontSize: 10, fill: "#9CA3AF" }} tickLine={false} axisLine={false} />
               <Tooltip
-                contentStyle={{ fontSize: 11, borderRadius: 6, border: "1px solid #E5E7EB" }}
+                contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E5E7EB", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
                 labelStyle={{ fontWeight: 600, color: "#0D1117" }}
               />
-              <Area type="monotone" dataKey="prev" name="Période préc." stroke="#D1D5DB" strokeWidth={1} fill="url(#grad-prev)" dot={false} />
-              <Area type="monotone" dataKey="scans" name="Scans" stroke="#F59E0B" strokeWidth={1.5} fill="url(#grad-curr)" dot={false} activeDot={{ r: 3, fill: "#F59E0B" }} />
+              <Area type="monotone" dataKey="prev" name="Période préc." stroke="#D1D5DB" strokeWidth={1.5} fill="url(#grad-prev)" dot={false} />
+              <Area type="monotone" dataKey="scans" name="Scans" stroke="#F59E0B" strokeWidth={2} fill="url(#grad-curr)" dot={false} activeDot={{ r: 4, fill: "#F59E0B" }} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
+      </div>
 
-        {/* CTA */}
-        <div className="xl:shrink-0">
-          <Link href="/business-analytics">
-            <Button className="w-full xl:w-auto bg-primary text-[#0D1117] font-semibold hover:bg-primary/90 text-xs px-4 h-8">
-              Voir plus <ChevronRight className="w-3 h-3 ml-1" />
-            </Button>
-          </Link>
-        </div>
+      {/* CTA */}
+      <div className="flex justify-end">
+        <Link href="/business-analytics">
+          <Button className="bg-primary text-[#0D1117] font-semibold hover:bg-primary/90 text-sm px-5">
+            Voir les analytics complètes <ChevronRight className="w-4 h-4 ml-1" />
+          </Button>
+        </Link>
       </div>
     </div>
   );
@@ -635,7 +628,7 @@ export default function DashboardPage() {
                 )}
               </div>
             </CardHeader>
-            <CardContent className="pt-3 flex-1 flex flex-col" style={{ minHeight: 160 }}>
+            <CardContent className="pt-4 flex-1 flex flex-col" style={{ minHeight: 320 }}>
               <AnalyticsPreviewCard isBusiness={isBusiness} summary={summary} leastScanned={leastScanned} realAnalytics={realAnalytics} />
             </CardContent>
           </Card>

@@ -139,17 +139,36 @@ export default function BusinessAnalyticsPage() {
       const LIGHT  = [249, 250, 251] as [number, number, number];
       const BORDER = [229, 231, 235] as [number, number, number];
 
+      // ── Load logo ─────────────────────────────────────────────────
+      let logoDataUrl: string | null = null;
+      try {
+        const resp = await fetch("/logo.png");
+        const blob = await resp.blob();
+        logoDataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      } catch {
+        logoDataUrl = null;
+      }
+
       // ── Header ────────────────────────────────────────────────────
       pdf.setFillColor(...DARK);
       pdf.rect(0, 0, W, 24, "F");
 
-      // Logo placeholder (amber square)
-      pdf.setFillColor(...AMBER);
-      pdf.roundedRect(M, 5, 14, 14, 2, 2, "F");
-      pdf.setTextColor(...DARK);
-      pdf.setFontSize(9);
-      pdf.setFont("helvetica", "bold");
-      pdf.text("AM", M + 2.5, 13.5);
+      // Logo — real image or fallback amber square
+      if (logoDataUrl) {
+        pdf.addImage(logoDataUrl, "PNG", M, 4, 16, 16);
+      } else {
+        pdf.setFillColor(...AMBER);
+        pdf.roundedRect(M, 5, 14, 14, 2, 2, "F");
+        pdf.setTextColor(...DARK);
+        pdf.setFontSize(9);
+        pdf.setFont("helvetica", "bold");
+        pdf.text("AM", M + 2.5, 13.5);
+      }
 
       pdf.setTextColor(...AMBER);
       pdf.setFontSize(13);

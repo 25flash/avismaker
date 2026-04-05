@@ -16,6 +16,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
@@ -39,6 +40,7 @@ const platformColors: Record<string, string> = {
 interface CardItem {
   id: number;
   code: string;
+  nickname?: string | null;
   status: string;
   platform: string | null;
   targetUrl: string | null;
@@ -48,6 +50,7 @@ interface CardItem {
 }
 
 export default function ProfileEditorPage() {
+  const { t, i18n } = useTranslation();
   const params = useParams<{ id: string }>();
   const profileId = parseInt(params.id ?? "0");
   const queryClient = useQueryClient();
@@ -75,10 +78,10 @@ export default function ProfileEditorPage() {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getListCardsQueryKey() });
           queryClient.invalidateQueries({ queryKey: getGetBusinessProfileQueryKey(profileId) });
-          toast({ title: "Carte retirée", description: `La carte ${cardCode} n'est plus rattachée à ce profil.` });
+          toast({ title: t('profiles.detachSuccess'), description: t('profiles.detachSuccessDesc', { code: cardCode }) });
         },
         onError: () => {
-          toast({ variant: "destructive", title: "Erreur", description: "Impossible de retirer la carte." });
+          toast({ variant: "destructive", title: t('common.error'), description: t('profiles.detachError') });
         },
       }
     );
@@ -122,11 +125,11 @@ export default function ProfileEditorPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      toast({ variant: "destructive", title: "Format invalide", description: "Veuillez choisir une image (PNG, JPG, SVG…)" });
+      toast({ variant: "destructive", title: t('profiles.invalidFormat'), description: t('profiles.invalidFormat') });
       return;
     }
     if (file.size > 2 * 1024 * 1024) {
-      toast({ variant: "destructive", title: "Fichier trop lourd", description: "Le logo ne doit pas dépasser 2 Mo." });
+      toast({ variant: "destructive", title: t('profiles.logoTooLarge'), description: t('profiles.logoTooLargeDesc') });
       return;
     }
     const reader = new FileReader();
@@ -161,10 +164,10 @@ export default function ProfileEditorPage() {
           queryClient.invalidateQueries({ queryKey: getGetBusinessProfileQueryKey(profileId) });
           queryClient.invalidateQueries({ queryKey: getListBusinessProfilesQueryKey() });
           setLogoChanged(false);
-          toast({ title: "Profil mis à jour", description: "Les informations ont été sauvegardées." });
+          toast({ title: t('profiles.profileUpdated'), description: t('profiles.profileUpdatedDesc') });
         },
         onError: () => {
-          toast({ variant: "destructive", title: "Erreur", description: "Impossible de mettre à jour le profil." });
+          toast({ variant: "destructive", title: t('common.error'), description: t('common.error') });
         },
       }
     );
@@ -177,10 +180,10 @@ export default function ProfileEditorPage() {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getListBusinessProfilesQueryKey() });
           setLocation("/profiles");
-          toast({ title: "Profil supprimé" });
+          toast({ title: t('profiles.profileDeleted') });
         },
         onError: () => {
-          toast({ variant: "destructive", title: "Erreur", description: "Impossible de supprimer le profil." });
+          toast({ variant: "destructive", title: t('common.error'), description: t('common.error') });
         },
       }
     );
@@ -201,8 +204,8 @@ export default function ProfileEditorPage() {
     return (
       <AuthLayout>
         <div className="text-center py-16">
-          <p className="text-[#6B7280]">Profil introuvable</p>
-          <Link href="/profiles"><Button className="mt-4" variant="outline">Retour aux profils</Button></Link>
+          <p className="text-[#6B7280]">{t('profiles.notFound')}</p>
+          <Link href="/profiles"><Button className="mt-4" variant="outline">{t('profiles.backToProfiles')}</Button></Link>
         </div>
       </AuthLayout>
     );
@@ -236,11 +239,11 @@ export default function ProfileEditorPage() {
               <div className="flex items-center gap-3 mt-1">
                 <span className="text-sm text-[#6B7280] flex items-center gap-1">
                   <CreditCard className="w-3.5 h-3.5" />
-                  {cardList.length} carte{cardList.length !== 1 ? "s" : ""} rattachée{cardList.length !== 1 ? "s" : ""}
+                  {cardList.length} {t('profiles.cards')}
                 </span>
                 <span className="text-sm text-[#6B7280] flex items-center gap-1">
                   <Activity className="w-3.5 h-3.5" />
-                  {profileData.totalScans} scan{profileData.totalScans !== 1 ? "s" : ""}
+                  {profileData.totalScans} {t('profiles.scans')}
                 </span>
               </div>
             </div>
@@ -249,42 +252,42 @@ export default function ProfileEditorPage() {
             <AlertDialogTrigger asChild>
               <Button variant="outline" size="sm" className="border-red-200 text-red-600 hover:bg-red-50 shrink-0" data-testid="button-delete">
                 <Trash2 className="w-4 h-4 mr-1.5" />
-                Supprimer
+                {t('profiles.delete')}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Supprimer ce profil ?</AlertDialogTitle>
+                <AlertDialogTitle>{t('profiles.deleteTitle')}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Le profil "{profileData.name}" sera définitivement supprimé. Les cartes rattachées ne seront pas supprimées mais perdront leur association. Cette action est irréversible.
+                  {t('profiles.deleteDesc', { name: profileData.name })}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                <AlertDialogCancel>{t('profiles.cancel')}</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={handleDelete}
                   className="bg-red-600 hover:bg-red-700"
                   data-testid="button-confirm-delete"
                 >
-                  Supprimer le profil
+                  {t('profiles.confirmDelete')}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
         </div>
 
-        {/* Cartes rattachées */}
+        {/* Linked Cards */}
         <Card className="bg-white border border-border shadow-sm">
           <CardHeader className="border-b border-border pb-4">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base font-semibold text-[#0D1117] flex items-center gap-2">
                 <CreditCard className="w-4 h-4 text-primary" />
-                Cartes rattachées
+                {t('profiles.linkedCards')}
               </CardTitle>
               <Link href="/cards">
                 <Button size="sm" variant="outline" className="text-xs h-8" data-testid="button-manage-cards">
                   <Plus className="w-3 h-3 mr-1" />
-                  Gérer les cartes
+                  {t('profiles.manageCards')}
                 </Button>
               </Link>
             </div>
@@ -299,14 +302,14 @@ export default function ProfileEditorPage() {
                 <div className="w-12 h-12 bg-[#F3F4F6] rounded-xl flex items-center justify-center mx-auto mb-3">
                   <CreditCard className="w-6 h-6 text-[#9CA3AF]" />
                 </div>
-                <p className="text-sm font-medium text-[#374151]">Aucune carte rattachée</p>
+                <p className="text-sm font-medium text-[#374151]">{t('profiles.noLinkedCards')}</p>
                 <p className="text-xs text-[#9CA3AF] mt-1 mb-4">
-                  Rattachez une carte NFC/QR à ce profil depuis la page carte.
+                  {t('profiles.noLinkedCardsDesc')}
                 </p>
                 <Link href="/cards">
                   <Button size="sm" variant="outline" data-testid="button-go-to-cards">
                     <CreditCard className="w-3.5 h-3.5 mr-1.5" />
-                    Voir mes cartes
+                    {t('profiles.goToCards')}
                   </Button>
                 </Link>
               </div>
@@ -314,7 +317,6 @@ export default function ProfileEditorPage() {
               <div className="divide-y divide-border">
                 {cardList.map((card) => (
                   <div key={card.id} className="flex items-center gap-4 px-5 py-4 hover:bg-[#F8FAFC] transition-colors" data-testid={`card-row-${card.id}`}>
-                    {/* Logo or code badge */}
                     {logoPreview ? (
                       <img
                         src={logoPreview}
@@ -327,7 +329,6 @@ export default function ProfileEditorPage() {
                       </div>
                     )}
 
-                    {/* Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         {card.nickname && (
@@ -335,7 +336,7 @@ export default function ProfileEditorPage() {
                         )}
                         <span className={cn("font-mono text-sm", card.nickname ? "text-[#9CA3AF] text-xs" : "font-bold text-[#0D1117]")}>{card.code}</span>
                         <span className={cn("text-xs font-semibold px-2 py-0.5 rounded-full", statusClass[card.status] ?? "status-pill-inactive")}>
-                          {card.status === "active" ? "Active" : card.status === "inactive" ? "Inactive" : "Désactivée"}
+                          {t(`status.${card.status}`, card.status)}
                         </span>
                         {card.platform && (
                           <span className={cn("text-xs font-medium px-2 py-0.5 rounded", platformColors[card.platform] ?? "bg-gray-100 text-gray-700")}>
@@ -346,17 +347,16 @@ export default function ProfileEditorPage() {
                       <div className="flex items-center gap-3 mt-0.5">
                         <span className="text-xs text-[#6B7280] flex items-center gap-1">
                           <Activity className="w-3 h-3" />
-                          {card.scanCount} scan{card.scanCount !== 1 ? "s" : ""}
+                          {card.scanCount} {t('cards.scans')}
                         </span>
                         {card.activatedAt && (
                           <span className="text-xs text-[#9CA3AF]">
-                            Activée le {new Date(card.activatedAt).toLocaleDateString("fr-FR")}
+                            {t('cards.activatedOn')} {new Date(card.activatedAt).toLocaleDateString(i18n.language)}
                           </span>
                         )}
                       </div>
                     </div>
 
-                    {/* Actions */}
                     <div className="flex items-center gap-2 shrink-0">
                       {card.targetUrl && (
                         <a href={card.targetUrl} target="_blank" rel="noopener noreferrer">
@@ -367,7 +367,7 @@ export default function ProfileEditorPage() {
                       )}
                       <Link href={`/cards/${card.id}`}>
                         <Button size="sm" variant="outline" className="h-8 text-xs" data-testid={`button-edit-card-${card.id}`}>
-                          Configurer
+                          {t('profiles.configure')}
                         </Button>
                       </Link>
                       <AlertDialog>
@@ -377,26 +377,26 @@ export default function ProfileEditorPage() {
                             size="icon"
                             className="h-8 w-8 text-[#9CA3AF] hover:text-red-500 hover:bg-red-50"
                             data-testid={`button-detach-card-${card.id}`}
-                            title="Retirer du profil"
+                            title={t('profiles.detachCard')}
                           >
                             <Unlink className="w-3.5 h-3.5" />
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Retirer cette carte ?</AlertDialogTitle>
+                            <AlertDialogTitle>{t('profiles.detachCard')}</AlertDialogTitle>
                             <AlertDialogDescription>
-                              La carte <span className="font-mono font-semibold">{card.code}</span> ne sera plus rattachée à ce profil. La carte n'est pas supprimée et peut être réassociée à tout moment.
+                              {t('profiles.detachCardDesc', { code: card.code })}
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Annuler</AlertDialogCancel>
+                            <AlertDialogCancel>{t('profiles.cancel')}</AlertDialogCancel>
                             <AlertDialogAction
                               onClick={() => handleDetachCard(card.id, card.code)}
                               className="bg-red-600 hover:bg-red-700"
                               data-testid={`button-confirm-detach-${card.id}`}
                             >
-                              Retirer la carte
+                              {t('profiles.confirmDetach')}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
@@ -412,7 +412,7 @@ export default function ProfileEditorPage() {
         {/* Profile Details */}
         <Card className="bg-white border border-border shadow-sm">
           <CardHeader className="border-b border-border pb-4">
-            <CardTitle className="text-base font-semibold text-[#0D1117]">Informations du profil</CardTitle>
+            <CardTitle className="text-base font-semibold text-[#0D1117]">{t('profiles.profileDetails')}</CardTitle>
           </CardHeader>
           <CardContent className="pt-6 space-y-5">
 
@@ -420,7 +420,7 @@ export default function ProfileEditorPage() {
             <div className="space-y-2">
               <Label className="flex items-center gap-1.5">
                 <Upload className="w-3.5 h-3.5" />
-                Logo de l'établissement
+                {t('profiles.logo')}
               </Label>
               <div className="flex items-center gap-4">
                 {logoPreview ? (
@@ -434,7 +434,7 @@ export default function ProfileEditorPage() {
                       onClick={handleRemoveLogo}
                       className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white shadow transition-colors"
                       data-testid="button-remove-logo"
-                      title="Supprimer le logo"
+                      title={t('profiles.deleteLogo')}
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -468,17 +468,17 @@ export default function ProfileEditorPage() {
                     >
                       <span>
                         <Upload className="w-3.5 h-3.5 mr-1.5" />
-                        {logoPreview ? "Changer le logo" : "Importer un logo"}
+                        {logoPreview ? t('profiles.changeLogo') : t('profiles.uploadLogo')}
                       </span>
                     </Button>
                   </label>
-                  <p className="text-xs text-[#9CA3AF] mt-1.5">PNG, JPG ou SVG · max 2 Mo</p>
+                  <p className="text-xs text-[#9CA3AF] mt-1.5">{t('profiles.logoHint')}</p>
                 </div>
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <Label>Nom de l'établissement *</Label>
+              <Label>{t('profiles.nameRequired')}</Label>
               <Input
                 value={form.name}
                 onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))}
@@ -488,45 +488,45 @@ export default function ProfileEditorPage() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> Adresse</Label>
+              <Label className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> {t('profiles.address')}</Label>
               <Input
                 value={form.address}
                 onChange={(e) => setForm(f => ({ ...f, address: e.target.value }))}
-                placeholder="12 Rue de la Paix, Paris"
+                placeholder={t('profiles.addressPlaceholder')}
                 className="h-11"
                 data-testid="input-address"
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label className="flex items-center gap-1.5"><Globe className="w-3.5 h-3.5" /> Site web</Label>
+              <Label className="flex items-center gap-1.5"><Globe className="w-3.5 h-3.5" /> {t('profiles.website')}</Label>
               <Input
                 value={form.website}
                 onChange={(e) => setForm(f => ({ ...f, website: e.target.value }))}
-                placeholder="https://monrestaurant.fr"
+                placeholder={t('profiles.websitePlaceholder')}
                 className="h-11"
                 data-testid="input-website"
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label className="flex items-center gap-1.5"><Star className="w-3.5 h-3.5" /> Lien Google Avis</Label>
+              <Label className="flex items-center gap-1.5"><Star className="w-3.5 h-3.5" /> {t('profiles.googleReviewUrl')}</Label>
               <Input
                 value={form.googleReviewUrl}
                 onChange={(e) => setForm(f => ({ ...f, googleReviewUrl: e.target.value }))}
-                placeholder="https://g.page/r/..."
+                placeholder={t('profiles.googleUrlPlaceholder')}
                 className="h-11"
                 data-testid="input-google-url"
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label>Description</Label>
+              <Label>{t('profiles.description')}</Label>
               <Textarea
                 value={form.description}
                 onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
                 rows={3}
-                placeholder="Courte description de votre établissement..."
+                placeholder={t('profiles.descriptionPlaceholder')}
                 data-testid="input-description"
               />
             </div>
@@ -539,7 +539,7 @@ export default function ProfileEditorPage() {
                 data-testid="button-save"
               >
                 <Save className="w-4 h-4 mr-2" />
-                {updateMutation.isPending ? "Enregistrement..." : "Enregistrer"}
+                {updateMutation.isPending ? t('profiles.saving') : t('profiles.save')}
               </Button>
             </div>
           </CardContent>

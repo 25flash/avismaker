@@ -12,6 +12,7 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 
 interface ProfileForm {
   name: string;
@@ -41,6 +42,7 @@ function ProfileAvatar({ name, logoUrl, size = "md" }: { name: string; logoUrl: 
 }
 
 export default function ProfilesPage() {
+  const { t, i18n } = useTranslation();
   const { data: profiles, isLoading } = useListBusinessProfiles();
   const createMutation = useCreateBusinessProfile();
   const { toast } = useToast();
@@ -63,11 +65,11 @@ export default function ProfilesPage() {
           queryClient.invalidateQueries({ queryKey: getListBusinessProfilesQueryKey() });
           setShowDialog(false);
           setForm({ name: "", address: "", website: "", googleReviewUrl: "", description: "" });
-          toast({ title: "Profil créé", description: "Votre profil business a été sauvegardé." });
+          toast({ title: t('profiles.profileCreated'), description: t('profiles.profileCreatedDesc') });
         },
         onError: (err: unknown) => {
           const apiError = err as { data?: { error?: string } };
-          toast({ variant: "destructive", title: "Erreur", description: apiError?.data?.error ?? "Impossible de créer le profil." });
+          toast({ variant: "destructive", title: t('common.error'), description: apiError?.data?.error ?? t('common.error') });
         },
       }
     );
@@ -78,8 +80,8 @@ export default function ProfilesPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-[#0D1117]">Profils Business</h1>
-            <p className="text-sm text-[#6B7280] mt-0.5">Gérez vos établissements et leurs liens d'avis</p>
+            <h1 className="text-2xl font-bold text-[#0D1117]">{t('profiles.title')}</h1>
+            <p className="text-sm text-[#6B7280] mt-0.5">{t('profiles.subtitle')}</p>
           </div>
           <Button
             onClick={() => setShowDialog(true)}
@@ -87,7 +89,7 @@ export default function ProfilesPage() {
             data-testid="button-add-profile"
           >
             <Plus className="w-4 h-4 mr-2" />
-            Ajouter un profil
+            {t('profiles.addProfile')}
           </Button>
         </div>
 
@@ -101,9 +103,9 @@ export default function ProfilesPage() {
               <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Building2 className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="text-lg font-semibold text-[#0D1117] mb-2">Aucun profil business</h3>
+              <h3 className="text-lg font-semibold text-[#0D1117] mb-2">{t('profiles.noProfiles')}</h3>
               <p className="text-sm text-[#6B7280] mb-6 max-w-xs mx-auto">
-                Créez un profil pour chaque établissement afin d'organiser vos cartes d'avis.
+                {t('profiles.noProfilesDesc')}
               </p>
               <Button
                 onClick={() => setShowDialog(true)}
@@ -111,7 +113,7 @@ export default function ProfilesPage() {
                 data-testid="button-create-first-profile"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                Créer mon premier profil
+                {t('profiles.createFirst')}
               </Button>
             </CardContent>
           </Card>
@@ -144,7 +146,7 @@ export default function ProfilesPage() {
                     <div className="flex gap-2 flex-wrap">
                       {profile.website && (
                         <span className="flex items-center gap-1 text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded">
-                          <Globe className="w-3 h-3" /> Site web
+                          <Globe className="w-3 h-3" /> {t('profiles.websiteBadge')}
                         </span>
                       )}
                       {profile.googleReviewUrl && (
@@ -155,7 +157,7 @@ export default function ProfilesPage() {
                     </div>
 
                     <p className="text-xs text-[#9CA3AF] mt-3">
-                      Créé le {new Date(profile.createdAt).toLocaleDateString("fr-FR")}
+                      {t('profiles.createdOn', { date: new Date(profile.createdAt).toLocaleDateString(i18n.language) })}
                     </p>
                   </CardContent>
                 </Card>
@@ -165,69 +167,68 @@ export default function ProfilesPage() {
         )}
       </div>
 
-      {/* Create profile dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogContent className="max-w-md" data-testid="dialog-create-profile">
           <DialogHeader>
-            <DialogTitle className="text-[#0D1117]">Créer un profil business</DialogTitle>
+            <DialogTitle className="text-[#0D1117]">{t('profiles.createProfile')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <Label>Nom de l'établissement *</Label>
+              <Label>{t('profiles.nameRequired')}</Label>
               <Input
                 value={form.name}
                 onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))}
-                placeholder="ex. Le Grand Hôtel"
+                placeholder={t('profiles.namePlaceholder')}
                 data-testid="input-profile-name"
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Adresse</Label>
+              <Label>{t('profiles.address')}</Label>
               <Input
                 value={form.address}
                 onChange={(e) => setForm(f => ({ ...f, address: e.target.value }))}
-                placeholder="12 Rue de la Paix, Paris"
+                placeholder={t('profiles.addressPlaceholder')}
                 data-testid="input-profile-address"
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Site web</Label>
+              <Label>{t('profiles.website')}</Label>
               <Input
                 value={form.website}
                 onChange={(e) => setForm(f => ({ ...f, website: e.target.value }))}
-                placeholder="https://monrestaurant.fr"
+                placeholder={t('profiles.websitePlaceholder')}
                 data-testid="input-profile-website"
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Lien Google Avis</Label>
+              <Label>{t('profiles.googleReviewUrl')}</Label>
               <Input
                 value={form.googleReviewUrl}
                 onChange={(e) => setForm(f => ({ ...f, googleReviewUrl: e.target.value }))}
-                placeholder="https://g.page/r/..."
+                placeholder={t('profiles.googleUrlPlaceholder')}
                 data-testid="input-profile-google-url"
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Description</Label>
+              <Label>{t('profiles.description')}</Label>
               <Textarea
                 value={form.description}
                 onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
-                placeholder="Courte description de votre établissement…"
+                placeholder={t('profiles.descriptionPlaceholder')}
                 rows={3}
                 data-testid="input-profile-description"
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDialog(false)} data-testid="button-cancel-profile">Annuler</Button>
+            <Button variant="outline" onClick={() => setShowDialog(false)} data-testid="button-cancel-profile">{t('profiles.cancel')}</Button>
             <Button
               onClick={handleCreate}
               disabled={!form.name.trim() || createMutation.isPending}
               className="bg-primary text-[#0D1117] font-semibold hover:bg-primary/90"
               data-testid="button-save-profile"
             >
-              {createMutation.isPending ? "Création…" : "Créer le profil"}
+              {createMutation.isPending ? t('profiles.creating') : t('profiles.createProfile')}
             </Button>
           </DialogFooter>
         </DialogContent>

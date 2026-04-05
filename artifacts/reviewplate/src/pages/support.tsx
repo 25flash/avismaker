@@ -9,8 +9,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function SupportPage() {
+  const { t } = useTranslation();
   const createMutation = useCreateSupportMessage();
   const { toast } = useToast();
   const [sent, setSent] = useState(false);
@@ -25,7 +27,7 @@ export default function SupportPage() {
           setSent(true);
         },
         onError: () => {
-          toast({ variant: "destructive", title: "Error", description: "Failed to send message. Please try again." });
+          toast({ variant: "destructive", title: t('common.error'), description: t('support.sendError') });
         },
       }
     );
@@ -35,8 +37,8 @@ export default function SupportPage() {
     <AuthLayout>
       <div className="space-y-6 max-w-2xl">
         <div>
-          <h1 className="text-2xl font-bold text-[#0D1117]">Support</h1>
-          <p className="text-sm text-[#6B7280] mt-0.5">Get help from our team</p>
+          <h1 className="text-2xl font-bold text-[#0D1117]">{t('support.title')}</h1>
+          <p className="text-sm text-[#6B7280] mt-0.5">{t('support.getHelp')}</p>
         </div>
 
         {sent ? (
@@ -45,16 +47,16 @@ export default function SupportPage() {
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle className="w-8 h-8 text-[#10B981]" />
               </div>
-              <h3 className="text-lg font-semibold text-[#0D1117] mb-2">Message sent!</h3>
+              <h3 className="text-lg font-semibold text-[#0D1117] mb-2">{t('support.messageSent')}</h3>
               <p className="text-sm text-[#6B7280] mb-6 max-w-xs mx-auto">
-                We've received your message and will get back to you within 24 hours.
+                {t('support.messageSentDesc')}
               </p>
               <Button
                 variant="outline"
                 onClick={() => { setSent(false); setForm({ subject: "", category: "general", message: "" }); }}
                 data-testid="button-send-another"
               >
-                Send another message
+                {t('support.sendAnother')}
               </Button>
             </CardContent>
           </Card>
@@ -64,43 +66,43 @@ export default function SupportPage() {
               <CardHeader className="border-b border-border pb-4">
                 <CardTitle className="text-base font-semibold text-[#0D1117] flex items-center gap-2">
                   <MessageCircle className="w-5 h-5 text-primary" />
-                  Contact Support
+                  {t('support.contactSupport')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-5 space-y-4">
                 <div className="space-y-1.5">
-                  <Label>Category</Label>
+                  <Label>{t('support.category')}</Label>
                   <Select value={form.category} onValueChange={(v) => setForm(f => ({ ...f, category: v }))}>
                     <SelectTrigger data-testid="select-category">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="general">General Question</SelectItem>
-                      <SelectItem value="billing">Billing & Payments</SelectItem>
-                      <SelectItem value="technical">Technical Issue</SelectItem>
-                      <SelectItem value="card">Card Issue</SelectItem>
-                      <SelectItem value="account">Account & Profile</SelectItem>
-                      <SelectItem value="feature">Feature Request</SelectItem>
+                      <SelectItem value="general">{t('support.categories.general')}</SelectItem>
+                      <SelectItem value="billing">{t('support.categories.billing')}</SelectItem>
+                      <SelectItem value="technical">{t('support.categories.technical')}</SelectItem>
+                      <SelectItem value="card">{t('support.categories.card')}</SelectItem>
+                      <SelectItem value="account">{t('support.categories.account')}</SelectItem>
+                      <SelectItem value="feature">{t('support.categories.feature')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label>Subject</Label>
+                  <Label>{t('support.subject')}</Label>
                   <Input
                     value={form.subject}
                     onChange={(e) => setForm(f => ({ ...f, subject: e.target.value }))}
-                    placeholder="Brief description of your issue"
+                    placeholder={t('support.subjectPlaceholder')}
                     data-testid="input-subject"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label>Message</Label>
+                  <Label>{t('support.message')}</Label>
                   <Textarea
                     value={form.message}
                     onChange={(e) => setForm(f => ({ ...f, message: e.target.value }))}
-                    placeholder="Please describe your issue in detail..."
+                    placeholder={t('support.messagePlaceholder')}
                     rows={6}
                     data-testid="input-message"
                     className="resize-none"
@@ -114,7 +116,7 @@ export default function SupportPage() {
                   data-testid="button-submit"
                 >
                   <Send className="w-4 h-4 mr-2" />
-                  {createMutation.isPending ? "Sending..." : "Send Message"}
+                  {createMutation.isPending ? t('support.sending') : t('support.send')}
                 </Button>
               </CardContent>
             </Card>
@@ -123,17 +125,17 @@ export default function SupportPage() {
               <div className="flex items-start gap-3 p-4 bg-white rounded-xl border border-border">
                 <Mail className="w-5 h-5 text-primary mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-sm font-semibold text-[#0D1117]">Email Support</p>
+                  <p className="text-sm font-semibold text-[#0D1117]">{t('support.emailSupport')}</p>
                   <p className="text-xs text-[#6B7280] mt-0.5">contact@avismaker.com</p>
-                  <p className="text-xs text-[#9CA3AF] mt-1">Response within 24 hours</p>
+                  <p className="text-xs text-[#9CA3AF] mt-1">{t('support.responseTime')}</p>
                 </div>
               </div>
               <div className="flex items-start gap-3 p-4 bg-white rounded-xl border border-border">
                 <MessageCircle className="w-5 h-5 text-primary mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-sm font-semibold text-[#0D1117]">Knowledge Base</p>
-                  <p className="text-xs text-[#6B7280] mt-0.5">Browse FAQs and guides</p>
-                  <p className="text-xs text-[#9CA3AF] mt-1">Available 24/7</p>
+                  <p className="text-sm font-semibold text-[#0D1117]">{t('support.knowledgeBase')}</p>
+                  <p className="text-xs text-[#6B7280] mt-0.5">{t('support.knowledgeBaseDesc')}</p>
+                  <p className="text-xs text-[#9CA3AF] mt-1">{t('support.available247')}</p>
                 </div>
               </div>
             </div>

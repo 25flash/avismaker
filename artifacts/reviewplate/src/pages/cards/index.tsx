@@ -6,11 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
-const statusConfig: Record<string, { label: string; dot: string; pill: string }> = {
-  active:   { label: "Active",     dot: "bg-[#10B981]", pill: "bg-[#D1FAE5] text-[#065F46]" },
-  inactive: { label: "Inactive",   dot: "bg-[#F59E0B]", pill: "bg-[#FEF3C7] text-[#92400E]" },
-  disabled: { label: "Désactivée", dot: "bg-[#9CA3AF]", pill: "bg-[#F3F4F6] text-[#6B7280]" },
+const statusDot: Record<string, string> = {
+  active: "bg-[#10B981]",
+  inactive: "bg-[#F59E0B]",
+  disabled: "bg-[#9CA3AF]",
+};
+const statusPill: Record<string, string> = {
+  active: "bg-[#D1FAE5] text-[#065F46]",
+  inactive: "bg-[#FEF3C7] text-[#92400E]",
+  disabled: "bg-[#F3F4F6] text-[#6B7280]",
 };
 
 const platformColors: Record<string, string> = {
@@ -29,12 +35,14 @@ interface BusinessProfile {
 }
 
 export default function CardsPage() {
+  const { t, i18n } = useTranslation();
   const { data: cards, isLoading } = useListCards();
   const { data: profiles } = useListBusinessProfiles();
 
   const cardList = (cards as unknown as Array<{
     id: number;
     code: string;
+    nickname: string | null;
     status: string;
     platform: string | null;
     targetUrl: string | null;
@@ -55,13 +63,13 @@ export default function CardsPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-[#0D1117]">Mes Cartes</h1>
-            <p className="text-sm text-[#6B7280] mt-0.5">Gérez vos cartes NFC et QR d'avis</p>
+            <h1 className="text-2xl font-bold text-[#0D1117]">{t('cards.title')}</h1>
+            <p className="text-sm text-[#6B7280] mt-0.5">{t('cards.subtitle')}</p>
           </div>
           <Link href="/activate">
             <Button className="bg-primary text-[#0D1117] font-semibold hover:bg-primary/90" data-testid="button-activate-new">
               <Plus className="w-4 h-4 mr-2" />
-              Activer une carte
+              {t('cards.activateCard')}
             </Button>
           </Link>
         </div>
@@ -76,14 +84,14 @@ export default function CardsPage() {
               <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <CreditCard className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="text-lg font-semibold text-[#0D1117] mb-2">Aucune carte</h3>
+              <h3 className="text-lg font-semibold text-[#0D1117] mb-2">{t('cards.noCards')}</h3>
               <p className="text-sm text-[#6B7280] mb-6 max-w-xs mx-auto">
-                Activez votre première carte NFC ou QR pour commencer à collecter des avis automatiquement.
+                {t('cards.noCardsDesc')}
               </p>
               <Link href="/activate">
                 <Button className="bg-primary text-[#0D1117] font-semibold hover:bg-primary/90" data-testid="button-activate-first">
                   <Plus className="w-4 h-4 mr-2" />
-                  Activer ma première carte
+                  {t('cards.activateFirst')}
                 </Button>
               </Link>
             </CardContent>
@@ -100,7 +108,6 @@ export default function CardsPage() {
                   >
                     <CardContent className="p-5">
                       <div className="flex items-start justify-between mb-4">
-                        {/* Left: logo or code badge */}
                         {linkedProfile?.logoUrl ? (
                           <img
                             src={linkedProfile.logoUrl}
@@ -113,26 +120,25 @@ export default function CardsPage() {
                           </div>
                         )}
                         {(() => {
-                          const s = statusConfig[card.status] ?? statusConfig.disabled;
+                          const dot = statusDot[card.status] ?? statusDot.disabled;
+                          const pill = statusPill[card.status] ?? statusPill.disabled;
                           return (
-                            <span className={cn("inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full", s.pill)}>
-                              <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", s.dot)} />
-                              {s.label}
+                            <span className={cn("inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full", pill)}>
+                              <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", dot)} />
+                              {t(`status.${card.status}`, card.status)}
                             </span>
                           );
                         })()}
                       </div>
 
-                      {/* Nom principal */}
                       {card.nickname ? (
                         <p className="text-base font-bold text-[#0D1117] mb-0 truncate">{card.nickname}</p>
                       ) : linkedProfile ? (
                         <p className="text-base font-bold text-[#0D1117] mb-0 truncate">{linkedProfile.name}</p>
                       ) : (
-                        <p className="text-base font-bold text-[#9CA3AF] mb-0">Sans nom</p>
+                        <p className="text-base font-bold text-[#9CA3AF] mb-0">{t('cards.noName')}</p>
                       )}
 
-                      {/* Badge profil business */}
                       {linkedProfile ? (
                         <div className="inline-flex items-center gap-1.5 mt-1.5 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 max-w-full">
                           {linkedProfile.logoUrl ? (
@@ -149,11 +155,10 @@ export default function CardsPage() {
                           <div className="w-3.5 h-3.5 rounded-full bg-[#D1D5DB] flex items-center justify-center shrink-0">
                             <span className="text-[8px] font-bold text-white leading-none">?</span>
                           </div>
-                          <span className="text-xs font-medium text-[#9CA3AF]">Sans profil</span>
+                          <span className="text-xs font-medium text-[#9CA3AF]">{t('cards.noProfileLabel')}</span>
                         </div>
                       )}
 
-                      {/* Plateforme + code sur la même ligne */}
                       <div className="flex items-center gap-2 mt-1 flex-wrap">
                         {card.smartReviewEnabled && (
                           <span className="text-xs bg-purple-100 text-purple-700 font-medium px-2 py-0.5 rounded">Smart</span>
@@ -172,11 +177,11 @@ export default function CardsPage() {
                         <div className="flex items-center gap-1.5 text-[#6B7280]">
                           <Activity className="w-3.5 h-3.5" />
                           <span className="font-semibold text-[#374151]">{card.scanCount}</span>
-                          <span>scans</span>
+                          <span>{t('cards.scans')}</span>
                         </div>
                         {card.activatedAt && (
                           <p className="text-xs text-[#9CA3AF]">
-                            {new Date(card.activatedAt).toLocaleDateString("fr-FR")}
+                            {new Date(card.activatedAt).toLocaleDateString(i18n.language)}
                           </p>
                         )}
                       </div>

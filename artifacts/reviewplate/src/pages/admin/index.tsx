@@ -3,10 +3,10 @@ import { useGetAdminStats, useListAdminUsers } from "@workspace/api-client-react
 import { Shield, Users, CreditCard, Activity, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 const planBadgeClass: Record<string, string> = {
   free: "plan-badge-free",
@@ -16,6 +16,7 @@ const planBadgeClass: Record<string, string> = {
 };
 
 export default function AdminPage() {
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const { data: stats, isLoading: statsLoading } = useGetAdminStats({
     query: { enabled: user?.role === "admin" },
@@ -37,8 +38,8 @@ export default function AdminPage() {
       <AuthLayout>
         <div className="text-center py-16">
           <Shield className="w-12 h-12 text-red-300 mx-auto mb-3" />
-          <h2 className="text-lg font-semibold text-[#0D1117]">Access Denied</h2>
-          <p className="text-sm text-[#6B7280]">You don't have permission to view this page.</p>
+          <h2 className="text-lg font-semibold text-[#0D1117]">{t('admin.accessDenied')}</h2>
+          <p className="text-sm text-[#6B7280]">{t('admin.accessDeniedDesc')}</p>
         </div>
       </AuthLayout>
     );
@@ -52,23 +53,23 @@ export default function AdminPage() {
             <Shield className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-[#0D1117]">Admin Panel</h1>
-            <p className="text-sm text-[#6B7280]">Platform overview and user management</p>
+            <h1 className="text-2xl font-bold text-[#0D1117]">{t('admin.title')}</h1>
+            <p className="text-sm text-[#6B7280]">{t('admin.subtitle')}</p>
           </div>
         </div>
 
         {/* Stats grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: "Total Users", value: adminStats?.totalUsers ?? 0, icon: Users, color: "bg-blue-50 text-blue-600" },
-            { label: "Total Cards", value: adminStats?.totalCards ?? 0, icon: CreditCard, color: "bg-amber-50 text-amber-600" },
-            { label: "Total Scans", value: adminStats?.totalScans ?? 0, icon: Activity, color: "bg-green-50 text-green-600" },
-            { label: "Profiles", value: adminStats?.totalProfiles ?? 0, icon: TrendingUp, color: "bg-purple-50 text-purple-600" },
+            { labelKey: "admin.totalUsers", value: adminStats?.totalUsers ?? 0, icon: Users, color: "bg-blue-50 text-blue-600" },
+            { labelKey: "admin.totalCards", value: adminStats?.totalCards ?? 0, icon: CreditCard, color: "bg-amber-50 text-amber-600" },
+            { labelKey: "admin.totalScans", value: adminStats?.totalScans ?? 0, icon: Activity, color: "bg-green-50 text-green-600" },
+            { labelKey: "admin.totalProfiles", value: adminStats?.totalProfiles ?? 0, icon: TrendingUp, color: "bg-purple-50 text-purple-600" },
           ].map((stat) => (
-            <Card key={stat.label} className="bg-white border border-border shadow-sm">
+            <Card key={stat.labelKey} className="bg-white border border-border shadow-sm">
               <CardContent className="p-5">
                 <div className="flex items-center justify-between mb-3">
-                  <p className="text-xs font-medium text-[#6B7280]">{stat.label}</p>
+                  <p className="text-xs font-medium text-[#6B7280]">{t(stat.labelKey)}</p>
                   <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center", stat.color)}>
                     <stat.icon className="w-4 h-4" />
                   </div>
@@ -76,8 +77,8 @@ export default function AdminPage() {
                 {statsLoading ? (
                   <Skeleton className="h-7 w-16" />
                 ) : (
-                  <p className="text-2xl font-bold text-[#0D1117]" data-testid={`stat-admin-${stat.label.toLowerCase().replace(/\s/g, "-")}`}>
-                    {stat.value.toLocaleString()}
+                  <p className="text-2xl font-bold text-[#0D1117]" data-testid={`stat-admin-${stat.labelKey.split('.')[1]}`}>
+                    {stat.value.toLocaleString(i18n.language)}
                   </p>
                 )}
               </CardContent>
@@ -89,7 +90,7 @@ export default function AdminPage() {
         {adminStats?.planBreakdown && (
           <Card className="bg-white border border-border shadow-sm">
             <CardHeader className="border-b border-border pb-4">
-              <CardTitle className="text-base font-semibold text-[#0D1117]">Plan Distribution</CardTitle>
+              <CardTitle className="text-base font-semibold text-[#0D1117]">{t('admin.planDistribution')}</CardTitle>
             </CardHeader>
             <CardContent className="p-5">
               <div className="grid sm:grid-cols-4 gap-4">
@@ -110,9 +111,9 @@ export default function AdminPage() {
         <Card className="bg-white border border-border shadow-sm">
           <CardHeader className="border-b border-border pb-4">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base font-semibold text-[#0D1117]">Users</CardTitle>
+              <CardTitle className="text-base font-semibold text-[#0D1117]">{t('admin.users')}</CardTitle>
               <Link href="/admin/users">
-                <button className="text-xs text-primary hover:underline">View all</button>
+                <button className="text-xs text-primary hover:underline">{t('admin.viewAll')}</button>
               </Link>
             </div>
           </CardHeader>
@@ -126,11 +127,11 @@ export default function AdminPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-[#F3F4F6]">
-                      <th className="px-5 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wider">User</th>
-                      <th className="px-5 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wider">Plan</th>
-                      <th className="px-5 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wider">Cards</th>
-                      <th className="px-5 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wider">Role</th>
-                      <th className="px-5 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wider">Joined</th>
+                      <th className="px-5 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wider">{t('admin.userCol')}</th>
+                      <th className="px-5 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wider">{t('admin.planCol')}</th>
+                      <th className="px-5 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wider">{t('admin.cardsCol')}</th>
+                      <th className="px-5 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wider">{t('admin.roleCol')}</th>
+                      <th className="px-5 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wider">{t('admin.joinedCol')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -160,7 +161,7 @@ export default function AdminPage() {
                           </span>
                         </td>
                         <td className="px-5 py-3.5 text-[#9CA3AF]">
-                          {new Date(u.createdAt).toLocaleDateString()}
+                          {new Date(u.createdAt).toLocaleDateString(i18n.language)}
                         </td>
                       </tr>
                     ))}

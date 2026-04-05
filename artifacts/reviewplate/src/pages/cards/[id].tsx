@@ -18,6 +18,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 const statusClass: Record<string, string> = {
   active: "status-pill-active",
@@ -54,6 +55,7 @@ function ProfileLogo({ profile, size = "sm" }: { profile: BusinessProfile; size?
 }
 
 export default function CardEditorPage() {
+  const { t, i18n } = useTranslation();
   const params = useParams<{ id: string }>();
   const cardId = parseInt(params.id ?? "0");
   const queryClient = useQueryClient();
@@ -109,10 +111,10 @@ export default function CardEditorPage() {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getGetCardQueryKey(cardId) });
           queryClient.invalidateQueries({ queryKey: getListCardsQueryKey() });
-          toast({ title: "Carte mise à jour", description: "Les paramètres ont été sauvegardés." });
+          toast({ title: t('cards.cardUpdated'), description: t('cards.cardUpdatedDesc') });
         },
         onError: () => {
-          toast({ variant: "destructive", title: "Erreur", description: "Impossible de mettre à jour la carte." });
+          toast({ variant: "destructive", title: t('common.error'), description: t('cards.updateFailed') });
         },
       }
     );
@@ -124,7 +126,7 @@ export default function CardEditorPage() {
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getGetCardQueryKey(cardId) });
-          toast({ title: "Carte activée", description: "La carte est maintenant active et prête à scanner." });
+          toast({ title: t('cards.activated') });
         },
       }
     );
@@ -136,7 +138,7 @@ export default function CardEditorPage() {
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getGetCardQueryKey(cardId) });
-          toast({ title: "Carte désactivée" });
+          toast({ title: t('cards.deactivated') });
         },
       }
     );
@@ -157,8 +159,8 @@ export default function CardEditorPage() {
     return (
       <AuthLayout>
         <div className="text-center py-16">
-          <p className="text-[#6B7280]">Carte introuvable</p>
-          <Link href="/cards"><Button className="mt-4" variant="outline">Retour aux cartes</Button></Link>
+          <p className="text-[#6B7280]">{t('cards.notFound')}</p>
+          <Link href="/cards"><Button className="mt-4" variant="outline">{t('cards.backToCards')}</Button></Link>
         </div>
       </AuthLayout>
     );
@@ -174,13 +176,13 @@ export default function CardEditorPage() {
             </button>
           </Link>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-[#0D1117]">{cardData.nickname || `Carte ${cardData.code}`}</h1>
+            <h1 className="text-2xl font-bold text-[#0D1117]">{cardData.nickname || `${t('cards.cardCode')} ${cardData.code}`}</h1>
             {cardData.nickname && <p className="text-sm text-[#9CA3AF] font-mono mt-0.5">{cardData.code}</p>}
             <div className="flex items-center gap-2 mt-1">
               <span className={cn("text-xs font-semibold px-2.5 py-1 rounded-full", statusClass[cardData.status] ?? "status-pill-inactive")}>
-                {cardData.status}
+                {t(`status.${cardData.status}`, cardData.status)}
               </span>
-              <span className="text-xs text-[#6B7280]">{cardData.scanCount} scans total</span>
+              <span className="text-xs text-[#6B7280]">{cardData.scanCount} {t('cards.scans')}</span>
             </div>
           </div>
           <div className="flex gap-2">
@@ -194,7 +196,7 @@ export default function CardEditorPage() {
                 className="border-red-200 text-red-600 hover:bg-red-50"
               >
                 <PowerOff className="w-4 h-4 mr-1.5" />
-                Désactiver
+                {t('cards.deactivate')}
               </Button>
             ) : (
               <Button
@@ -205,7 +207,7 @@ export default function CardEditorPage() {
                 className="bg-[#10B981] text-white hover:bg-[#10B981]/90"
               >
                 <Power className="w-4 h-4 mr-1.5" />
-                Activer
+                {t('cards.activate')}
               </Button>
             )}
           </div>
@@ -213,39 +215,41 @@ export default function CardEditorPage() {
 
         <Card className="bg-white border border-border shadow-sm">
           <CardHeader className="border-b border-border pb-4">
-            <CardTitle className="text-base font-semibold text-[#0D1117]">Paramètres de la carte</CardTitle>
+            <CardTitle className="text-base font-semibold text-[#0D1117]">{t('cards.settings')}</CardTitle>
           </CardHeader>
           <CardContent className="pt-6 space-y-6">
 
             {/* Nickname */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-[#374151]">Nom de la carte <span className="text-[#9CA3AF] font-normal">(optionnel)</span></Label>
+              <Label className="text-sm font-medium text-[#374151]">
+                {t('cards.nicknameLabel')} <span className="text-[#9CA3AF] font-normal">{t('cards.nicknameOptional')}</span>
+              </Label>
               <Input
-                placeholder="ex : Entrée principale, Comptoir, Table VIP…"
+                placeholder={t('cards.nicknamePlaceholder')}
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
                 maxLength={80}
                 data-testid="input-nickname"
               />
-              <p className="text-xs text-[#6B7280]">Un nom personnalisé pour identifier facilement cette carte dans votre tableau de bord.</p>
+              <p className="text-xs text-[#6B7280]">{t('cards.nicknameHint')}</p>
             </div>
 
             {/* Business profile selector */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-[#374151]">Profil Business</Label>
+              <Label className="text-sm font-medium text-[#374151]">{t('cards.businessProfile')}</Label>
               {profileList.length === 0 ? (
                 <div className="flex items-center gap-3 p-4 bg-[#F8FAFC] rounded-xl border border-dashed border-border">
                   <div className="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
                     <Building2 className="w-4 h-4 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#374151]">Aucun profil business</p>
-                    <p className="text-xs text-[#9CA3AF]">Créez un profil pour le rattacher à cette carte</p>
+                    <p className="text-sm font-medium text-[#374151]">{t('cards.noBusinessProfile')}</p>
+                    <p className="text-xs text-[#9CA3AF]">{t('cards.createProfileHint')}</p>
                   </div>
                   <Link href="/profiles">
                     <Button size="sm" variant="outline" className="shrink-0" data-testid="button-create-profile-link">
                       <Plus className="w-3.5 h-3.5 mr-1.5" />
-                      Créer
+                      {t('common.create')}
                     </Button>
                   </Link>
                 </div>
@@ -253,7 +257,7 @@ export default function CardEditorPage() {
                 <>
                   <Select value={businessProfileId} onValueChange={setBusinessProfileId}>
                     <SelectTrigger className="h-11" data-testid="select-business-profile">
-                      <SelectValue placeholder="Sélectionner un profil business" />
+                      <SelectValue placeholder={t('cards.selectProfile')} />
                     </SelectTrigger>
                     <SelectContent>
                       {profileList.map((profile) => (
@@ -270,7 +274,6 @@ export default function CardEditorPage() {
                     </SelectContent>
                   </Select>
 
-                  {/* Selected profile preview with logo */}
                   {selectedProfile && (
                     <div className="flex items-center gap-3 px-3 py-2.5 bg-amber-50 border border-amber-200 rounded-lg">
                       <ProfileLogo profile={selectedProfile} size="md" />
@@ -282,24 +285,24 @@ export default function CardEditorPage() {
                       </div>
                       <Link href={`/profiles/${selectedProfile.id}`}>
                         <Button variant="ghost" size="sm" className="h-7 text-xs text-amber-700 hover:bg-amber-100 shrink-0">
-                          Modifier
+                          {t('cards.modify')}
                         </Button>
                       </Link>
                     </div>
                   )}
                 </>
               )}
-              <p className="text-xs text-[#6B7280]">Associez cette carte à l'un de vos établissements.</p>
+              <p className="text-xs text-[#6B7280]">{t('cards.profileHint')}</p>
             </div>
 
             {/* Target URL */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-[#374151]">URL de destination</Label>
+              <Label className="text-sm font-medium text-[#374151]">{t('cards.targetUrl')}</Label>
               <div className="flex gap-2">
                 <Input
                   value={targetUrl}
                   onChange={(e) => setTargetUrl(e.target.value)}
-                  placeholder="https://g.page/votre-etablissement/review"
+                  placeholder={t('cards.targetUrlPlaceholder')}
                   className="h-11 font-mono text-sm"
                   data-testid="input-target-url"
                 />
@@ -311,14 +314,14 @@ export default function CardEditorPage() {
                   </a>
                 )}
               </div>
-              <p className="text-xs text-[#6B7280]">L'URL vers laquelle les clients seront redirigés lorsqu'ils scannent la carte.</p>
+              <p className="text-xs text-[#6B7280]">{t('cards.targetUrlHint')}</p>
             </div>
 
             {/* Smart Review */}
             <div className="flex items-center justify-between p-4 bg-[#F8FAFC] rounded-xl border border-border">
               <div>
                 <p className="text-sm font-medium text-[#374151]">Smart Review Flow</p>
-                <p className="text-xs text-[#6B7280] mt-0.5">Afficher un écran de notation avant de rediriger vers la plateforme d'avis</p>
+                <p className="text-xs text-[#6B7280] mt-0.5">{t('cards.smartReviewHint')}</p>
               </div>
               <Switch
                 checked={smartReview}
@@ -331,7 +334,7 @@ export default function CardEditorPage() {
               <Link href={`/analytics/cards/${cardData.id}`}>
                 <Button variant="outline" size="sm" data-testid="button-analytics">
                   <BarChart2 className="w-4 h-4 mr-1.5" />
-                  Voir les Analytics
+                  {t('cards.viewAnalytics')}
                 </Button>
               </Link>
               <Button
@@ -341,7 +344,7 @@ export default function CardEditorPage() {
                 data-testid="button-save"
               >
                 <Save className="w-4 h-4 mr-2" />
-                {updateMutation.isPending ? "Enregistrement…" : "Enregistrer"}
+                {updateMutation.isPending ? t('cards.saving') : t('cards.saveChanges')}
               </Button>
             </div>
           </CardContent>
@@ -352,20 +355,20 @@ export default function CardEditorPage() {
           <CardContent className="p-5">
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <p className="text-[#6B7280] font-medium mb-1">Code carte</p>
+                <p className="text-[#6B7280] font-medium mb-1">{t('cards.cardCode')}</p>
                 <p className="font-mono font-bold text-[#0D1117]">{cardData.code}</p>
               </div>
               <div>
-                <p className="text-[#6B7280] font-medium mb-1">Créée le</p>
-                <p className="text-[#374151]">{new Date(cardData.createdAt).toLocaleDateString("fr-FR")}</p>
+                <p className="text-[#6B7280] font-medium mb-1">{t('cards.createdOn')}</p>
+                <p className="text-[#374151]">{new Date(cardData.createdAt).toLocaleDateString(i18n.language)}</p>
               </div>
               <div>
-                <p className="text-[#6B7280] font-medium mb-1">Activée le</p>
-                <p className="text-[#374151]">{cardData.activatedAt ? new Date(cardData.activatedAt).toLocaleDateString("fr-FR") : "Non activée"}</p>
+                <p className="text-[#6B7280] font-medium mb-1">{t('cards.activatedOn')}</p>
+                <p className="text-[#374151]">{cardData.activatedAt ? new Date(cardData.activatedAt).toLocaleDateString(i18n.language) : t('cards.notActivated')}</p>
               </div>
               <div>
-                <p className="text-[#6B7280] font-medium mb-1">Scans totaux</p>
-                <p className="font-bold text-[#0D1117]">{cardData.scanCount.toLocaleString()}</p>
+                <p className="text-[#6B7280] font-medium mb-1">{t('cards.totalScansLabel')}</p>
+                <p className="font-bold text-[#0D1117]">{cardData.scanCount.toLocaleString(i18n.language)}</p>
               </div>
             </div>
           </CardContent>

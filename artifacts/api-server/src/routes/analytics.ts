@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { eq, and, count, gte, inArray } from "drizzle-orm";
-import { db, cardsTable, scanLogsTable, businessProfilesTable, usersTable } from "@workspace/db";
+import { db, cardsTable, scanLogsTable, businessProfilesTable } from "@workspace/db";
 import { requireAuth, type AuthRequest } from "../lib/auth";
 import { GetCardStatsParams, ListScanLogsQueryParams } from "@workspace/api-zod";
 
@@ -187,16 +187,9 @@ router.get("/scan-logs", requireAuth, async (req: AuthRequest, res): Promise<voi
   })));
 });
 
-// ── Business Analytics (Business plan only) ────────────────────────────────
+// ── Business Analytics (all authenticated users — plan check on frontend) ──
 router.get("/business-analytics", requireAuth, async (req: AuthRequest, res): Promise<void> => {
   const userId = req.userId!;
-
-  // Enforce Business plan
-  const [user] = await db.select().from(usersTable).where(eq(usersTable.id, userId));
-  if (!user || user.plan !== "business") {
-    res.status(403).json({ error: "Business plan required", code: "PLAN_REQUIRED" });
-    return;
-  }
 
   const cards = await db.select().from(cardsTable).where(eq(cardsTable.ownerId, userId));
   const cardIds = cards.map(c => c.id);

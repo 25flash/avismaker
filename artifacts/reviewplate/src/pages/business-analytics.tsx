@@ -618,29 +618,60 @@ export default function BusinessAnalyticsPage() {
           {/* Top cards bar chart + table — blurred */}
           <BlurWrapper locked={!isBusiness}>
             <div className="space-y-4">
-              {/* Bar chart */}
-              <Card className="bg-white border border-border shadow-sm">
-                <CardHeader className="pb-2 border-b border-border">
-                  <CardTitle className="text-sm font-semibold text-[#0D1117] flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-primary" />
-                    Top cartes par scans
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-4">
-                  <ResponsiveContainer width="100%" height={200}>
-                    <BarChart data={displayData?.topCards ?? []} layout="vertical" margin={{ left: 20 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" horizontal={false} />
-                      <XAxis type="number" tick={{ fontSize: 10, fill: "#9CA3AF" }} />
-                      <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: "#374151" }} width={110} />
-                      <Tooltip
-                        contentStyle={{ fontSize: 12, borderRadius: 8 }}
-                        formatter={(v: number) => [v, "Scans"]}
-                      />
-                      <Bar dataKey="scans" fill="#F59E0B" radius={[0, 4, 4, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
+              {/* Bar charts row — Top + Least active side by side */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Top cartes par scans */}
+                <Card className="bg-white border border-border shadow-sm">
+                  <CardHeader className="pb-2 border-b border-border">
+                    <CardTitle className="text-sm font-semibold text-[#0D1117] flex items-center gap-2">
+                      <TrendingUp className="w-4 h-4 text-primary" />
+                      Top cartes par scans
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-4">
+                    <ResponsiveContainer width="100%" height={200}>
+                      <BarChart data={displayData?.topCards ?? []} layout="vertical" margin={{ left: 20 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" horizontal={false} />
+                        <XAxis type="number" tick={{ fontSize: 10, fill: "#9CA3AF" }} />
+                        <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: "#374151" }} width={110} />
+                        <Tooltip
+                          contentStyle={{ fontSize: 12, borderRadius: 8 }}
+                          formatter={(v: number) => [v, "Scans"]}
+                        />
+                        <Bar dataKey="scans" fill="#F59E0B" radius={[0, 4, 4, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+
+                {/* Cartes les moins actives */}
+                <Card className="bg-white border border-border shadow-sm">
+                  <CardHeader className="pb-2 border-b border-border">
+                    <CardTitle className="text-sm font-semibold text-[#0D1117] flex items-center gap-2">
+                      <ArrowDownRight className="w-4 h-4 text-[#6B7280]" />
+                      Cartes les moins actives
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-4">
+                    <ResponsiveContainer width="100%" height={200}>
+                      <BarChart
+                        data={[...(displayData?.topCards ?? [])].sort((a, b) => a.scans - b.scans)}
+                        layout="vertical"
+                        margin={{ left: 20 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" horizontal={false} />
+                        <XAxis type="number" tick={{ fontSize: 10, fill: "#9CA3AF" }} />
+                        <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: "#374151" }} width={110} />
+                        <Tooltip
+                          contentStyle={{ fontSize: 12, borderRadius: 8 }}
+                          formatter={(v: number) => [v, "Scans"]}
+                        />
+                        <Bar dataKey="scans" fill="#94A3B8" radius={[0, 4, 4, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              </div>
 
               {/* Data table */}
               <Card className="bg-white border border-border shadow-sm">

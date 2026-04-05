@@ -528,6 +528,113 @@ export default function BusinessAnalyticsPage() {
             })}
           </div>
 
+          {/* Tendances détaillées */}
+          <BlurWrapper locked={!isBusiness}>
+            <Card className="bg-white border border-border shadow-sm mb-6">
+              <CardHeader className="pb-3 border-b border-border">
+                <CardTitle className="text-sm font-semibold text-[#0D1117] flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-primary" />
+                  Tendances détaillées
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4">
+                {(() => {
+                  const kd = displayData?.kpis ?? { totalScans: 0, conversionRate: 0, growth: 0, recentActivity: 0 };
+                  const cards = displayData?.topCards ?? [];
+                  const sorted = [...cards].sort((a, b) => b.scans - a.scans);
+                  const topCard = sorted[0];
+                  const worstCard = [...cards].sort((a, b) => a.scans - b.scans)[0];
+                  const avgScans = cards.length > 0 ? (kd.totalScans / cards.length) : 0;
+                  const highPerf = cards.filter(c => c.performance === "high").length;
+                  const tiles = [
+                    {
+                      label: "Taux de satisfaction",
+                      value: `${kd.conversionRate}%`,
+                      sub: kd.conversionRate >= 70 ? "Excellent" : kd.conversionRate >= 50 ? "Correct" : "À améliorer",
+                      subColor: kd.conversionRate >= 70 ? "text-emerald-600" : kd.conversionRate >= 50 ? "text-amber-500" : "text-red-500",
+                      trend: kd.conversionRate >= 50 ? "up" : "down",
+                      icon: TrendingUp,
+                      accent: "#10B981",
+                      bg: "bg-emerald-50",
+                    },
+                    {
+                      label: "Moy. scans / carte",
+                      value: avgScans.toFixed(1),
+                      sub: `sur ${cards.length} carte${cards.length > 1 ? "s" : ""}`,
+                      subColor: "text-[#6B7280]",
+                      trend: "neutral",
+                      icon: BarChart2,
+                      accent: "#3B82F6",
+                      bg: "bg-blue-50",
+                    },
+                    {
+                      label: "Évolution (30j)",
+                      value: `${kd.growth >= 0 ? "+" : ""}${kd.growth}%`,
+                      sub: kd.growth > 0 ? "En progression" : kd.growth < 0 ? "En baisse" : "Stable",
+                      subColor: kd.growth > 0 ? "text-emerald-600" : kd.growth < 0 ? "text-red-500" : "text-[#6B7280]",
+                      trend: kd.growth > 0 ? "up" : kd.growth < 0 ? "down" : "neutral",
+                      icon: Activity,
+                      accent: kd.growth >= 0 ? "#F59E0B" : "#EF4444",
+                      bg: kd.growth >= 0 ? "bg-amber-50" : "bg-red-50",
+                    },
+                    {
+                      label: "Top performer",
+                      value: topCard ? (topCard.name.length > 16 ? topCard.name.slice(0, 16) + "…" : topCard.name) : "—",
+                      sub: topCard ? `${topCard.scans} scan${topCard.scans > 1 ? "s" : ""} · ${topCard.platform}` : "Aucune carte",
+                      subColor: "text-[#6B7280]",
+                      trend: "up",
+                      icon: ArrowUpRight,
+                      accent: "#F59E0B",
+                      bg: "bg-amber-50",
+                    },
+                    {
+                      label: "Moins performante",
+                      value: worstCard ? (worstCard.name.length > 16 ? worstCard.name.slice(0, 16) + "…" : worstCard.name) : "—",
+                      sub: worstCard ? `${worstCard.scans} scan${worstCard.scans !== 1 ? "s" : ""} · ${worstCard.platform}` : "Aucune carte",
+                      subColor: "text-[#6B7280]",
+                      trend: "down",
+                      icon: ArrowDownRight,
+                      accent: "#EF4444",
+                      bg: "bg-red-50",
+                    },
+                    {
+                      label: "Haute performance",
+                      value: `${highPerf} / ${cards.length}`,
+                      sub: highPerf > 0 ? "cartes avec bon score" : "Aucune carte performante",
+                      subColor: highPerf > 0 ? "text-emerald-600" : "text-[#6B7280]",
+                      trend: highPerf > 0 ? "up" : "neutral",
+                      icon: Users,
+                      accent: "#8B5CF6",
+                      bg: "bg-purple-50",
+                    },
+                  ];
+                  return (
+                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+                      {tiles.map((tile, i) => {
+                        const Icon = tile.icon;
+                        return (
+                          <div key={i} className={cn("rounded-xl p-4 border flex flex-col gap-2", tile.bg, "border-transparent")}>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-1.5">
+                                <Icon style={{ width: 14, height: 14, color: tile.accent }} />
+                                <p className="text-[10px] font-semibold uppercase tracking-wide text-[#6B7280]">{tile.label}</p>
+                              </div>
+                              {tile.trend === "up" && <ArrowUpRight className="w-4 h-4 text-emerald-500 shrink-0" />}
+                              {tile.trend === "down" && <ArrowDownRight className="w-4 h-4 text-red-400 shrink-0" />}
+                              {tile.trend === "neutral" && <Minus className="w-4 h-4 text-gray-400 shrink-0" />}
+                            </div>
+                            <p className="text-xl font-bold text-[#0D1117] leading-tight">{tile.value}</p>
+                            <p className={cn("text-xs leading-tight", tile.subColor)}>{tile.sub}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
+              </CardContent>
+            </Card>
+          </BlurWrapper>
+
           {/* Charts row */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
             {/* Scan timeline — blurred for non-business */}

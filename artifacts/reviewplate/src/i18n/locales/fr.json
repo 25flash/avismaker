@@ -240,27 +240,7 @@
     "updateFailed": "Erreur",
     "updateFailedDesc": "Impossible de changer de plan. Réessayez.",
     "mostPopular": "Le plus populaire",
-    "annualLabel": "Annuel",
-    "annualSavings": "Économisez 3 mois en passant à la facturation annuelle",
-    "unlimitedCards": "Cartes actives illimitées",
-    "activeCardsCount": "{{count}} carte(s) active(s)",
-    "unlimitedProfiles": "Profils business illimités",
-    "profilesCount": "{{count}} profil(s) business",
-    "footer": "Tous les prix en EUR. Annulez à tout moment.",
-    "contactUs": "Nous contacter",
-    "features": {
-      "unlimitedScans": "Scans illimités",
-      "basicAnalytics": "Analytics de base",
-      "qrGeneration": "Génération QR code",
-      "aiReplies": "Réponses IA aux avis",
-      "negativeReviewDetection": "Détection avis négatifs",
-      "advancedAnalyticsPdf": "Analytics avancées + export PDF",
-      "customBanner": "Bannière personnalisée",
-      "prioritySupport": "Support prioritaire",
-      "customBranding": "Branding personnalisé (sans badge AvisMakers)",
-      "whiteLabel": "Option white-label",
-      "dedicatedManager": "Gestionnaire de compte dédié"
-    }
+    "annualLabel": "Annuel"
   },
   "activate": {
     "title": "Activer votre carte",

@@ -151,14 +151,13 @@ export default function DashboardPage() {
                                 {profile ? profile.name : card.code}
                               </p>
                               <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                                {/* Code carte en secondaire */}
-                                {profile && (
-                                  <span className="text-xs font-mono text-[#9CA3AF]">{card.code}</span>
-                                )}
                                 {card.platform && (
                                   <span className={cn("text-xs px-1.5 py-0.5 rounded font-medium", platformColors[card.platform] ?? "bg-gray-100 text-gray-700")}>
                                     {card.platform}
                                   </span>
+                                )}
+                                {profile && (
+                                  <span className="text-xs font-mono text-[#9CA3AF]">{card.code}</span>
                                 )}
                               </div>
                             </div>

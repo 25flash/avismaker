@@ -124,10 +124,11 @@ export default function CardsPage() {
                         <p className="text-base font-bold text-[#9CA3AF] mb-0.5">Sans profil</p>
                       )}
 
-                      {/* Code carte en secondaire */}
-                      <p className="text-xs font-mono text-[#6B7280]">{card.code}</p>
-
-                      <div className="flex items-center gap-2 mt-3">
+                      {/* Plateforme en secondaire */}
+                      <div className="flex items-center gap-2 mt-1">
+                        {card.smartReviewEnabled && (
+                          <span className="text-xs bg-purple-100 text-purple-700 font-medium px-2 py-0.5 rounded">Smart</span>
+                        )}
                         {card.platform ? (
                           <span className={cn("text-xs font-medium px-2 py-0.5 rounded", platformColors[card.platform] ?? "bg-gray-100 text-gray-700")}>
                             {card.platform}
@@ -135,10 +136,10 @@ export default function CardsPage() {
                         ) : (
                           <span className="text-xs text-[#9CA3AF]">Plateforme non définie</span>
                         )}
-                        {card.smartReviewEnabled && (
-                          <span className="text-xs bg-purple-100 text-purple-700 font-medium px-2 py-0.5 rounded">Smart</span>
-                        )}
                       </div>
+
+                      {/* Code carte en bas */}
+                      <p className="text-xs font-mono text-[#9CA3AF] mt-1">{card.code}</p>
 
                       <div className="flex items-center justify-between text-sm border-t border-[#F3F4F6] pt-3 mt-3">
                         <div className="flex items-center gap-1.5 text-[#6B7280]">

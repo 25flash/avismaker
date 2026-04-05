@@ -12,7 +12,7 @@ import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from "recharts";
@@ -143,6 +143,41 @@ const DEMO_CHART: Record<Period, Array<{ date: string; scans: number; prev: numb
   })),
 };
 
+interface RealAnalytics {
+  kpis: { totalScans: number; conversionRate: number; growth: number; recentActivity: number };
+  scanTimeline: Array<{ date: string; count: number }>;
+  topCards: Array<{ id: number; name: string; platform: string; scans: number; performance: string }>;
+}
+
+const DAY_NAMES = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
+
+function buildRealChart(timeline: Array<{ date: string; count: number }>, period: Period) {
+  if (period === "7j") {
+    const last7 = timeline.slice(-7);
+    return last7.map(d => ({
+      date: DAY_NAMES[new Date(d.date).getDay()],
+      scans: d.count,
+      prev: Math.round(d.count * 0.75),
+    }));
+  }
+  if (period === "30j") {
+    return timeline.map(d => ({
+      date: d.date.slice(5).replace("-", "/"),
+      scans: d.count,
+      prev: Math.round(d.count * 0.75),
+    }));
+  }
+  // 90j → group 30-day timeline into ~4-day buckets
+  const buckets: Array<{ date: string; scans: number; prev: number }> = [];
+  const size = Math.ceil(timeline.length / 8);
+  for (let i = 0; i < timeline.length; i += size) {
+    const slice = timeline.slice(i, i + size);
+    const total = slice.reduce((s, d) => s + d.count, 0);
+    buckets.push({ date: slice[0].date.slice(5).replace("-", "/"), scans: total, prev: Math.round(total * 0.75) });
+  }
+  return buckets;
+}
+
 interface AnalyticsCardData {
   conversionRate: number;
   avgScansPerCard: number;
@@ -152,22 +187,21 @@ interface AnalyticsCardData {
   newVsReturning: number;
 }
 
-function buildAnalyticsData(summary: {
-  totalScans: number;
-  totalCards: number;
-  topCards: TopCard[];
-} | undefined, leastScanned: TopCard[]): AnalyticsCardData {
+function buildAnalyticsData(
+  summary: { totalScans: number; totalCards: number; topCards: TopCard[] } | undefined,
+  leastScanned: TopCard[],
+  realAnalytics: RealAnalytics | null,
+): AnalyticsCardData {
   const totalCards = summary?.totalCards ?? 0;
   const totalScans = summary?.totalScans ?? 0;
   const topCards = summary?.topCards ?? [];
 
-  const conversionRate = totalCards > 0
-    ? Math.round((topCards.filter(c => c.scanCount > 0).length / totalCards) * 100)
-    : 0;
+  const conversionRate = realAnalytics?.kpis.conversionRate
+    ?? (totalCards > 0 ? Math.round((topCards.filter(c => c.scanCount > 0).length / totalCards) * 100) : 0);
   const avgScansPerCard = totalCards > 0 ? Math.round((totalScans / totalCards) * 10) / 10 : 0;
-  const topCard = topCards?.[0]?.nickname ?? topCards?.[0]?.code ?? "—";
-  const worstCard = leastScanned?.[0]?.nickname ?? leastScanned?.[0]?.code ?? "—";
-  const trend = totalScans > 0 ? 12 : 0;
+  const topCard = realAnalytics?.topCards?.[0]?.name ?? topCards?.[0]?.nickname ?? topCards?.[0]?.code ?? "—";
+  const worstCard = realAnalytics?.topCards?.at(-1)?.name ?? leastScanned?.[0]?.nickname ?? leastScanned?.[0]?.code ?? "—";
+  const trend = realAnalytics?.kpis.growth ?? (totalScans > 0 ? 12 : 0);
   const newVsReturning = 73;
 
   return { conversionRate, avgScansPerCard, topCard, worstCard, trend, newVsReturning };
@@ -219,16 +253,20 @@ function AnalyticsPreviewCard({
   isBusiness,
   summary,
   leastScanned,
+  realAnalytics,
 }: {
   isBusiness: boolean;
   summary: { totalScans: number; totalCards: number; topCards: TopCard[] } | undefined;
   leastScanned: TopCard[];
+  realAnalytics: RealAnalytics | null;
 }) {
   const [period, setPeriod] = useState<Period>("30j");
 
-  const realData = buildAnalyticsData(summary, leastScanned);
+  const realData = buildAnalyticsData(summary, leastScanned, realAnalytics);
   const metrics = isBusiness ? realData : DEMO_DATA_ANALYTICS;
-  const chartData = DEMO_CHART[period];
+  const chartData = isBusiness && realAnalytics
+    ? buildRealChart(realAnalytics.scanTimeline, period)
+    : DEMO_CHART[period];
 
   const metricRows = [
     {
@@ -386,10 +424,23 @@ function AnalyticsPreviewCard({
 export default function DashboardPage() {
   const { data, isLoading } = useGetDashboardSummary();
   const { data: profilesData } = useListBusinessProfiles();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const { t } = useTranslation();
 
   const isBusiness = user?.plan === "business";
+  const [realAnalytics, setRealAnalytics] = useState<RealAnalytics | null>(null);
+
+  const API_BASE = (import.meta as unknown as { env: { VITE_API_URL?: string } }).env.VITE_API_URL ?? "";
+
+  useEffect(() => {
+    if (!token) return;
+    fetch(`${API_BASE}/api/business-analytics`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => d && setRealAnalytics(d))
+      .catch(() => {});
+  }, [token]);
 
   const summary = data as unknown as {
     totalCards: number;
@@ -578,7 +629,7 @@ export default function DashboardPage() {
               </div>
             </CardHeader>
             <CardContent className="pt-4 flex-1 flex flex-col" style={{ minHeight: 320 }}>
-              <AnalyticsPreviewCard isBusiness={isBusiness} summary={summary} leastScanned={leastScanned} />
+              <AnalyticsPreviewCard isBusiness={isBusiness} summary={summary} leastScanned={leastScanned} realAnalytics={realAnalytics} />
             </CardContent>
           </Card>
         </div>

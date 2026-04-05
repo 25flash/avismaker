@@ -579,7 +579,7 @@ export default function BusinessAnalyticsPage() {
                   <CardContent className="h-full flex items-center justify-between gap-2" style={{ padding: "0 12px" }}>
                     <div className="flex items-baseline gap-2 min-w-0">
                       <p style={{ fontSize: 13, lineHeight: 1 }} className="font-medium text-[#6B7280] shrink-0">{kpi.label}</p>
-                      <p style={{ fontSize: 15, lineHeight: 1 }} className="font-semibold text-[#0D1117] truncate">{kpi.value}</p>
+                      <p style={{ fontSize: 15, lineHeight: 1, filter: !isBusiness ? "blur(6px)" : undefined, userSelect: !isBusiness ? "none" : undefined }} className="font-semibold text-[#0D1117] truncate">{kpi.value}</p>
                     </div>
                     <Icon style={{ width: 16, height: 16 }} className={cn("shrink-0", iconColor)} />
                   </CardContent>

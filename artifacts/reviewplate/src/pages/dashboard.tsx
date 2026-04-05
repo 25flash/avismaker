@@ -169,7 +169,7 @@ export default function DashboardPage() {
                                     {card.platform}
                                   </span>
                                 )}
-                                <span className="text-xs font-mono text-[#9CA3AF]">{card.code}</span>
+                                <span className={cn("text-xs font-mono px-2 py-0.5 rounded", card.platform ? platformColors[card.platform] ?? "bg-gray-100 text-gray-700" : "bg-[#F3F4F6] text-[#6B7280]")}>{card.code}</span>
                               </div>
                             </div>
                           </div>

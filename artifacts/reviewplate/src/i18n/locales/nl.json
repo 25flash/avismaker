@@ -83,7 +83,9 @@
     "backToLogin": "Terug naar inloggen",
     "resetEmailSent": "E-mail verzonden",
     "resetEmailDesc": "Als er een account bestaat met dat e-mailadres, ontvang je de instructies binnenkort.",
-    "passwordRequirements": "Gebruik minimaal 8 tekens met een combinatie van letters en cijfers."
+    "passwordRequirements": "Gebruik minimaal 8 tekens met een combinatie van letters en cijfers.",
+    "showPassword": "Wachtwoord tonen",
+    "hidePassword": "Wachtwoord verbergen"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -291,6 +293,11 @@
     "generatedReply": "Gegenereerd antwoord",
     "copy": "Kopiëren",
     "copied": "Gekopieerd!",
+    "copiedDesc": "Antwoord gekopieerd naar klembord.",
+    "upgradeRequired": "Upgrade vereist",
+    "upgradeDesc": "AI-antwoord is beschikbaar op Premium en hoger.",
+    "generateFailed": "Generatie mislukt",
+    "generateFailedDesc": "Kon het antwoord niet genereren. Probeer opnieuw.",
     "aiDisclaimer": "AI-gegenereerd. Controleer voor publicatie.",
     "emptyState": "Je gegenereerde antwoord verschijnt hier",
     "emptyStateDesc": "Plak een beoordeling en klik op Genereren",

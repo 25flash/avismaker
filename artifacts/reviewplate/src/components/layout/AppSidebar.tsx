@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import {
   LayoutDashboard, CreditCard, Building2, Bot, Receipt, MessageCircle,
-  Shield, LogOut, Star, ChevronRight, X
+  Shield, LogOut, Star, X
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
@@ -40,25 +40,24 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
   return (
     <div className="flex flex-col h-full w-64 bg-[#0D1117] text-white border-r border-white/10">
       {/* Logo + close button */}
-      <div className="flex items-center gap-2 px-6 py-5 border-b border-white/10">
+      <div className="flex items-center gap-2 px-5 py-4 border-b border-white/10">
         <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shrink-0">
-          <Star className="w-5 h-5 text-[#0D1117]" strokeWidth={2.5} />
+          <Star className="w-4.5 h-4.5 text-[#0D1117]" strokeWidth={2.5} />
         </div>
         <span className="text-lg font-bold text-white tracking-tight flex-1">AvisMakers</span>
-        {/* Close button — only visible on mobile */}
         {onClose && (
           <button
             onClick={onClose}
             aria-label="Close menu"
-            className="md:hidden text-white/60 hover:text-white transition-colors"
+            className="md:hidden w-7 h-7 flex items-center justify-center rounded-md text-white/60 hover:text-white hover:bg-white/10 transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         )}
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto" aria-label="Main navigation">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = location === item.href || location.startsWith(item.href + "/");
@@ -68,18 +67,22 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
               href={item.href}
               data-testid={item.testId}
               onClick={handleNavClick}
+              aria-current={isActive ? "page" : undefined}
             >
               <div
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer group",
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium cursor-pointer group relative",
+                  "transition-colors duration-150",
                   isActive
-                    ? "bg-primary text-[#0D1117]"
-                    : "text-white/70 hover:text-white hover:bg-white/10"
+                    ? "bg-primary/15 text-primary"
+                    : "text-white/65 hover:text-white hover:bg-white/8"
                 )}
               >
-                <Icon className="w-4 h-4 shrink-0" />
+                {isActive && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-primary rounded-r-full" />
+                )}
+                <Icon className={cn("w-4 h-4 shrink-0 transition-colors", isActive ? "text-primary" : "text-white/50 group-hover:text-white/80")} />
                 <span>{item.label}</span>
-                {isActive && <ChevronRight className="w-3 h-3 ml-auto opacity-60" />}
               </div>
             </Link>
           );
@@ -87,25 +90,32 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
 
         {/* Admin link */}
         {user?.role === "admin" && (
-          <Link href="/admin" data-testid="nav-admin" onClick={handleNavClick}>
-            <div
-              className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer mt-4",
-                location.startsWith("/admin")
-                  ? "bg-primary text-[#0D1117]"
-                  : "text-amber-400/70 hover:text-amber-400 hover:bg-white/10"
-              )}
-            >
-              <Shield className="w-4 h-4 shrink-0" />
-              <span>{t("nav.admin")}</span>
-            </div>
-          </Link>
+          <>
+            <div className="my-2 border-t border-white/10" />
+            <Link href="/admin" data-testid="nav-admin" onClick={handleNavClick}>
+              <div
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium cursor-pointer relative",
+                  "transition-colors duration-150",
+                  location.startsWith("/admin")
+                    ? "bg-amber-500/15 text-amber-400"
+                    : "text-amber-400/60 hover:text-amber-400 hover:bg-white/8"
+                )}
+              >
+                {location.startsWith("/admin") && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-amber-400 rounded-r-full" />
+                )}
+                <Shield className="w-4 h-4 shrink-0" />
+                <span>{t("nav.admin")}</span>
+              </div>
+            </Link>
+          </>
         )}
       </nav>
 
       {/* User section */}
       <div className="border-t border-white/10 px-4 py-4">
-        <div className="flex items-center gap-3 mb-3">
+        <div className="flex items-center gap-3 mb-3 min-w-0">
           <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
             <span className="text-sm font-bold text-[#0D1117]">
               {user?.name?.[0]?.toUpperCase() ?? "U"}
@@ -113,7 +123,7 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-white truncate" data-testid="text-username">{user?.name}</p>
-            <p className="text-xs text-white/50 truncate">{user?.email}</p>
+            <p className="text-xs text-white/45 truncate">{user?.email}</p>
           </div>
           <span
             className={cn(
@@ -129,9 +139,10 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
           <button
             onClick={() => { logout(); handleNavClick(); }}
             data-testid="button-logout"
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+            aria-label={t("nav.logout")}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/55 hover:text-white hover:bg-white/10 transition-colors"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-3.5 h-3.5" />
             <span>{t("nav.logout")}</span>
           </button>
           <LanguageSwitcher variant="dark" />

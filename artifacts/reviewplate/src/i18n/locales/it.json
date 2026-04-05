@@ -83,7 +83,9 @@
     "backToLogin": "Torna al login",
     "resetEmailSent": "Email inviata",
     "resetEmailDesc": "Se esiste un account con quell'email, riceverai presto le istruzioni.",
-    "passwordRequirements": "Usa almeno 8 caratteri con una combinazione di lettere e numeri."
+    "passwordRequirements": "Usa almeno 8 caratteri con una combinazione di lettere e numeri.",
+    "showPassword": "Mostra password",
+    "hidePassword": "Nascondi password"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -291,6 +293,11 @@
     "generatedReply": "Risposta generata",
     "copy": "Copia",
     "copied": "Copiato!",
+    "copiedDesc": "Risposta copiata negli appunti.",
+    "upgradeRequired": "Aggiornamento richiesto",
+    "upgradeDesc": "La risposta IA è disponibile su Premium e superiori.",
+    "generateFailed": "Generazione fallita",
+    "generateFailedDesc": "Impossibile generare la risposta. Riprova.",
     "aiDisclaimer": "Generato dall'IA. Controlla prima di pubblicare.",
     "emptyState": "La tua risposta generata apparirà qui",
     "emptyStateDesc": "Incolla una recensione e clicca su Genera",

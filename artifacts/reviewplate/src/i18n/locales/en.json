@@ -83,7 +83,9 @@
     "backToLogin": "Back to login",
     "resetEmailSent": "Reset email sent",
     "resetEmailDesc": "If an account exists with that email, you'll receive reset instructions shortly.",
-    "passwordRequirements": "Use at least 8 characters with a mix of letters and numbers."
+    "passwordRequirements": "Use at least 8 characters with a mix of letters and numbers.",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -291,6 +293,11 @@
     "generatedReply": "Generated Reply",
     "copy": "Copy",
     "copied": "Copied!",
+    "copiedDesc": "Reply copied to clipboard.",
+    "upgradeRequired": "Upgrade required",
+    "upgradeDesc": "AI Reply is available on Premium and above.",
+    "generateFailed": "Generation failed",
+    "generateFailedDesc": "Could not generate reply. Please try again.",
     "aiDisclaimer": "AI-generated. Review before posting.",
     "emptyState": "Your generated reply will appear here",
     "emptyStateDesc": "Paste a review and click Generate",

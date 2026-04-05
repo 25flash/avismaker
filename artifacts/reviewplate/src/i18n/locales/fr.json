@@ -83,7 +83,9 @@
     "backToLogin": "Retour à la connexion",
     "resetEmailSent": "Email envoyé",
     "resetEmailDesc": "Si un compte existe avec cet email, vous recevrez les instructions sous peu.",
-    "passwordRequirements": "Utilisez au moins 8 caractères avec un mélange de lettres et de chiffres."
+    "passwordRequirements": "Utilisez au moins 8 caractères avec un mélange de lettres et de chiffres.",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe"
   },
   "dashboard": {
     "title": "Tableau de bord",
@@ -291,6 +293,11 @@
     "generatedReply": "Réponse générée",
     "copy": "Copier",
     "copied": "Copié !",
+    "copiedDesc": "Réponse copiée dans le presse-papiers.",
+    "upgradeRequired": "Mise à niveau requise",
+    "upgradeDesc": "La réponse IA est disponible sur Premium et supérieur.",
+    "generateFailed": "Échec de la génération",
+    "generateFailedDesc": "Impossible de générer la réponse. Réessayez.",
     "aiDisclaimer": "Généré par IA. Relisez avant de publier.",
     "emptyState": "Votre réponse générée apparaîtra ici",
     "emptyStateDesc": "Collez un avis et cliquez sur Générer",

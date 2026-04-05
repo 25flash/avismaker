@@ -78,13 +78,13 @@ export default function DashboardPage() {
     <AuthLayout>
       <div className="space-y-8">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-[#0D1117]">{t("dashboard.title")}</h1>
             <p className="text-sm text-[#6B7280] mt-0.5">{t("dashboard.welcome", { name: user?.name })}</p>
           </div>
           <Link href="/activate">
-            <Button className="bg-primary text-[#0D1117] font-semibold hover:bg-primary/90" data-testid="button-activate-card">
+            <Button className="bg-primary text-[#0D1117] font-semibold hover:bg-primary/90 shrink-0" data-testid="button-activate-card">
               <Zap className="w-4 h-4 mr-2" />
               {t("dashboard.activateCard")}
             </Button>
@@ -92,7 +92,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Stats grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard title={t("dashboard.totalCards")} value={summary?.totalCards ?? 0} icon={CreditCard} loading={isLoading} />
           <StatCard title={t("dashboard.activeCards")} value={summary?.activeCards ?? 0} icon={Activity} subtitle={t("dashboard.readyToScan")} loading={isLoading} />
           <StatCard title={t("dashboard.totalScans")} value={summary?.totalScans ?? 0} icon={TrendingUp} loading={isLoading} />

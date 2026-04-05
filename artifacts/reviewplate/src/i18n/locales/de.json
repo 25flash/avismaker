@@ -83,7 +83,9 @@
     "backToLogin": "Zurück zur Anmeldung",
     "resetEmailSent": "E-Mail gesendet",
     "resetEmailDesc": "Wenn ein Konto mit dieser E-Mail existiert, erhältst du die Anweisungen in Kürze.",
-    "passwordRequirements": "Verwende mindestens 8 Zeichen mit einer Mischung aus Buchstaben und Zahlen."
+    "passwordRequirements": "Verwende mindestens 8 Zeichen mit einer Mischung aus Buchstaben und Zahlen.",
+    "showPassword": "Passwort anzeigen",
+    "hidePassword": "Passwort verbergen"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -291,6 +293,11 @@
     "generatedReply": "Generierte Antwort",
     "copy": "Kopieren",
     "copied": "Kopiert!",
+    "copiedDesc": "Antwort in die Zwischenablage kopiert.",
+    "upgradeRequired": "Upgrade erforderlich",
+    "upgradeDesc": "KI-Antwort ist ab Premium verfügbar.",
+    "generateFailed": "Generierung fehlgeschlagen",
+    "generateFailedDesc": "Antwort konnte nicht generiert werden. Bitte erneut versuchen.",
     "aiDisclaimer": "KI-generiert. Vor dem Veröffentlichen überprüfen.",
     "emptyState": "Deine generierte Antwort erscheint hier",
     "emptyStateDesc": "Bewertung einfügen und auf Generieren klicken",

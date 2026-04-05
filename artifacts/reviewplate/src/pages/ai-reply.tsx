@@ -38,9 +38,9 @@ export default function AiReplyPage() {
         onError: (err: unknown) => {
           const apiError = err as { status?: number };
           if (apiError?.status === 403) {
-            toast({ variant: "destructive", title: "Upgrade required", description: "AI Reply is available on Premium and above." });
+            toast({ variant: "destructive", title: t("aiReply.upgradeRequired"), description: t("aiReply.upgradeDesc") });
           } else {
-            toast({ variant: "destructive", title: "Generation failed", description: "Could not generate reply. Try again." });
+            toast({ variant: "destructive", title: t("aiReply.generateFailed"), description: t("aiReply.generateFailedDesc") });
           }
         },
       }
@@ -51,7 +51,7 @@ export default function AiReplyPage() {
     navigator.clipboard.writeText(reply);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-    toast({ title: "Copied!", description: "Reply copied to clipboard." });
+    toast({ title: t("aiReply.copied"), description: t("aiReply.copiedDesc") });
   };
 
   return (
@@ -98,10 +98,10 @@ export default function AiReplyPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="google">Google</SelectItem>
-                    <SelectItem value="airbnb">Airbnb</SelectItem>
-                    <SelectItem value="tripadvisor">TripAdvisor</SelectItem>
-                    <SelectItem value="trustpilot">Trustpilot</SelectItem>
+                    <SelectItem value="google">{t("aiReply.platforms.google")}</SelectItem>
+                    <SelectItem value="airbnb">{t("aiReply.platforms.airbnb")}</SelectItem>
+                    <SelectItem value="tripadvisor">{t("aiReply.platforms.tripadvisor")}</SelectItem>
+                    <SelectItem value="trustpilot">{t("aiReply.platforms.trustpilot")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -113,10 +113,10 @@ export default function AiReplyPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="professional">Professional</SelectItem>
-                    <SelectItem value="friendly">Friendly</SelectItem>
-                    <SelectItem value="formal">Formal</SelectItem>
-                    <SelectItem value="casual">Casual</SelectItem>
+                    <SelectItem value="professional">{t("aiReply.tones.professional")}</SelectItem>
+                    <SelectItem value="friendly">{t("aiReply.tones.friendly")}</SelectItem>
+                    <SelectItem value="formal">{t("aiReply.tones.formal")}</SelectItem>
+                    <SelectItem value="casual">{t("aiReply.tones.casual")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

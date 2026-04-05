@@ -44,8 +44,8 @@ export default function LoginPage() {
           const apiError = err as { data?: { error?: string } };
           toast({
             variant: "destructive",
-            title: "Login failed",
-            description: apiError?.data?.error ?? "Invalid credentials",
+            title: t("auth.loginFailed"),
+            description: apiError?.data?.error ?? t("auth.invalidCredentials"),
           });
         },
       }
@@ -85,7 +85,12 @@ export default function LoginPage() {
       </div>
 
       {/* Right: Form */}
-      <div className="flex-1 flex items-center justify-center p-8">
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-8 relative">
+        {/* Language switcher — top right */}
+        <div className="absolute top-4 right-4">
+          <LanguageSwitcher />
+        </div>
+
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-2 mb-8">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
@@ -112,6 +117,7 @@ export default function LoginPage() {
                         placeholder="you@example.com"
                         data-testid="input-email"
                         className="h-11"
+                        autoComplete="email"
                       />
                     </FormControl>
                     <FormMessage />
@@ -137,11 +143,13 @@ export default function LoginPage() {
                           placeholder="••••••••"
                           data-testid="input-password"
                           className="h-11 pr-10"
+                          autoComplete="current-password"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B7280] hover:text-[#374151]"
+                          aria-label={showPassword ? t("auth.hidePassword") : t("auth.showPassword")}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B7280] hover:text-[#374151] transition-colors"
                         >
                           {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
@@ -156,9 +164,17 @@ export default function LoginPage() {
                 type="submit"
                 data-testid="button-submit"
                 disabled={loginMutation.isPending}
-                className="w-full h-11 bg-primary text-[#0D1117] font-semibold hover:bg-primary/90"
+                className="w-full h-11 bg-primary text-[#0D1117] font-semibold hover:bg-primary/90 transition-all"
               >
-                {loginMutation.isPending ? t("auth.signingIn") : t("auth.signIn")}
+                {loginMutation.isPending ? (
+                  <span className="flex items-center gap-2">
+                    <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                    </svg>
+                    {t("auth.signingIn")}
+                  </span>
+                ) : t("auth.signIn")}
               </Button>
             </form>
           </Form>

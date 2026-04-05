@@ -78,14 +78,14 @@ export default function ProfilesPage() {
   return (
     <AuthLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-[#0D1117]">{t('profiles.title')}</h1>
             <p className="text-sm text-[#6B7280] mt-0.5">{t('profiles.subtitle')}</p>
           </div>
           <Button
             onClick={() => setShowDialog(true)}
-            className="bg-primary text-[#0D1117] font-semibold hover:bg-primary/90"
+            className="bg-primary text-[#0D1117] font-semibold hover:bg-primary/90 shrink-0"
             data-testid="button-add-profile"
           >
             <Plus className="w-4 h-4 mr-2" />

@@ -61,13 +61,13 @@ export default function CardsPage() {
   return (
     <AuthLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-[#0D1117]">{t('cards.title')}</h1>
             <p className="text-sm text-[#6B7280] mt-0.5">{t('cards.subtitle')}</p>
           </div>
           <Link href="/activate">
-            <Button className="bg-primary text-[#0D1117] font-semibold hover:bg-primary/90" data-testid="button-activate-new">
+            <Button className="bg-primary text-[#0D1117] font-semibold hover:bg-primary/90 shrink-0" data-testid="button-activate-new">
               <Plus className="w-4 h-4 mr-2" />
               {t('cards.activateCard')}
             </Button>

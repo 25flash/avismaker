@@ -240,7 +240,25 @@
     "updateFailed": "Fout",
     "updateFailedDesc": "Kan plan niet wijzigen. Probeer het opnieuw.",
     "mostPopular": "Meest populair",
-    "annualLabel": "Jaarlijks"
+    "annualLabel": "Jaarlijks",
+    "annualSavings": "Bespaar 3 maanden door over te stappen op jaarlijkse facturering",
+    "unlimitedCards": "Onbeperkte actieve kaarten",
+    "activeCardsCount": "{{count}} actieve kaart(en)",
+    "unlimitedProfiles": "Onbeperkte bedrijfsprofielen",
+    "profilesCount": "{{count}} bedrijfsprofiel(en)",
+    "footer": "Alle prijzen in EUR. Op elk moment opzegbaar.",
+    "contactUs": "Neem contact op",
+    "features": {
+      "unlimitedScans": "Onbeperkte scans",
+      "basicAnalytics": "Basisanalyse",
+      "qrGeneration": "QR-codegeneratie",
+      "aiReplies": "AI-antwoorden op reviews",
+      "negativeReviewDetection": "Detectie van negatieve reviews",
+      "advancedAnalyticsPdf": "Geavanceerde analyse + PDF-export",
+      "customBanner": "Aangepaste banner",
+      "prioritySupport": "Prioriteitsondersteuning",
+      "customBranding": "Aangepaste branding (zonder AvisMakers-badge)"
+    }
   },
   "activate": {
     "title": "Activeer je kaart",

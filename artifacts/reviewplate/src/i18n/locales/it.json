@@ -240,7 +240,25 @@
     "updateFailed": "Errore",
     "updateFailedDesc": "Impossibile cambiare piano. Riprova.",
     "mostPopular": "Il più popolare",
-    "annualLabel": "Annuale"
+    "annualLabel": "Annuale",
+    "annualSavings": "Risparmia 3 mesi passando alla fatturazione annuale",
+    "unlimitedCards": "Carte attive illimitate",
+    "activeCardsCount": "{{count}} carta/e attiva/e",
+    "unlimitedProfiles": "Profili aziendali illimitati",
+    "profilesCount": "{{count}} profilo/i aziendale/i",
+    "footer": "Tutti i prezzi in EUR. Disdici quando vuoi.",
+    "contactUs": "Contattaci",
+    "features": {
+      "unlimitedScans": "Scansioni illimitate",
+      "basicAnalytics": "Analisi di base",
+      "qrGeneration": "Generazione codice QR",
+      "aiReplies": "Risposte IA alle recensioni",
+      "negativeReviewDetection": "Rilevamento recensioni negative",
+      "advancedAnalyticsPdf": "Analisi avanzate + esportazione PDF",
+      "customBanner": "Banner personalizzato",
+      "prioritySupport": "Supporto prioritario",
+      "customBranding": "Branding personalizzato (senza badge AvisMakers)"
+    }
   },
   "activate": {
     "title": "Attiva la tua carta",

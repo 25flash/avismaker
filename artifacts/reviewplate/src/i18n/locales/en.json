@@ -240,7 +240,25 @@
     "updateFailed": "Error",
     "updateFailedDesc": "Unable to change plan. Please try again.",
     "mostPopular": "Most popular",
-    "annualLabel": "Annual"
+    "annualLabel": "Annual",
+    "annualSavings": "Save 3 months by switching to annual billing",
+    "unlimitedCards": "Unlimited active cards",
+    "activeCardsCount": "{{count}} active card(s)",
+    "unlimitedProfiles": "Unlimited business profiles",
+    "profilesCount": "{{count}} business profile(s)",
+    "footer": "All prices in EUR. Cancel anytime.",
+    "contactUs": "Contact us",
+    "features": {
+      "unlimitedScans": "Unlimited scans",
+      "basicAnalytics": "Basic analytics",
+      "qrGeneration": "QR code generation",
+      "aiReplies": "AI review replies",
+      "negativeReviewDetection": "Negative review detection",
+      "advancedAnalyticsPdf": "Advanced analytics + PDF export",
+      "customBanner": "Custom banner",
+      "prioritySupport": "Priority support",
+      "customBranding": "Custom branding (no AvisMakers badge)"
+    }
   },
   "activate": {
     "title": "Activate your card",

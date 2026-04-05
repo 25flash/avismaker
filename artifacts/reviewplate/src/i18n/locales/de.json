@@ -240,7 +240,25 @@
     "updateFailed": "Fehler",
     "updateFailedDesc": "Plan konnte nicht geändert werden. Bitte versuche es erneut.",
     "mostPopular": "Am beliebtesten",
-    "annualLabel": "Jährlich"
+    "annualLabel": "Jährlich",
+    "annualSavings": "Sparen Sie 3 Monate mit jährlicher Abrechnung",
+    "unlimitedCards": "Unbegrenzte aktive Karten",
+    "activeCardsCount": "{{count}} aktive Karte(n)",
+    "unlimitedProfiles": "Unbegrenzte Unternehmensprofile",
+    "profilesCount": "{{count}} Unternehmensprofil(e)",
+    "footer": "Alle Preise in EUR. Jederzeit kündbar.",
+    "contactUs": "Kontakt",
+    "features": {
+      "unlimitedScans": "Unbegrenzte Scans",
+      "basicAnalytics": "Basis-Analysen",
+      "qrGeneration": "QR-Code-Generierung",
+      "aiReplies": "KI-Antworten auf Bewertungen",
+      "negativeReviewDetection": "Erkennung negativer Bewertungen",
+      "advancedAnalyticsPdf": "Erweiterte Analysen + PDF-Export",
+      "customBanner": "Individuelles Banner",
+      "prioritySupport": "Prioritäts-Support",
+      "customBranding": "Individuelles Branding (ohne AvisMakers-Badge)"
+    }
   },
   "activate": {
     "title": "Karte aktivieren",

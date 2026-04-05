@@ -1,6 +1,9 @@
 import { AuthLayout } from "@/components/layout/AuthLayout";
 import { useGetDashboardSummary, useListBusinessProfiles } from "@workspace/api-client-react";
-import { CreditCard, Activity, TrendingUp, Building2, Star, Zap, ArrowRight } from "lucide-react";
+import {
+  CreditCard, Activity, TrendingUp, Building2, Star, Zap,
+  ArrowRight, Lock, BarChart2, ChevronRight,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -53,11 +56,137 @@ interface DashboardProfile {
   logoUrl: string | null;
 }
 
+type TopCard = {
+  id: number;
+  code: string;
+  nickname: string | null;
+  status: string;
+  platform: string | null;
+  scanCount: number;
+  smartReviewEnabled: boolean;
+  businessProfileId: number | null;
+};
+
+function CardRow({
+  card,
+  profile,
+  t,
+}: {
+  card: TopCard;
+  profile: DashboardProfile | null;
+  t: (k: string) => string;
+}) {
+  return (
+    <Link href={`/cards/${card.id}`}>
+      <div className="flex items-center justify-between p-2.5 rounded-lg hover:bg-[#F8FAFC] transition-colors cursor-pointer">
+        <div className="flex items-center gap-2.5 min-w-0">
+          {profile?.logoUrl ? (
+            <img src={profile.logoUrl} alt={profile.name} className="w-7 h-7 rounded-lg object-cover border border-border shrink-0" />
+          ) : (
+            <div className="w-7 h-7 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+              <span className="text-xs font-mono font-bold text-primary">{card.code.slice(0, 2)}</span>
+            </div>
+          )}
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-[#0D1117] truncate">
+              {card.nickname ?? (profile ? profile.name : card.code)}
+            </p>
+            <div className="flex items-center gap-1 flex-wrap mt-0.5">
+              {profile && (
+                <span className="text-xs text-amber-700 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-full truncate max-w-[90px]">
+                  {profile.name}
+                </span>
+              )}
+              {card.platform && (
+                <span className={cn("text-xs px-1.5 py-0.5 rounded font-medium", platformColors[card.platform] ?? "bg-gray-100 text-gray-700")}>
+                  {card.platform}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="text-right shrink-0 ml-2">
+          <p className="text-sm font-bold text-[#0D1117]">{card.scanCount}</p>
+          <p className="text-xs text-[#6B7280]">{t("dashboard.scans")}</p>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+const DEMO_SPARKLINE = [4, 7, 5, 9, 6, 11, 8, 13, 10, 14, 12, 16];
+
+function AnalyticsPreviewCard({ isBusiness }: { isBusiness: boolean }) {
+  const max = Math.max(...DEMO_SPARKLINE);
+
+  const content = (
+    <div className="flex flex-col justify-between h-full gap-3">
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-[#6B7280]">Total scans</span>
+          <span className="text-sm font-bold text-[#0D1117]">1 248</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-[#6B7280]">Croissance</span>
+          <span className="text-sm font-bold text-emerald-600">+12 %</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-[#6B7280]">Ce mois</span>
+          <span className="text-sm font-bold text-[#0D1117]">342</span>
+        </div>
+      </div>
+
+      <div className="flex items-end gap-0.5 h-10">
+        {DEMO_SPARKLINE.map((v, i) => (
+          <div
+            key={i}
+            className="flex-1 bg-amber-300 rounded-sm"
+            style={{ height: `${(v / max) * 100}%` }}
+          />
+        ))}
+      </div>
+
+      <Link href="/business-analytics">
+        <Button size="sm" className="w-full bg-primary text-[#0D1117] font-semibold hover:bg-primary/90 text-xs">
+          Voir plus <ChevronRight className="w-3 h-3 ml-1" />
+        </Button>
+      </Link>
+    </div>
+  );
+
+  if (!isBusiness) {
+    return (
+      <div className="relative h-full flex flex-col">
+        <div className="flex-1" style={{ filter: "blur(5px)", pointerEvents: "none", userSelect: "none" }}>
+          {content}
+        </div>
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/70 rounded-lg gap-2 px-2">
+          <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center">
+            <Lock className="w-4 h-4 text-gray-500" />
+          </div>
+          <p className="text-xs font-semibold text-[#0D1117] text-center leading-tight">
+            Débloquez les Analytics avancées
+          </p>
+          <Link href="/billing">
+            <Button size="sm" className="bg-primary text-[#0D1117] font-semibold hover:bg-primary/90 text-xs px-3">
+              Passer à Business
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return content;
+}
+
 export default function DashboardPage() {
   const { data, isLoading } = useGetDashboardSummary();
   const { data: profilesData } = useListBusinessProfiles();
   const { user } = useAuth();
   const { t } = useTranslation();
+
+  const isBusiness = user?.plan === "business";
 
   const summary = data as unknown as {
     totalCards: number;
@@ -65,8 +194,13 @@ export default function DashboardPage() {
     totalScans: number;
     scansThisMonth: number;
     totalProfiles: number;
-    recentScans: Array<{ id: number; cardId: number; cardCode: string; platform: string | null; businessProfileId: number | null; timestamp: string; country: string | null; deviceType: string | null; wasNegative: boolean }>;
-    topCards: Array<{ id: number; code: string; nickname: string | null; status: string; platform: string | null; scanCount: number; smartReviewEnabled: boolean; businessProfileId: number | null }>;
+    recentScans: Array<{
+      id: number; cardId: number; cardCode: string;
+      platform: string | null; businessProfileId: number | null;
+      timestamp: string; country: string | null;
+      deviceType: string | null; wasNegative: boolean;
+    }>;
+    topCards: TopCard[];
   } | undefined;
 
   const profileMap = ((profilesData as unknown as DashboardProfile[]) ?? []).reduce<Record<number, DashboardProfile>>(
@@ -74,9 +208,12 @@ export default function DashboardPage() {
     {}
   );
 
+  const topCards = summary?.topCards ?? [];
+  const leastScanned = [...topCards].sort((a, b) => a.scanCount - b.scanCount);
+
   return (
     <AuthLayout>
-      <div className="space-y-8">
+      <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -91,7 +228,7 @@ export default function DashboardPage() {
           </Link>
         </div>
 
-        {/* Stats grid */}
+        {/* Stats KPI grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard title={t("dashboard.totalCards")} value={summary?.totalCards ?? 0} icon={CreditCard} loading={isLoading} />
           <StatCard title={t("dashboard.activeCards")} value={summary?.activeCards ?? 0} icon={Activity} subtitle={t("dashboard.readyToScan")} loading={isLoading} />
@@ -99,12 +236,14 @@ export default function DashboardPage() {
           <StatCard title={t("dashboard.thisMonth")} value={summary?.scansThisMonth ?? 0} icon={Star} subtitle={t("dashboard.scansThisMonth")} loading={isLoading} />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Top performing cards */}
-          <Card className="bg-white border border-border shadow-sm">
-            <CardHeader className="pb-3 border-b border-border">
+        {/* 4-block main grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+
+          {/* 1. Meilleures cartes */}
+          <Card className="bg-white border border-border shadow-sm flex flex-col">
+            <CardHeader className="pb-3 border-b border-border shrink-0">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base font-semibold text-[#0D1117]">{t("dashboard.topCards")}</CardTitle>
+                <CardTitle className="text-sm font-semibold text-[#0D1117]">{t("dashboard.topCards")}</CardTitle>
                 <Link href="/cards">
                   <button className="text-xs text-primary hover:underline flex items-center gap-1">
                     {t("dashboard.viewAll")} <ArrowRight className="w-3 h-3" />
@@ -112,136 +251,106 @@ export default function DashboardPage() {
                 </Link>
               </div>
             </CardHeader>
-            <CardContent className="pt-3">
+            <CardContent className="pt-2 flex-1 overflow-y-auto" style={{ maxHeight: 260 }}>
               {isLoading ? (
-                <div className="space-y-3">
-                  {[1, 2, 3].map(i => <Skeleton key={i} className="h-12 w-full" />)}
+                <div className="space-y-2 pt-1">
+                  {[1, 2, 3].map(i => <Skeleton key={i} className="h-11 w-full" />)}
                 </div>
-              ) : summary?.topCards?.length === 0 ? (
+              ) : topCards.length === 0 ? (
                 <div className="text-center py-8">
-                  <CreditCard className="w-10 h-10 text-[#D1D5DB] mx-auto mb-2" />
-                  <p className="text-sm text-[#6B7280]">{t("dashboard.noCards")}</p>
+                  <CreditCard className="w-8 h-8 text-[#D1D5DB] mx-auto mb-2" />
+                  <p className="text-xs text-[#6B7280]">{t("dashboard.noCards")}</p>
                 </div>
               ) : (
-                <div className="space-y-2">
-                  {summary?.topCards?.map((card) => {
-                    const profile = card.businessProfileId ? profileMap[card.businessProfileId] : null;
-                    return (
-                      <Link key={card.id} href={`/cards/${card.id}`}>
-                        <div
-                          className="flex items-center justify-between p-3 rounded-lg hover:bg-[#F8FAFC] transition-colors cursor-pointer"
-                          data-testid={`card-top-${card.id}`}
-                        >
-                          <div className="flex items-center gap-3">
-                            {/* Logo du profil ou badge code */}
-                            {profile?.logoUrl ? (
-                              <img
-                                src={profile.logoUrl}
-                                alt={profile.name}
-                                className="w-8 h-8 rounded-lg object-cover border border-border shrink-0"
-                              />
-                            ) : (
-                              <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
-                                <span className="text-xs font-mono font-bold text-primary">{card.code.slice(0, 2)}</span>
-                              </div>
-                            )}
-                            <div>
-                              {/* Surnom si défini, sinon nom du profil, sinon code */}
-                              <p className="text-sm font-semibold text-[#0D1117] truncate max-w-[180px]">
-                                {card.nickname ?? (profile ? profile.name : card.code)}
-                              </p>
-                              {/* Badge profil — identique à la page Cartes */}
-                              {profile ? (
-                                <div className="inline-flex items-center gap-1.5 mt-1 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 max-w-full">
-                                  {profile.logoUrl ? (
-                                    <img src={profile.logoUrl} alt="" className="w-3.5 h-3.5 rounded-full object-cover shrink-0" />
-                                  ) : (
-                                    <div className="w-3.5 h-3.5 rounded-full bg-amber-400 flex items-center justify-center shrink-0">
-                                      <span className="text-[8px] font-bold text-white leading-none">{profile.name.charAt(0).toUpperCase()}</span>
-                                    </div>
-                                  )}
-                                  <span className="text-xs font-medium text-amber-800 truncate max-w-[110px]">{profile.name}</span>
-                                </div>
-                              ) : null}
-                              <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                                {card.platform && (
-                                  <span className={cn("text-xs px-1.5 py-0.5 rounded font-medium", platformColors[card.platform] ?? "bg-gray-100 text-gray-700")}>
-                                    {card.platform}
-                                  </span>
-                                )}
-                                <span className={cn("text-xs font-mono px-2 py-0.5 rounded", card.platform ? platformColors[card.platform] ?? "bg-gray-100 text-gray-700" : "bg-[#F3F4F6] text-[#6B7280]")}>{card.code}</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-sm font-bold text-[#0D1117]">{card.scanCount}</p>
-                            <p className="text-xs text-[#6B7280]">{t("dashboard.scans")}</p>
-                          </div>
-                        </div>
-                      </Link>
-                    );
-                  })}
+                <div className="space-y-0.5 pt-1">
+                  {topCards.slice(0, 3).map(card => (
+                    <CardRow key={card.id} card={card} profile={card.businessProfileId ? profileMap[card.businessProfileId] : null} t={t} />
+                  ))}
                 </div>
               )}
             </CardContent>
           </Card>
 
-          {/* Recent scans */}
-          <Card className="bg-white border border-border shadow-sm">
-            <CardHeader className="pb-3 border-b border-border">
-              <CardTitle className="text-base font-semibold text-[#0D1117]">{t("dashboard.recentActivity")}</CardTitle>
+          {/* 2. Cartes les moins scannées */}
+          <Card className="bg-white border border-border shadow-sm flex flex-col">
+            <CardHeader className="pb-3 border-b border-border shrink-0">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-semibold text-[#0D1117]">Cartes peu scannées</CardTitle>
+                <Link href="/cards">
+                  <button className="text-xs text-primary hover:underline flex items-center gap-1">
+                    Voir tout <ArrowRight className="w-3 h-3" />
+                  </button>
+                </Link>
+              </div>
             </CardHeader>
-            <CardContent className="pt-3">
+            <CardContent className="pt-2 flex-1 overflow-y-auto" style={{ maxHeight: 260 }}>
               {isLoading ? (
-                <div className="space-y-3">
-                  {[1, 2, 3].map(i => <Skeleton key={i} className="h-10 w-full" />)}
+                <div className="space-y-2 pt-1">
+                  {[1, 2, 3].map(i => <Skeleton key={i} className="h-11 w-full" />)}
                 </div>
-              ) : summary?.recentScans?.length === 0 ? (
+              ) : leastScanned.length === 0 ? (
                 <div className="text-center py-8">
-                  <Activity className="w-10 h-10 text-[#D1D5DB] mx-auto mb-2" />
-                  <p className="text-sm text-[#6B7280]">{t("dashboard.noActivity")}</p>
+                  <CreditCard className="w-8 h-8 text-[#D1D5DB] mx-auto mb-2" />
+                  <p className="text-xs text-[#6B7280]">{t("dashboard.noCards")}</p>
                 </div>
               ) : (
-                <div className="space-y-1">
-                  {summary?.recentScans?.slice(0, 8).map((scan) => {
+                <div className="space-y-0.5 pt-1">
+                  {leastScanned.slice(0, 3).map(card => (
+                    <CardRow key={card.id} card={card} profile={card.businessProfileId ? profileMap[card.businessProfileId] : null} t={t} />
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* 3. Activité récente */}
+          <Card className="bg-white border border-border shadow-sm flex flex-col">
+            <CardHeader className="pb-3 border-b border-border shrink-0">
+              <CardTitle className="text-sm font-semibold text-[#0D1117]">{t("dashboard.recentActivity")}</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-2 flex-1 overflow-y-auto" style={{ maxHeight: 260 }}>
+              {isLoading ? (
+                <div className="space-y-2 pt-1">
+                  {[1, 2, 3].map(i => <Skeleton key={i} className="h-10 w-full" />)}
+                </div>
+              ) : (summary?.recentScans?.length ?? 0) === 0 ? (
+                <div className="text-center py-8">
+                  <Activity className="w-8 h-8 text-[#D1D5DB] mx-auto mb-2" />
+                  <p className="text-xs text-[#6B7280]">{t("dashboard.noActivity")}</p>
+                </div>
+              ) : (
+                <div className="pt-1">
+                  {summary?.recentScans?.slice(0, 6).map((scan) => {
                     const scanProfile = scan.businessProfileId ? profileMap[scan.businessProfileId] : null;
                     return (
                       <div
                         key={scan.id}
-                        className="flex items-center justify-between py-2.5 border-b border-[#F3F4F6] last:border-0"
+                        className="flex items-center justify-between py-2 border-b border-[#F3F4F6] last:border-0"
                         data-testid={`row-scan-${scan.id}`}
                       >
-                        <div className="flex items-center gap-3">
-                          {/* Logo ou dot de statut */}
+                        <div className="flex items-center gap-2 min-w-0">
                           {scanProfile?.logoUrl ? (
-                            <img
-                              src={scanProfile.logoUrl}
-                              alt={scanProfile.name}
-                              className="w-6 h-6 rounded object-cover border border-border shrink-0"
-                            />
+                            <img src={scanProfile.logoUrl} alt={scanProfile.name} className="w-5 h-5 rounded object-cover border border-border shrink-0" />
                           ) : (
                             <div className={cn("w-2 h-2 rounded-full shrink-0", scan.wasNegative ? "bg-red-400" : "bg-[#10B981]")} />
                           )}
-                          <div>
-                            {/* Nom de l'établissement en principal */}
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <p className="text-sm font-medium text-[#374151]">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <p className="text-xs font-medium text-[#374151] truncate">
                                 {scanProfile ? scanProfile.name : scan.cardCode}
                               </p>
                               {scan.platform && (
-                                <span className={cn("text-xs px-1.5 py-0.5 rounded font-medium", platformColors[scan.platform] ?? "bg-gray-100 text-gray-700")}>
+                                <span className={cn("text-xs px-1 py-0.5 rounded font-medium", platformColors[scan.platform] ?? "bg-gray-100 text-gray-700")}>
                                   {scan.platform}
                                 </span>
                               )}
                             </div>
-                            {/* Code carte + localisation en secondaire */}
-                            <p className="text-xs text-[#6B7280]">
-                              {scanProfile && <span className="font-mono mr-1">{scan.cardCode} ·</span>}
+                            <p className="text-xs text-[#6B7280] truncate">
                               {scan.country ?? t("dashboard.unknown")} · {scan.deviceType ?? t("dashboard.unknown")}
                             </p>
                           </div>
                         </div>
-                        <p className="text-xs text-[#6B7280] shrink-0">
+                        <p className="text-xs text-[#6B7280] shrink-0 ml-2">
                           {new Date(scan.timestamp).toLocaleDateString()}
                         </p>
                       </div>
@@ -249,6 +358,24 @@ export default function DashboardPage() {
                   })}
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          {/* 4. Analytics avancées */}
+          <Card className="bg-white border border-border shadow-sm flex flex-col">
+            <CardHeader className="pb-3 border-b border-border shrink-0">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <BarChart2 className="w-4 h-4 text-primary" />
+                  <CardTitle className="text-sm font-semibold text-[#0D1117]">Analytics avancées</CardTitle>
+                </div>
+                {isBusiness && (
+                  <span className="text-xs bg-primary/10 text-primary font-semibold px-2 py-0.5 rounded-full">Business</span>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent className="pt-3 flex-1 flex flex-col" style={{ minHeight: 200 }}>
+              <AnalyticsPreviewCard isBusiness={isBusiness} />
             </CardContent>
           </Card>
         </div>

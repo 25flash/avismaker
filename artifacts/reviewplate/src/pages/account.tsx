@@ -160,12 +160,15 @@ export default function AccountPage() {
 
   return (
     <AuthLayout>
-      <div className="space-y-6 max-w-2xl">
+      <div className="max-w-5xl">
         {/* Header */}
-        <div>
+        <div className="mb-6">
           <h1 className="text-2xl font-bold text-[#0D1117]">{t("account.title")}</h1>
           <p className="text-sm text-[#6B7280] mt-0.5">{t("account.subtitle")}</p>
         </div>
+
+        {/* Desktop two-column layout — stacked on mobile */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)] lg:items-start">
 
         {/* ── Profile card ── */}
         <Card className="bg-white border border-border shadow-sm">
@@ -399,6 +402,8 @@ export default function AccountPage() {
             </p>
           </CardContent>
         </Card>
+
+        </div>{/* end desktop grid */}
       </div>
     </AuthLayout>
   );

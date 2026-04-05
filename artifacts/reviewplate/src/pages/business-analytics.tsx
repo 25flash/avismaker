@@ -104,22 +104,26 @@ export default function BusinessAnalyticsPage() {
   const [loading, setLoading] = useState(true);
   const [exportLoading, setExportLoading] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const reportRef = useRef<HTMLDivElement>(null); // kept for potential future use
+  const [period, setPeriod] = useState<"7j" | "30j" | "90j">("30j");
+  const reportRef = useRef<HTMLDivElement>(null);
 
   const isBusiness = user?.plan === "business";
   const displayData = isBusiness ? (data ?? DEMO_DATA) : DEMO_DATA;
+
+  const PERIOD_DAYS: Record<string, number> = { "7j": 7, "30j": 30, "90j": 90 };
 
   useEffect(() => {
     if (!isBusiness) { setLoading(false); return; }
     const tk = token ?? localStorage.getItem("reviewplate_token");
     if (!tk) { setLoading(false); return; }
-    fetch(`${API_BASE}/api/business-analytics`, {
+    setLoading(true);
+    fetch(`${API_BASE}/api/business-analytics?days=${PERIOD_DAYS[period]}`, {
       headers: { Authorization: `Bearer ${tk}` },
     })
       .then(r => r.ok ? r.json() : Promise.reject(r))
       .then(d => { setData(d); setLoading(false); })
       .catch(() => setLoading(false));
-  }, [isBusiness, token]);
+  }, [isBusiness, token, period]);
 
   const handleExportPDF = async () => {
     if (!isBusiness) { setShowUpgradeModal(true); return; }
@@ -452,7 +456,24 @@ export default function BusinessAnalyticsPage() {
             </h1>
             <p className="text-sm text-[#6B7280] mt-0.5">Suivez vos performances en temps réel</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3 flex-wrap justify-end">
+            {/* Period filter pills */}
+            <div className="flex items-center gap-1">
+              {(["7j", "30j", "90j"] as const).map(p => (
+                <button
+                  key={p}
+                  onClick={() => setPeriod(p)}
+                  className={cn(
+                    "px-3 py-1 text-xs font-semibold rounded-full transition-colors",
+                    period === p
+                      ? "bg-primary text-[#0D1117]"
+                      : "bg-[#F3F4F6] text-[#6B7280] hover:bg-[#E5E7EB]"
+                  )}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
             {!isBusiness && (
               <Badge className="bg-[#0D1117] text-primary border-0 text-xs px-3 py-1">
                 <Lock className="w-3 h-3 mr-1" />

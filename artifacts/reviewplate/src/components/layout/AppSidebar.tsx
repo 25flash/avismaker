@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import {
   LayoutDashboard, CreditCard, Building2, Bot, Receipt, MessageCircle,
-  Shield, LogOut, Star, ChevronRight
+  Shield, LogOut, Star, ChevronRight, X
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
@@ -15,7 +15,11 @@ const planBadgeClass: Record<string, string> = {
   business: "plan-badge-business",
 };
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  onClose?: () => void;
+}
+
+export function AppSidebar({ onClose }: AppSidebarProps) {
   const [location] = useLocation();
   const { user, logout } = useAuth();
   const { t } = useTranslation();
@@ -29,14 +33,28 @@ export function AppSidebar() {
     { href: "/support", label: t("nav.support"), icon: MessageCircle, testId: "nav-support" },
   ];
 
+  const handleNavClick = () => {
+    onClose?.();
+  };
+
   return (
     <div className="flex flex-col h-full w-64 bg-[#0D1117] text-white border-r border-white/10">
-      {/* Logo */}
+      {/* Logo + close button */}
       <div className="flex items-center gap-2 px-6 py-5 border-b border-white/10">
-        <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+        <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shrink-0">
           <Star className="w-5 h-5 text-[#0D1117]" strokeWidth={2.5} />
         </div>
-        <span className="text-lg font-bold text-white tracking-tight">AvisMakers</span>
+        <span className="text-lg font-bold text-white tracking-tight flex-1">AvisMakers</span>
+        {/* Close button — only visible on mobile */}
+        {onClose && (
+          <button
+            onClick={onClose}
+            aria-label="Close menu"
+            className="md:hidden text-white/60 hover:text-white transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
       {/* Navigation */}
@@ -49,6 +67,7 @@ export function AppSidebar() {
               key={item.href}
               href={item.href}
               data-testid={item.testId}
+              onClick={handleNavClick}
             >
               <div
                 className={cn(
@@ -68,7 +87,7 @@ export function AppSidebar() {
 
         {/* Admin link */}
         {user?.role === "admin" && (
-          <Link href="/admin" data-testid="nav-admin">
+          <Link href="/admin" data-testid="nav-admin" onClick={handleNavClick}>
             <div
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer mt-4",
@@ -108,7 +127,7 @@ export function AppSidebar() {
         </div>
         <div className="flex items-center justify-between">
           <button
-            onClick={logout}
+            onClick={() => { logout(); handleNavClick(); }}
             data-testid="button-logout"
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/10 transition-colors"
           >

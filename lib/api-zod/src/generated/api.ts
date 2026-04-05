@@ -329,7 +329,7 @@ export const DeactivateCardResponse = zod.object({
  */
 export const ActivateCardByCodeBody = zod.object({
   code: zod.string(),
-  businessProfileId: zod.number(),
+  businessProfileId: zod.number().optional().nullable(),
 });
 
 export const ActivateCardByCodeResponse = zod.object({

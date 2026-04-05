@@ -163,7 +163,7 @@ router.post("/cards/activate-by-code", requireAuth, async (req: AuthRequest, res
   const [updated] = await db.update(cardsTable)
     .set({
       ownerId: req.userId!,
-      businessProfileId: parsed.data.businessProfileId,
+      ...(parsed.data.businessProfileId != null ? { businessProfileId: parsed.data.businessProfileId } : {}),
       status: "active",
       activatedAt: new Date(),
     })

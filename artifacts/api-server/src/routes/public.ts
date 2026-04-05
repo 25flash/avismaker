@@ -42,6 +42,35 @@ router.get("/public/scan", async (req, res): Promise<void> => {
   });
 });
 
+router.post("/public/scan/:code", async (req, res): Promise<void> => {
+  const code = (req.params.code ?? "").toUpperCase();
+  const wasNegative = typeof req.body?.wasNegative === "boolean" ? req.body.wasNegative : false;
+
+  const [card] = await db.select().from(cardsTable).where(eq(cardsTable.code, code));
+  if (!card || card.status !== "active") {
+    res.status(404).json({ error: "Card not found or not active" });
+    return;
+  }
+
+  const userAgent = req.headers["user-agent"] ?? "";
+  const isMobile = /mobile|android|iphone|ipad/i.test(userAgent);
+  const deviceType = isMobile ? "mobile" : "desktop";
+
+  await db.insert(scanLogsTable).values({
+    cardId: card.id,
+    timestamp: new Date(),
+    ipAddress: req.ip,
+    country: null,
+    deviceType,
+    browser: userAgent.split(" ")[0] ?? "unknown",
+    wasNegative,
+  });
+
+  await db.update(cardsTable).set({ scanCount: card.scanCount + 1 }).where(eq(cardsTable.id, card.id));
+
+  res.json({ ok: true });
+});
+
 router.get("/public/card/:code", async (req, res): Promise<void> => {
   const params = GetPublicCardParams.safeParse(req.params);
   if (!params.success) {

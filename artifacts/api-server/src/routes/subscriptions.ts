@@ -6,18 +6,18 @@ import { UpgradePlanBody } from "@workspace/api-zod";
 
 const router: IRouter = Router();
 
-const PLANS = [
+export const PLANS = [
   {
     id: "free",
     name: "Free",
     price: 0,
     features: [
-      "1 business profile",
-      "Unlimited scans",
-      "Basic analytics",
-      "QR code generation",
+      "Scans illimités",
+      "Analytics de base",
+      "Génération QR code",
     ],
     maxProfiles: 1,
+    maxActiveCards: 1,
     aiReply: false,
     customBranding: false,
     advancedAnalytics: false,
@@ -27,15 +27,15 @@ const PLANS = [
     name: "Premium",
     price: 19,
     features: [
-      "3 business profiles",
-      "Unlimited scans",
-      "AI review replies",
-      "Negative review auto-detection",
-      "Advanced analytics + PDF export",
-      "Custom banner on public pages",
-      "Priority support",
+      "Scans illimités",
+      "Réponses IA aux avis",
+      "Détection avis négatifs",
+      "Analytics avancées + export PDF",
+      "Bannière personnalisée",
+      "Support prioritaire",
     ],
     maxProfiles: 3,
+    maxActiveCards: null,
     aiReply: true,
     customBranding: false,
     advancedAnalytics: true,
@@ -45,12 +45,12 @@ const PLANS = [
     name: "Pro",
     price: 39,
     features: [
-      "10 business profiles",
-      "All Premium features",
-      "Custom branding (remove AvisMakers badge)",
-      "Live preview editor",
+      "Tout Premium inclus",
+      "Branding personnalisé (sans badge AvisMakers)",
+      "Éditeur de prévisualisation live",
     ],
     maxProfiles: 10,
+    maxActiveCards: null,
     aiReply: true,
     customBranding: true,
     advancedAnalytics: true,
@@ -60,12 +60,12 @@ const PLANS = [
     name: "Business",
     price: 79,
     features: [
-      "Unlimited business profiles",
-      "All Pro features",
-      "White-label option",
-      "Dedicated support",
+      "Tout Pro inclus",
+      "Option white-label",
+      "Gestionnaire de compte dédié",
     ],
     maxProfiles: null,
+    maxActiveCards: null,
     aiReply: true,
     customBranding: true,
     advancedAnalytics: true,
@@ -81,6 +81,7 @@ router.get("/subscriptions/current", requireAuth, async (req: AuthRequest, res):
       userId: req.userId!,
       plan: "free",
       status: "active",
+      billingPeriod: "monthly",
       renewsAt: null,
       monthlyPrice: 0,
     });
@@ -92,6 +93,7 @@ router.get("/subscriptions/current", requireAuth, async (req: AuthRequest, res):
     userId: sub.userId,
     plan: sub.plan,
     status: sub.status,
+    billingPeriod: sub.stripePriceId === "annual" ? "annual" : "monthly",
     renewsAt: sub.renewsAt?.toISOString() ?? null,
     monthlyPrice: sub.monthlyPrice,
   });
@@ -109,33 +111,49 @@ router.post("/subscriptions/upgrade", requireAuth, async (req: AuthRequest, res)
   }
 
   const { plan } = parsed.data;
+  const billing: string = (req.body as Record<string, unknown>).billing === "annual" ? "annual" : "monthly";
+
   const planInfo = PLANS.find(p => p.id === plan);
   if (!planInfo) {
     res.status(400).json({ error: "Invalid plan" });
     return;
   }
 
+  const discountFactor = billing === "annual" ? 0.75 : 1;
+  const effectiveMonthlyPrice = Number((planInfo.price * discountFactor).toFixed(2));
+
   await db.update(usersTable).set({ plan }).where(eq(usersTable.id, req.userId!));
 
   const renewsAt = new Date();
-  renewsAt.setMonth(renewsAt.getMonth() + 1);
+  if (billing === "annual") {
+    renewsAt.setFullYear(renewsAt.getFullYear() + 1);
+  } else {
+    renewsAt.setMonth(renewsAt.getMonth() + 1);
+  }
 
   const [existingSub] = await db.select().from(subscriptionsTable).where(eq(subscriptionsTable.userId, req.userId!));
   if (existingSub) {
     await db.update(subscriptionsTable)
-      .set({ plan, monthlyPrice: planInfo.price, renewsAt, status: "active" })
+      .set({
+        plan,
+        monthlyPrice: effectiveMonthlyPrice,
+        renewsAt,
+        status: "active",
+        stripePriceId: billing,
+      })
       .where(eq(subscriptionsTable.userId, req.userId!));
   } else {
     await db.insert(subscriptionsTable).values({
       userId: req.userId!,
       plan,
-      monthlyPrice: planInfo.price,
+      monthlyPrice: effectiveMonthlyPrice,
       renewsAt,
       status: "active",
+      stripePriceId: billing,
     });
   }
 
-  res.json({ success: true, plan });
+  res.json({ success: true, plan, billingPeriod: billing });
 });
 
 export default router;

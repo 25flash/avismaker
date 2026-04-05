@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { eq, and, or, isNull } from "drizzle-orm";
+import { eq, and, count } from "drizzle-orm";
 import { db, cardsTable } from "@workspace/db";
 import { requireAuth, type AuthRequest } from "../lib/auth";
 import {
@@ -11,6 +11,13 @@ import {
   DeactivateCardParams,
   ActivateCardByCodeBody,
 } from "@workspace/api-zod";
+
+const MAX_ACTIVE_CARDS: Record<string, number | null> = {
+  free: 1,
+  premium: null,
+  pro: null,
+  business: null,
+};
 
 const router: IRouter = Router();
 
@@ -109,6 +116,21 @@ router.post("/cards/:id/activate", requireAuth, async (req: AuthRequest, res): P
     return;
   }
 
+  const plan = req.userPlan ?? "free";
+  const maxActive = MAX_ACTIVE_CARDS[plan] ?? null;
+  if (maxActive !== null) {
+    const [activeCount] = await db.select({ count: count() }).from(cardsTable).where(
+      and(eq(cardsTable.ownerId, req.userId!), eq(cardsTable.status, "active"))
+    );
+    if (Number(activeCount?.count ?? 0) >= maxActive) {
+      res.status(403).json({
+        error: `Your ${plan} plan allows a maximum of ${maxActive} active card(s). Upgrade to activate more cards.`,
+        code: "ACTIVE_CARD_LIMIT_REACHED",
+      });
+      return;
+    }
+  }
+
   const [card] = await db.update(cardsTable)
     .set({ status: "active", activatedAt: new Date() })
     .where(and(eq(cardsTable.id, params.data.id), eq(cardsTable.ownerId, req.userId!)))
@@ -147,6 +169,21 @@ router.post("/cards/activate-by-code", requireAuth, async (req: AuthRequest, res
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
     return;
+  }
+
+  const plan = req.userPlan ?? "free";
+  const maxActive = MAX_ACTIVE_CARDS[plan] ?? null;
+  if (maxActive !== null) {
+    const [activeCount] = await db.select({ count: count() }).from(cardsTable).where(
+      and(eq(cardsTable.ownerId, req.userId!), eq(cardsTable.status, "active"))
+    );
+    if (Number(activeCount?.count ?? 0) >= maxActive) {
+      res.status(403).json({
+        error: `Your ${plan} plan allows a maximum of ${maxActive} active card(s). Upgrade to activate more cards.`,
+        code: "ACTIVE_CARD_LIMIT_REACHED",
+      });
+      return;
+    }
   }
 
   const [card] = await db.select().from(cardsTable).where(eq(cardsTable.code, parsed.data.code.toUpperCase()));

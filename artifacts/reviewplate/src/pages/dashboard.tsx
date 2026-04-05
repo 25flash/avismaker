@@ -150,20 +150,26 @@ export default function DashboardPage() {
                               <p className="text-sm font-semibold text-[#0D1117] truncate max-w-[180px]">
                                 {card.nickname ?? (profile ? profile.name : card.code)}
                               </p>
+                              {/* Badge profil — identique à la page Cartes */}
+                              {profile ? (
+                                <div className="inline-flex items-center gap-1.5 mt-1 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 max-w-full">
+                                  {profile.logoUrl ? (
+                                    <img src={profile.logoUrl} alt="" className="w-3.5 h-3.5 rounded-full object-cover shrink-0" />
+                                  ) : (
+                                    <div className="w-3.5 h-3.5 rounded-full bg-amber-400 flex items-center justify-center shrink-0">
+                                      <span className="text-[8px] font-bold text-white leading-none">{profile.name.charAt(0).toUpperCase()}</span>
+                                    </div>
+                                  )}
+                                  <span className="text-xs font-medium text-amber-800 truncate max-w-[110px]">{profile.name}</span>
+                                </div>
+                              ) : null}
                               <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                                 {card.platform && (
                                   <span className={cn("text-xs px-1.5 py-0.5 rounded font-medium", platformColors[card.platform] ?? "bg-gray-100 text-gray-700")}>
                                     {card.platform}
                                   </span>
                                 )}
-                                {/* Affiche le nom du profil en secondaire quand surnom est actif */}
-                                {card.nickname && profile && (
-                                  <span className="text-xs text-[#6B7280] truncate">{profile.name}</span>
-                                )}
-                                {/* Affiche le code si on a un profil ou un surnom */}
-                                {(profile || card.nickname) && (
-                                  <span className="text-xs font-mono text-[#9CA3AF]">{card.code}</span>
-                                )}
+                                <span className="text-xs font-mono text-[#9CA3AF]">{card.code}</span>
                               </div>
                             </div>
                           </div>

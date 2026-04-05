@@ -2,7 +2,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "cards": "Meine Karten",
-    "profiles": "Geschäftsprofile",
+    "profiles": "Meine Betriebe",
     "aiReply": "KI-Antwort",
     "billing": "Abrechnung",
     "support": "Support",
@@ -217,7 +217,7 @@
     }
   },
   "profiles": {
-    "title": "Geschäftsprofile",
+    "title": "Meine Betriebe",
     "subtitle": "Verwalte die Informationen für jeden deiner Standorte",
     "addProfile": "Profil hinzufügen",
     "noProfiles": "Keine Profile",

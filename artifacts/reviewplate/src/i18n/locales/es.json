@@ -2,7 +2,7 @@
   "nav": {
     "dashboard": "Panel",
     "cards": "Mis Tarjetas",
-    "profiles": "Perfiles de negocio",
+    "profiles": "Mis Establecimientos",
     "aiReply": "Respuesta IA",
     "billing": "Facturación",
     "support": "Soporte",
@@ -217,7 +217,7 @@
     }
   },
   "profiles": {
-    "title": "Perfiles de negocio",
+    "title": "Mis Establecimientos",
     "subtitle": "Gestiona la información de cada una de tus ubicaciones",
     "addProfile": "Añadir perfil",
     "noProfiles": "Sin perfiles",

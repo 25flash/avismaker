@@ -2,7 +2,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "cards": "Mijn Kaarten",
-    "profiles": "Bedrijfsprofielen",
+    "profiles": "Mijn Vestigingen",
     "aiReply": "AI-antwoord",
     "billing": "Facturering",
     "support": "Ondersteuning",
@@ -217,7 +217,7 @@
     }
   },
   "profiles": {
-    "title": "Bedrijfsprofielen",
+    "title": "Mijn Vestigingen",
     "subtitle": "Beheer de informatie voor elk van je locaties",
     "addProfile": "Profiel toevoegen",
     "noProfiles": "Geen profielen",

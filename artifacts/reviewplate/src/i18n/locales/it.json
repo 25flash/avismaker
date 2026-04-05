@@ -2,7 +2,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "cards": "Le mie schede",
-    "profiles": "Profili aziendali",
+    "profiles": "I Miei Esercizi",
     "aiReply": "Risposta IA",
     "billing": "Fatturazione",
     "support": "Supporto",
@@ -217,7 +217,7 @@
     }
   },
   "profiles": {
-    "title": "Profili aziendali",
+    "title": "I Miei Esercizi",
     "subtitle": "Gestisci le informazioni di ciascuna delle tue sedi",
     "addProfile": "Aggiungi profilo",
     "noProfiles": "Nessun profilo",

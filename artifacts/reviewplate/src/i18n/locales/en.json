@@ -2,7 +2,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "cards": "My Cards",
-    "profiles": "Business Profiles",
+    "profiles": "My Establishments",
     "aiReply": "AI Reply",
     "billing": "Billing",
     "support": "Support",
@@ -217,7 +217,7 @@
     }
   },
   "profiles": {
-    "title": "Business Profiles",
+    "title": "My Establishments",
     "subtitle": "Manage your business information for each location",
     "addProfile": "Add Profile",
     "noProfiles": "No profiles yet",

@@ -14,6 +14,7 @@ export const PLANS = [
     features: [
       "billing.features.unlimitedScans",
       "billing.features.basicAnalytics",
+      "billing.features.qrGeneration",
     ],
     maxProfiles: 1,
     maxActiveCards: 1,

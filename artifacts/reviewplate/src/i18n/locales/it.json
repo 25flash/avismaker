@@ -309,6 +309,7 @@
     "features": {
       "unlimitedScans": "Scansioni illimitate",
       "basicAnalytics": "Analisi di base",
+      "qrGeneration": "Generazione codice QR",
       "aiReplies": "Risposte IA alle recensioni",
       "negativeReviewDetection": "Rilevamento recensioni negative",
       "advancedAnalyticsPdf": "Analisi avanzate + esportazione PDF",

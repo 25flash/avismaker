@@ -309,6 +309,7 @@
     "features": {
       "unlimitedScans": "Onbeperkte scans",
       "basicAnalytics": "Basisanalyse",
+      "qrGeneration": "QR-codegeneratie",
       "aiReplies": "AI-antwoorden op reviews",
       "negativeReviewDetection": "Detectie van negatieve reviews",
       "advancedAnalyticsPdf": "Geavanceerde analyse + PDF-export",

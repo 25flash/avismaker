@@ -65,7 +65,7 @@ export default function DashboardPage() {
     totalScans: number;
     scansThisMonth: number;
     totalProfiles: number;
-    recentScans: Array<{ id: number; cardId: number; cardCode: string; timestamp: string; country: string | null; deviceType: string | null; wasNegative: boolean }>;
+    recentScans: Array<{ id: number; cardId: number; cardCode: string; businessProfileId: number | null; timestamp: string; country: string | null; deviceType: string | null; wasNegative: boolean }>;
     topCards: Array<{ id: number; code: string; status: string; platform: string | null; scanCount: number; smartReviewEnabled: boolean; businessProfileId: number | null }>;
   } | undefined;
 
@@ -193,24 +193,43 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="space-y-1">
-                  {summary?.recentScans?.slice(0, 8).map((scan) => (
-                    <div
-                      key={scan.id}
-                      className="flex items-center justify-between py-2.5 border-b border-[#F3F4F6] last:border-0"
-                      data-testid={`row-scan-${scan.id}`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={cn("w-2 h-2 rounded-full", scan.wasNegative ? "bg-red-400" : "bg-[#10B981]")} />
-                        <div>
-                          <p className="text-sm font-medium text-[#374151]">{scan.cardCode}</p>
-                          <p className="text-xs text-[#6B7280]">{scan.country ?? t("dashboard.unknown")} · {scan.deviceType ?? t("dashboard.unknown")}</p>
+                  {summary?.recentScans?.slice(0, 8).map((scan) => {
+                    const scanProfile = scan.businessProfileId ? profileMap[scan.businessProfileId] : null;
+                    return (
+                      <div
+                        key={scan.id}
+                        className="flex items-center justify-between py-2.5 border-b border-[#F3F4F6] last:border-0"
+                        data-testid={`row-scan-${scan.id}`}
+                      >
+                        <div className="flex items-center gap-3">
+                          {/* Logo ou dot de statut */}
+                          {scanProfile?.logoUrl ? (
+                            <img
+                              src={scanProfile.logoUrl}
+                              alt={scanProfile.name}
+                              className="w-6 h-6 rounded object-cover border border-border shrink-0"
+                            />
+                          ) : (
+                            <div className={cn("w-2 h-2 rounded-full shrink-0", scan.wasNegative ? "bg-red-400" : "bg-[#10B981]")} />
+                          )}
+                          <div>
+                            {/* Nom de l'établissement en principal */}
+                            <p className="text-sm font-medium text-[#374151]">
+                              {scanProfile ? scanProfile.name : scan.cardCode}
+                            </p>
+                            {/* Code carte + localisation en secondaire */}
+                            <p className="text-xs text-[#6B7280]">
+                              {scanProfile && <span className="font-mono mr-1">{scan.cardCode} ·</span>}
+                              {scan.country ?? t("dashboard.unknown")} · {scan.deviceType ?? t("dashboard.unknown")}
+                            </p>
+                          </div>
                         </div>
+                        <p className="text-xs text-[#6B7280] shrink-0">
+                          {new Date(scan.timestamp).toLocaleDateString()}
+                        </p>
                       </div>
-                      <p className="text-xs text-[#6B7280]">
-                        {new Date(scan.timestamp).toLocaleDateString()}
-                      </p>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </CardContent>

@@ -37,6 +37,7 @@ router.get("/analytics/dashboard", requireAuth, async (req: AuthRequest, res): P
           id: log.id,
           cardId: log.cardId,
           cardCode: card?.code ?? "",
+          businessProfileId: card?.businessProfileId ?? null,
           timestamp: log.timestamp,
           country: log.country,
           deviceType: log.deviceType,

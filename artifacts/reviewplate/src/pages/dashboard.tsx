@@ -517,6 +517,24 @@ export default function DashboardPage() {
           <StatCard title="Scans ce mois" value={summary?.scansThisMonth ?? 0} icon={Star} loading={isLoading} accentColor="#F59E0B" iconBg="bg-amber-50" iconColor="text-amber-500" />
         </div>
 
+        {/* Tendances — full width */}
+        <Card className="bg-white border border-border shadow-sm flex flex-col">
+          <CardHeader className="pb-3 border-b border-border shrink-0">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <BarChart2 className="w-4 h-4 text-primary" />
+                <CardTitle className="text-sm font-semibold text-[#0D1117]">Tendances</CardTitle>
+              </div>
+              {isBusiness && (
+                <span className="text-xs bg-primary/10 text-primary font-semibold px-2 py-0.5 rounded-full">Business</span>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent className="pt-4 flex-1 flex flex-col" style={{ minHeight: 320 }}>
+            <AnalyticsPreviewCard isBusiness={isBusiness} summary={summary} leastScanned={leastScanned} realAnalytics={realAnalytics} />
+          </CardContent>
+        </Card>
+
         {/* Main grid — 3 cols on desktop, 2 on tablet, 1 on mobile */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
 
@@ -642,23 +660,6 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* 4. Analytics avancées — full width on tablet (md) and desktop (xl) */}
-          <Card className="bg-white border border-border shadow-sm flex flex-col md:col-span-2 xl:col-span-3">
-            <CardHeader className="pb-3 border-b border-border shrink-0">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
-                  <BarChart2 className="w-4 h-4 text-primary" />
-                  <CardTitle className="text-sm font-semibold text-[#0D1117]">Tendances</CardTitle>
-                </div>
-                {isBusiness && (
-                  <span className="text-xs bg-primary/10 text-primary font-semibold px-2 py-0.5 rounded-full">Business</span>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent className="pt-4 flex-1 flex flex-col" style={{ minHeight: 320 }}>
-              <AnalyticsPreviewCard isBusiness={isBusiness} summary={summary} leastScanned={leastScanned} realAnalytics={realAnalytics} />
-            </CardContent>
-          </Card>
         </div>
 
         {/* Quick actions */}

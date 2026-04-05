@@ -1,5 +1,5 @@
 import { AuthLayout } from "@/components/layout/AuthLayout";
-import { useGetDashboardSummary } from "@workspace/api-client-react";
+import { useGetDashboardSummary, useListBusinessProfiles } from "@workspace/api-client-react";
 import { CreditCard, Activity, TrendingUp, Building2, Star, Zap, ArrowRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
@@ -47,8 +47,15 @@ const platformColors: Record<string, string> = {
   social: "bg-pink-100 text-pink-700",
 };
 
+interface DashboardProfile {
+  id: number;
+  name: string;
+  logoUrl: string | null;
+}
+
 export default function DashboardPage() {
   const { data, isLoading } = useGetDashboardSummary();
+  const { data: profilesData } = useListBusinessProfiles();
   const { user } = useAuth();
   const { t } = useTranslation();
 
@@ -59,8 +66,13 @@ export default function DashboardPage() {
     scansThisMonth: number;
     totalProfiles: number;
     recentScans: Array<{ id: number; cardId: number; cardCode: string; timestamp: string; country: string | null; deviceType: string | null; wasNegative: boolean }>;
-    topCards: Array<{ id: number; code: string; status: string; platform: string | null; scanCount: number; smartReviewEnabled: boolean }>;
+    topCards: Array<{ id: number; code: string; status: string; platform: string | null; scanCount: number; smartReviewEnabled: boolean; businessProfileId: number | null }>;
   } | undefined;
+
+  const profileMap = ((profilesData as unknown as DashboardProfile[]) ?? []).reduce<Record<number, DashboardProfile>>(
+    (acc, p) => { acc[p.id] = p; return acc; },
+    {}
+  );
 
   return (
     <AuthLayout>
@@ -112,32 +124,52 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {summary?.topCards?.map((card) => (
-                    <Link key={card.id} href={`/cards/${card.id}`}>
-                      <div
-                        className="flex items-center justify-between p-3 rounded-lg hover:bg-[#F8FAFC] transition-colors cursor-pointer"
-                        data-testid={`card-top-${card.id}`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-                            <span className="text-xs font-mono font-bold text-primary">{card.code.slice(0, 2)}</span>
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-[#0D1117]">{card.code}</p>
-                            {card.platform && (
-                              <span className={cn("text-xs px-1.5 py-0.5 rounded font-medium", platformColors[card.platform] ?? "bg-gray-100 text-gray-700")}>
-                                {card.platform}
-                              </span>
+                  {summary?.topCards?.map((card) => {
+                    const profile = card.businessProfileId ? profileMap[card.businessProfileId] : null;
+                    return (
+                      <Link key={card.id} href={`/cards/${card.id}`}>
+                        <div
+                          className="flex items-center justify-between p-3 rounded-lg hover:bg-[#F8FAFC] transition-colors cursor-pointer"
+                          data-testid={`card-top-${card.id}`}
+                        >
+                          <div className="flex items-center gap-3">
+                            {/* Logo du profil ou badge code */}
+                            {profile?.logoUrl ? (
+                              <img
+                                src={profile.logoUrl}
+                                alt={profile.name}
+                                className="w-8 h-8 rounded-lg object-cover border border-border shrink-0"
+                              />
+                            ) : (
+                              <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+                                <span className="text-xs font-mono font-bold text-primary">{card.code.slice(0, 2)}</span>
+                              </div>
                             )}
+                            <div>
+                              <p className="text-sm font-medium text-[#0D1117]">{card.code}</p>
+                              <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                                {profile ? (
+                                  <span className="text-xs text-[#6B7280] flex items-center gap-1">
+                                    <Building2 className="w-3 h-3" />
+                                    {profile.name}
+                                  </span>
+                                ) : null}
+                                {card.platform && (
+                                  <span className={cn("text-xs px-1.5 py-0.5 rounded font-medium", platformColors[card.platform] ?? "bg-gray-100 text-gray-700")}>
+                                    {card.platform}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-bold text-[#0D1117]">{card.scanCount}</p>
+                            <p className="text-xs text-[#6B7280]">{t("dashboard.scans")}</p>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className="text-sm font-bold text-[#0D1117]">{card.scanCount}</p>
-                          <p className="text-xs text-[#6B7280]">{t("dashboard.scans")}</p>
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
+                      </Link>
+                    );
+                  })}
                 </div>
               )}
             </CardContent>

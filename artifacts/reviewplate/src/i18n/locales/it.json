@@ -436,7 +436,13 @@
     "cardsCol": "Schede",
     "roleCol": "Ruolo",
     "joinedCol": "Iscritto il",
-    "viewAll": "Visualizza tutti"
+    "viewAll": "Visualizza tutti",
+    "actionsCol": "Azioni",
+    "editUser": "Modifica account",
+    "editDesc": "Modifica il piano e il ruolo di questo account",
+    "updateSuccess": "Account aggiornato",
+    "updateSuccessDesc": "Le modifiche sono state salvate.",
+    "updateFailed": "Aggiornamento fallito"
   },
   "status": {
     "active": "Attivo",

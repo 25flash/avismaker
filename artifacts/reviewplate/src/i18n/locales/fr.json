@@ -436,7 +436,13 @@
     "cardsCol": "Cartes",
     "roleCol": "Rôle",
     "joinedCol": "Inscrit le",
-    "viewAll": "Voir tout"
+    "viewAll": "Voir tout",
+    "actionsCol": "Actions",
+    "editUser": "Modifier le compte",
+    "editDesc": "Modifier le plan et le rôle de ce compte",
+    "updateSuccess": "Compte mis à jour",
+    "updateSuccessDesc": "Les modifications ont été enregistrées.",
+    "updateFailed": "Échec de la mise à jour"
   },
   "status": {
     "active": "Actif",

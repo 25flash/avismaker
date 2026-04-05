@@ -436,7 +436,13 @@
     "cardsCol": "Cards",
     "roleCol": "Role",
     "joinedCol": "Joined",
-    "viewAll": "View all"
+    "viewAll": "View all",
+    "actionsCol": "Actions",
+    "editUser": "Edit Account",
+    "editDesc": "Modify the plan and role for this account",
+    "updateSuccess": "Account updated",
+    "updateSuccessDesc": "Changes have been saved successfully.",
+    "updateFailed": "Update failed"
   },
   "status": {
     "active": "Active",

@@ -436,7 +436,13 @@
     "cardsCol": "Karten",
     "roleCol": "Rolle",
     "joinedCol": "Beigetreten",
-    "viewAll": "Alle anzeigen"
+    "viewAll": "Alle anzeigen",
+    "actionsCol": "Aktionen",
+    "editUser": "Konto bearbeiten",
+    "editDesc": "Plan und Rolle dieses Kontos ändern",
+    "updateSuccess": "Konto aktualisiert",
+    "updateSuccessDesc": "Die Änderungen wurden gespeichert.",
+    "updateFailed": "Aktualisierung fehlgeschlagen"
   },
   "status": {
     "active": "Aktiv",

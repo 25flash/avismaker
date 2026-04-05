@@ -436,7 +436,13 @@
     "cardsCol": "Kaarten",
     "roleCol": "Rol",
     "joinedCol": "Lid geworden",
-    "viewAll": "Alles bekijken"
+    "viewAll": "Alles bekijken",
+    "actionsCol": "Acties",
+    "editUser": "Account bewerken",
+    "editDesc": "Wijzig het plan en de rol van dit account",
+    "updateSuccess": "Account bijgewerkt",
+    "updateSuccessDesc": "De wijzigingen zijn opgeslagen.",
+    "updateFailed": "Bijwerken mislukt"
   },
   "status": {
     "active": "Actief",

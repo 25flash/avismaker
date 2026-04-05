@@ -1,12 +1,22 @@
+import { useState } from "react";
 import { AuthLayout } from "@/components/layout/AuthLayout";
-import { useGetAdminStats, useListAdminUsers } from "@workspace/api-client-react";
-import { Shield, Users, CreditCard, Activity, TrendingUp } from "lucide-react";
+import { useGetAdminStats, useListAdminUsers, useUpdateAdminUser } from "@workspace/api-client-react";
+import { Shield, Users, CreditCard, Activity, TrendingUp, Pencil, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 import { Link } from "wouter";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
+import { useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 
 const planBadgeClass: Record<string, string> = {
   free: "plan-badge-free",
@@ -15,9 +25,26 @@ const planBadgeClass: Record<string, string> = {
   business: "plan-badge-business",
 };
 
+const PLANS = ["free", "premium", "business"] as const;
+const ROLES = ["user", "admin"] as const;
+
+type AdminUserRow = {
+  id: number;
+  name: string;
+  email: string;
+  plan: string;
+  role: string;
+  createdAt: string;
+  cardCount: number;
+  totalScans: number;
+};
+
 export default function AdminPage() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
   const { data: stats, isLoading: statsLoading } = useGetAdminStats({
     query: { enabled: user?.role === "admin" },
   });
@@ -25,13 +52,36 @@ export default function AdminPage() {
     { limit: 20, offset: 0 },
     { query: { enabled: user?.role === "admin" } }
   );
+  const { mutateAsync: updateUser } = useUpdateAdminUser();
+
+  const [editUser, setEditUser] = useState<{ id: number; name: string; plan: string; role: string } | null>(null);
+  const [saving, setSaving] = useState(false);
 
   const adminStats = stats as unknown as {
     totalUsers: number; totalCards: number; activeCards: number; totalScans: number;
     scansToday: number; totalProfiles: number; planBreakdown: Record<string, number>; revenueMonthly: number;
   } | undefined;
 
-  const userList = (users as unknown as Array<{ id: number; name: string; email: string; plan: string; role: string; createdAt: string; cardCount: number; totalScans: number }>) ?? [];
+  const userList = (users as unknown as AdminUserRow[]) ?? [];
+
+  const handleEdit = (u: AdminUserRow) => {
+    setEditUser({ id: u.id, name: u.name, plan: u.plan, role: u.role });
+  };
+
+  const handleSave = async () => {
+    if (!editUser) return;
+    setSaving(true);
+    try {
+      await updateUser({ id: editUser.id, data: { plan: editUser.plan, role: editUser.role } });
+      await queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({ title: t("admin.updateSuccess"), description: t("admin.updateSuccessDesc") });
+      setEditUser(null);
+    } catch {
+      toast({ variant: "destructive", title: t("admin.updateFailed") });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (user?.role !== "admin") {
     return (
@@ -132,6 +182,7 @@ export default function AdminPage() {
                       <th className="px-5 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wider">{t('admin.cardsCol')}</th>
                       <th className="px-5 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wider">{t('admin.roleCol')}</th>
                       <th className="px-5 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wider">{t('admin.joinedCol')}</th>
+                      <th className="px-5 py-3 text-right text-xs font-medium text-[#6B7280] uppercase tracking-wider">{t('admin.actionsCol')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -163,6 +214,18 @@ export default function AdminPage() {
                         <td className="px-5 py-3.5 text-[#9CA3AF]">
                           {new Date(u.createdAt).toLocaleDateString(i18n.language)}
                         </td>
+                        <td className="px-5 py-3.5 text-right">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 w-7 p-0 text-[#9CA3AF] hover:text-[#0D1117]"
+                            onClick={() => handleEdit(u)}
+                            data-testid={`btn-edit-user-${u.id}`}
+                            title={t("common.edit")}
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                          </Button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -172,6 +235,84 @@ export default function AdminPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Edit user dialog */}
+      <Dialog open={!!editUser} onOpenChange={(open) => { if (!open) setEditUser(null); }}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle className="text-base font-semibold">{t("admin.editUser")}</DialogTitle>
+            <DialogDescription className="text-sm text-[#6B7280]">
+              {editUser?.name} — {t("admin.editDesc")}
+            </DialogDescription>
+          </DialogHeader>
+
+          {editUser && (
+            <div className="space-y-4 py-2">
+              {/* Plan selector */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-[#374151]">{t("admin.planCol")}</label>
+                <Select
+                  value={editUser.plan}
+                  onValueChange={(v) => setEditUser({ ...editUser, plan: v })}
+                >
+                  <SelectTrigger className="w-full" data-testid="select-edit-plan">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PLANS.map((p) => (
+                      <SelectItem key={p} value={p}>
+                        <span className={cn("text-xs font-semibold px-2 py-0.5 rounded-full mr-2", planBadgeClass[p])}>
+                          {p.charAt(0).toUpperCase() + p.slice(1)}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Role selector */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-[#374151]">{t("admin.roleCol")}</label>
+                <Select
+                  value={editUser.role}
+                  onValueChange={(v) => setEditUser({ ...editUser, role: v })}
+                >
+                  <SelectTrigger className="w-full" data-testid="select-edit-role">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ROLES.map((r) => (
+                      <SelectItem key={r} value={r}>
+                        <span className={cn("text-xs font-medium px-2 py-0.5 rounded",
+                          r === "admin" ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-600"
+                        )}>
+                          {r}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setEditUser(null)} disabled={saving}>
+              {t("common.cancel")}
+            </Button>
+            <Button
+              onClick={handleSave}
+              disabled={saving}
+              className="bg-primary text-[#0D1117] font-semibold hover:bg-primary/90"
+              data-testid="btn-save-user-edit"
+            >
+              {saving
+                ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t("common.loading")}</>
+                : t("common.save")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AuthLayout>
   );
 }

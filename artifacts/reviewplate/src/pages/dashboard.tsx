@@ -92,7 +92,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Stats grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard title={t("dashboard.totalCards")} value={summary?.totalCards ?? 0} icon={CreditCard} loading={isLoading} />
           <StatCard title={t("dashboard.activeCards")} value={summary?.activeCards ?? 0} icon={Activity} subtitle={t("dashboard.readyToScan")} loading={isLoading} />
           <StatCard title={t("dashboard.totalScans")} value={summary?.totalScans ?? 0} icon={TrendingUp} loading={isLoading} />

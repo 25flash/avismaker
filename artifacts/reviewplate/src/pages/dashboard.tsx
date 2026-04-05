@@ -25,22 +25,22 @@ function StatCard({ title, value, icon: Icon, subtitle, loading }: {
   loading?: boolean;
 }) {
   return (
-    <Card className="bg-white border border-border shadow-sm">
-      <CardContent className="p-3">
-        <div className="flex items-center justify-between mb-1.5">
-          <p className="text-xs font-medium text-[#6B7280]">{title}</p>
-          <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center">
-            <Icon className="w-3 h-3 text-primary" />
-          </div>
+    <Card className="bg-white border border-border shadow-sm" style={{ height: 70 }}>
+      <CardContent className="h-full flex items-center justify-between" style={{ padding: "8px 12px" }}>
+        <div className="flex flex-col justify-center">
+          <p style={{ fontSize: 11, lineHeight: 1.3 }} className="font-medium text-[#6B7280]">{title}</p>
+          {loading ? (
+            <Skeleton className="h-5 w-12 mt-0.5" />
+          ) : (
+            <p style={{ fontSize: 20, lineHeight: 1.2 }} className="font-bold text-[#0D1117]" data-testid={`stat-${title.toLowerCase().replace(/\s/g, "-")}`}>
+              {typeof value === "number" ? value.toLocaleString() : value}
+            </p>
+          )}
+          {subtitle && <p style={{ fontSize: 10, lineHeight: 1.2 }} className="text-[#6B7280]">{subtitle}</p>}
         </div>
-        {loading ? (
-          <Skeleton className="h-5 w-16" />
-        ) : (
-          <p className="text-xl font-bold text-[#0D1117]" data-testid={`stat-${title.toLowerCase().replace(/\s/g, "-")}`}>
-            {typeof value === "number" ? value.toLocaleString() : value}
-          </p>
-        )}
-        {subtitle && <p className="text-[10px] text-[#6B7280] mt-0.5">{subtitle}</p>}
+        <div className="shrink-0 w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center self-start mt-0.5">
+          <Icon style={{ width: 14, height: 14 }} className="text-primary" />
+        </div>
       </CardContent>
     </Card>
   );

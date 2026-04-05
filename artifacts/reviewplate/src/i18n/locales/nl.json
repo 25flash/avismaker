@@ -301,7 +301,7 @@
     "annualLabel": "Jaarlijks",
     "annualSavings": "Bespaar 3 maanden door over te stappen op jaarlijkse facturering",
     "unlimitedCards": "Onbeperkte actieve kaarten",
-    "activeCardsCount_one": "{{count}} actieve kaart",
+    "activeCardsCount_one": "{{count}} kaart",
     "activeCardsCount_other": "{{count}} actieve kaarten",
     "activeCardsCount": "{{count}} actieve kaart(en)",
     "unlimitedProfiles": "Onbeperkte bedrijfsprofielen",

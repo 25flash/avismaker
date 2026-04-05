@@ -301,7 +301,7 @@
     "annualLabel": "Annual",
     "annualSavings": "Save 3 months by switching to annual billing",
     "unlimitedCards": "Unlimited active cards",
-    "activeCardsCount_one": "{{count}} active card",
+    "activeCardsCount_one": "{{count}} card",
     "activeCardsCount_other": "{{count}} active cards",
     "activeCardsCount": "{{count}} active card(s)",
     "unlimitedProfiles": "Unlimited business profiles",

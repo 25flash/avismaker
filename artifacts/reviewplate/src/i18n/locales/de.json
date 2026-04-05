@@ -301,7 +301,7 @@
     "annualLabel": "Jährlich",
     "annualSavings": "Sparen Sie 3 Monate mit jährlicher Abrechnung",
     "unlimitedCards": "Unbegrenzte aktive Karten",
-    "activeCardsCount_one": "{{count}} aktive Karte",
+    "activeCardsCount_one": "{{count}} Karte",
     "activeCardsCount_other": "{{count}} aktive Karten",
     "activeCardsCount": "{{count}} aktive Karte(n)",
     "unlimitedProfiles": "Unbegrenzte Unternehmensprofile",

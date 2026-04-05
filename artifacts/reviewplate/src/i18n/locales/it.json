@@ -301,7 +301,7 @@
     "annualLabel": "Annuale",
     "annualSavings": "Risparmia 3 mesi passando alla fatturazione annuale",
     "unlimitedCards": "Carte attive illimitate",
-    "activeCardsCount_one": "{{count}} carta attiva",
+    "activeCardsCount_one": "{{count}} carta",
     "activeCardsCount_other": "{{count}} carte attive",
     "activeCardsCount": "{{count}} carta/e attiva/e",
     "unlimitedProfiles": "Profili aziendali illimitati",

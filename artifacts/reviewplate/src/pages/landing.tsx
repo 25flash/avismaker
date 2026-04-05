@@ -48,7 +48,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="text-lg text-white/60 max-w-2xl mx-auto mb-10 leading-relaxed">
-            AvisMakers smart cards let customers leave reviews on Google, TripAdvisor, Airbnb, and Trustpilot with a single tap or scan — no app required.
+            AvisMakers smart cards let customers leave reviews on Google, TripAdvisor, Airbnb, and Trustpilot with a single tap or scan, without any app required.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -110,7 +110,7 @@ export default function LandingPage() {
               {
                 icon: Globe,
                 title: "Multi-Platform",
-                desc: "Google, TripAdvisor, Airbnb, Trustpilot — route customers to any review platform you choose.",
+                desc: "Google, TripAdvisor, Airbnb, Trustpilot : redirigez vos clients vers la plateforme de votre choix.",
                 color: "bg-blue-500/20 text-blue-400",
               },
               {
@@ -174,46 +174,6 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Pricing preview */}
-      <section className="py-24 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Simple, transparent pricing</h2>
-          <p className="text-white/60 mb-16">Start free. Upgrade when you're ready.</p>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-            {[
-              { name: "Free", price: "€0", highlight: false },
-              { name: "Premium", price: "€19", highlight: false },
-              { name: "Pro", price: "€49", highlight: true },
-              { name: "Business", price: "€99", highlight: false },
-            ].map((plan) => (
-              <div
-                key={plan.name}
-                className={`p-5 rounded-xl border ${plan.highlight
-                  ? "bg-primary/10 border-primary/50"
-                  : "bg-white/5 border-white/10"
-                }`}
-              >
-                <p className="text-sm text-white/60 mb-1">{plan.name}</p>
-                <p className="text-2xl font-bold text-white">{plan.price}<span className="text-sm font-normal text-white/40">/mo</span></p>
-                {plan.highlight && (
-                  <span className="text-xs text-primary font-semibold">Most Popular</span>
-                )}
-              </div>
-            ))}
-          </div>
-
-          <Link href="/signup">
-            <Button
-              className="bg-primary text-[#0D1117] font-bold hover:bg-primary/90 h-14 px-10 text-base"
-              data-testid="button-pricing-cta"
-            >
-              Start free today <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
-          </Link>
         </div>
       </section>
 

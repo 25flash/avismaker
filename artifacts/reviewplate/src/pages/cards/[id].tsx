@@ -226,7 +226,7 @@ export default function CardEditorPage() {
                             </span>
                             <span>{profile.name}</span>
                             {profile.address && (
-                              <span className="text-[#9CA3AF] text-xs truncate max-w-[140px]">— {profile.address}</span>
+                              <span className="text-[#9CA3AF] text-xs truncate max-w-[140px]">{profile.address}</span>
                             )}
                           </div>
                         </SelectItem>

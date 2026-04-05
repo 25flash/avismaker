@@ -95,7 +95,7 @@ export default function SignupPage() {
           </div>
 
           <h1 className="text-2xl font-bold text-[#0D1117] mb-2">Create your account</h1>
-          <p className="text-sm text-[#6B7280] mb-8">Start collecting reviews in minutes — free</p>
+          <p className="text-sm text-[#6B7280] mb-8">Start collecting reviews in minutes, for free</p>
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

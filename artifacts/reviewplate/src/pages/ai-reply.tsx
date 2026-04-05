@@ -206,7 +206,7 @@ export default function AiReplyPage() {
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-primary font-bold">03.</span>
-                Keep replies concise — 3-4 sentences max
+                Keep replies concise, 3-4 sentences max
               </div>
             </div>
           </CardContent>

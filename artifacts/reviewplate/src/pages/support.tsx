@@ -124,7 +124,7 @@ export default function SupportPage() {
                 <Mail className="w-5 h-5 text-primary mt-0.5 shrink-0" />
                 <div>
                   <p className="text-sm font-semibold text-[#0D1117]">Email Support</p>
-                  <p className="text-xs text-[#6B7280] mt-0.5">support@reviewplate.com</p>
+                  <p className="text-xs text-[#6B7280] mt-0.5">contact@avismaker.com</p>
                   <p className="text-xs text-[#9CA3AF] mt-1">Response within 24 hours</p>
                 </div>
               </div>

@@ -107,9 +107,10 @@ export default function BusinessAnalyticsPage() {
   const reportRef = useRef<HTMLDivElement>(null);
 
   const isBusiness = user?.plan === "business";
-  const displayData = data ?? DEMO_DATA;
+  const displayData = isBusiness ? (data ?? DEMO_DATA) : DEMO_DATA;
 
   useEffect(() => {
+    if (!isBusiness) { setLoading(false); return; }
     const tk = token ?? localStorage.getItem("reviewplate_token");
     if (!tk) { setLoading(false); return; }
     fetch(`${API_BASE}/api/business-analytics`, {
@@ -118,7 +119,7 @@ export default function BusinessAnalyticsPage() {
       .then(r => r.ok ? r.json() : Promise.reject(r))
       .then(d => { setData(d); setLoading(false); })
       .catch(() => setLoading(false));
-  }, [token]);
+  }, [isBusiness, token]);
 
   const handleExportPDF = async () => {
     if (!isBusiness) { setShowUpgradeModal(true); return; }

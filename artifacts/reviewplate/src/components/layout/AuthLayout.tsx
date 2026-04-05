@@ -80,8 +80,8 @@ export function AuthLayout({ children }: { children: ReactNode }) {
             <Menu className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="AvisMakers" className="w-6 h-6 object-contain shrink-0" />
-            <span className="text-white font-bold text-base tracking-tight">AvisMakers</span>
+            <img src="/logo.png" alt="AvisMaker" className="w-6 h-6 object-contain shrink-0" />
+            <span className="text-white font-bold text-base tracking-tight">AvisMaker</span>
           </div>
         </div>
 

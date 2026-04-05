@@ -60,8 +60,8 @@ export default function SignupPage() {
       <div className="hidden lg:flex flex-col justify-between w-1/2 bg-[#0D1117] p-12">
         <Link href="/">
           <div className="flex items-center gap-2 cursor-pointer">
-            <img src="/logo.png" alt="AvisMakers" className="w-9 h-9 object-contain shrink-0" />
-            <span className="text-xl font-bold text-white">AvisMakers</span>
+            <img src="/logo.png" alt="AvisMaker" className="w-9 h-9 object-contain shrink-0" />
+            <span className="text-xl font-bold text-white">AvisMaker</span>
           </div>
         </Link>
         <div className="space-y-6">
@@ -87,8 +87,8 @@ export default function SignupPage() {
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-2 mb-8">
-            <img src="/logo.png" alt="AvisMakers" className="w-8 h-8 object-contain shrink-0" />
-            <span className="text-lg font-bold text-[#0D1117]">AvisMakers</span>
+            <img src="/logo.png" alt="AvisMaker" className="w-8 h-8 object-contain shrink-0" />
+            <span className="text-lg font-bold text-[#0D1117]">AvisMaker</span>
           </div>
 
           <h1 className="text-2xl font-bold text-[#0D1117] mb-2">{t("auth.createAccount")}</h1>

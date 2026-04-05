@@ -26,7 +26,7 @@ i18n
     detection: {
       order: ["localStorage", "navigator"],
       caches: ["localStorage"],
-      lookupLocalStorage: "avismakers_lang",
+      lookupLocalStorage: "avismaker_lang",
     },
     interpolation: {
       escapeValue: false,

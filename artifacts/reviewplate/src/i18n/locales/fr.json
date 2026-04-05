@@ -38,18 +38,18 @@
     "tagline": "Cartes NFC & QR pour les avis clients",
     "heroTitle": "Transformez chaque client en",
     "heroTitleHighlight": "avis 5 étoiles",
-    "heroDesc": "Les cartes intelligentes AvisMakers permettent à vos clients de laisser des avis sur Google, TripAdvisor, Airbnb et Trustpilot en un seul geste, sans application requise.",
+    "heroDesc": "Les cartes intelligentes AvisMaker permettent à vos clients de laisser des avis sur Google, TripAdvisor, Airbnb et Trustpilot en un seul geste, sans application requise.",
     "startFreeToday": "Commencer gratuitement",
     "freePlanAvailable": "Plan gratuit disponible",
     "noCreditCard": "Sans carte bancaire",
     "setupIn2Min": "Prêt en 2 minutes",
     "trustedBy": "Utilisé par des professionnels du monde entier",
     "featuresTitle": "Tout ce qu'il vous faut pour collecter des avis",
-    "featuresDesc": "Fini d'espérer que les clients pensent à laisser un avis. AvisMakers rend ça simple.",
+    "featuresDesc": "Fini d'espérer que les clients pensent à laisser un avis. AvisMaker rend ça simple.",
     "howItWorksTitle": "Prêt en 3 étapes simples",
     "howItWorksDesc": "Recevez votre premier avis en moins de 5 minutes",
     "ctaTitle": "Prêt à obtenir plus d'avis ?",
-    "ctaDesc": "Rejoignez 2 400+ entreprises qui utilisent AvisMakers pour développer leur réputation en ligne.",
+    "ctaDesc": "Rejoignez 2 400+ entreprises qui utilisent AvisMaker pour développer leur réputation en ligne.",
     "getStartedForFree": "Démarrer gratuitement",
     "allRightsReserved": "Tous droits réservés.",
     "features": {
@@ -295,7 +295,7 @@
       "advancedAnalyticsPdf": "Analytics avancées + export PDF",
       "customBanner": "Bannière personnalisée",
       "prioritySupport": "Support prioritaire",
-      "customBranding": "Branding personnalisé (sans badge AvisMakers)"
+      "customBranding": "Branding personnalisé (sans badge AvisMaker)"
     }
   },
   "activate": {

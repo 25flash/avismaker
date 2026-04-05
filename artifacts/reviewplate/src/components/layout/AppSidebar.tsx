@@ -41,8 +41,8 @@ export function AppSidebar({ onClose }: AppSidebarProps) {
     <div className="flex flex-col h-full w-64 bg-[#0D1117] text-white border-r border-white/10">
       {/* Logo + close button */}
       <div className="flex items-center gap-2 px-5 py-4 border-b border-white/10">
-        <img src="/logo.png" alt="AvisMakers" className="w-8 h-8 object-contain shrink-0" />
-        <span className="text-lg font-bold text-white tracking-tight flex-1">AvisMakers</span>
+        <img src="/logo.png" alt="AvisMaker" className="w-8 h-8 object-contain shrink-0" />
+        <span className="text-lg font-bold text-white tracking-tight flex-1">AvisMaker</span>
         {onClose && (
           <button
             onClick={onClose}

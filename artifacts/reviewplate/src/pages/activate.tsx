@@ -125,7 +125,7 @@ export default function ActivatePage() {
           <ul className="text-sm text-[#92400E] space-y-1.5">
             <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">•</span>On the back of your physical NFC or QR card</li>
             <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">•</span>In your order confirmation email</li>
-            <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">•</span>In your AvisMakers order receipt</li>
+            <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">•</span>In your AvisMaker order receipt</li>
           </ul>
         </div>
       </div>

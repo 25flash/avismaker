@@ -10,8 +10,8 @@ function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0D1117]/95 backdrop-blur border-b border-white/10">
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <img src="/logo.png" alt="AvisMakers" className="w-8 h-8 object-contain shrink-0" />
-          <span className="text-lg font-bold text-white">AvisMakers</span>
+          <img src="/logo.png" alt="AvisMaker" className="w-8 h-8 object-contain shrink-0" />
+          <span className="text-lg font-bold text-white">AvisMaker</span>
         </div>
         <div className="flex items-center gap-3">
           <LanguageSwitcher variant="dark" />
@@ -162,10 +162,10 @@ export default function LandingPage() {
       <footer className="border-t border-white/10 py-8 px-6">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-white/40">
           <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="AvisMakers" className="w-6 h-6 object-contain opacity-80" />
-            <span>AvisMakers</span>
+            <img src="/logo.png" alt="AvisMaker" className="w-6 h-6 object-contain opacity-80" />
+            <span>AvisMaker</span>
           </div>
-          <p>© 2025 AvisMakers. {t("landing.allRightsReserved")}</p>
+          <p>© 2025 AvisMaker. {t("landing.allRightsReserved")}</p>
           <div className="flex gap-4">
             <Link href="/login" className="hover:text-white transition-colors">{t("landing.signIn")}</Link>
             <Link href="/signup" className="hover:text-white transition-colors">{t("landing.getStartedFree")}</Link>

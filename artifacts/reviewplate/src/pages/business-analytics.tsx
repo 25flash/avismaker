@@ -104,7 +104,7 @@ export default function BusinessAnalyticsPage() {
   const [loading, setLoading] = useState(true);
   const [exportLoading, setExportLoading] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const reportRef = useRef<HTMLDivElement>(null);
+  const reportRef = useRef<HTMLDivElement>(null); // kept for potential future use
 
   const isBusiness = user?.plan === "business";
   const displayData = isBusiness ? (data ?? DEMO_DATA) : DEMO_DATA;
@@ -123,51 +123,264 @@ export default function BusinessAnalyticsPage() {
 
   const handleExportPDF = async () => {
     if (!isBusiness) { setShowUpgradeModal(true); return; }
-    if (!reportRef.current) return;
     setExportLoading(true);
     try {
-      const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
-        import("jspdf"),
-        import("html2canvas"),
-      ]);
-      const canvas = await html2canvas(reportRef.current, { scale: 1.5, useCORS: true, backgroundColor: "#ffffff" });
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      const { default: jsPDF } = await import("jspdf");
 
-      pdf.setFillColor(13, 17, 23);
-      pdf.rect(0, 0, pdfWidth, 18, "F");
-      pdf.setTextColor(245, 158, 11);
-      pdf.setFontSize(14);
+      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      const W = pdf.internal.pageSize.getWidth();   // 210
+      const H = pdf.internal.pageSize.getHeight();  // 297
+      const M = 14; // margin
+      let y = 0;
+
+      const AMBER  = [245, 158, 11]  as [number, number, number];
+      const DARK   = [13, 17, 23]    as [number, number, number];
+      const GRAY   = [107, 114, 128] as [number, number, number];
+      const LIGHT  = [249, 250, 251] as [number, number, number];
+      const BORDER = [229, 231, 235] as [number, number, number];
+
+      // ── Header ────────────────────────────────────────────────────
+      pdf.setFillColor(...DARK);
+      pdf.rect(0, 0, W, 24, "F");
+
+      // Logo placeholder (amber square)
+      pdf.setFillColor(...AMBER);
+      pdf.roundedRect(M, 5, 14, 14, 2, 2, "F");
+      pdf.setTextColor(...DARK);
+      pdf.setFontSize(9);
       pdf.setFont("helvetica", "bold");
-      pdf.text("AvisMaker — Analytics avancées", 10, 12);
+      pdf.text("AM", M + 2.5, 13.5);
+
+      pdf.setTextColor(...AMBER);
+      pdf.setFontSize(13);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("AvisMaker", M + 17, 13);
+      pdf.setTextColor(200, 200, 200);
+      pdf.setFontSize(9);
+      pdf.setFont("helvetica", "normal");
+      pdf.text("Analytics avancées", M + 17, 19.5);
+
       pdf.setTextColor(150, 150, 150);
       pdf.setFontSize(8);
-      pdf.setFont("helvetica", "normal");
-      pdf.text(`Généré le ${new Date().toLocaleDateString("fr-FR")}`, pdfWidth - 10, 12, { align: "right" });
+      pdf.text(`Rapport généré le ${new Date().toLocaleDateString("fr-FR")}`, W - M, 11, { align: "right" });
+      pdf.text(`contact@avismaker.com`, W - M, 17, { align: "right" });
+      y = 32;
 
-      const pageHeight = pdf.internal.pageSize.getHeight() - 22;
-      let yOffset = 20;
-      let imgOffset = 0;
-      const imgHeightPerPage = (pageHeight / pdfHeight) * canvas.height;
+      // ── Section title helper ────────────────────────────────────
+      const sectionTitle = (title: string) => {
+        pdf.setFillColor(...AMBER);
+        pdf.rect(M, y, 3, 5, "F");
+        pdf.setTextColor(...DARK);
+        pdf.setFontSize(10);
+        pdf.setFont("helvetica", "bold");
+        pdf.text(title, M + 6, y + 4);
+        y += 9;
+      };
 
-      while (imgOffset < canvas.height) {
-        if (imgOffset > 0) { pdf.addPage(); yOffset = 10; }
-        const sliceCanvas = document.createElement("canvas");
-        sliceCanvas.width = canvas.width;
-        sliceCanvas.height = Math.min(imgHeightPerPage, canvas.height - imgOffset);
-        const sliceCtx = sliceCanvas.getContext("2d");
-        if (sliceCtx) {
-          sliceCtx.drawImage(canvas, 0, imgOffset, canvas.width, sliceCanvas.height, 0, 0, canvas.width, sliceCanvas.height);
-        }
-        const sliceData = sliceCanvas.toDataURL("image/png");
-        const sliceHeight = (sliceCanvas.height * pdfWidth) / canvas.width;
-        pdf.addImage(sliceData, "PNG", 0, yOffset, pdfWidth, sliceHeight);
-        imgOffset += imgHeightPerPage;
+      // ── KPI Cards ─────────────────────────────────────────────────
+      sectionTitle("Indicateurs clés de performance");
+
+      const kd = displayData?.kpis ?? { totalScans: 0, conversionRate: 0, growth: 0, recentActivity: 0 };
+      const kpiItems = [
+        { label: "Total scans",        value: kd.totalScans.toLocaleString("fr-FR") },
+        { label: "Taux de satisfaction", value: `${kd.conversionRate}%` },
+        { label: "Croissance (30j)",   value: `${kd.growth >= 0 ? "+" : ""}${kd.growth}%` },
+        { label: "Activité récente",   value: kd.recentActivity.toLocaleString("fr-FR") },
+      ];
+
+      const kpiW = (W - M * 2 - 9) / 4;
+      kpiItems.forEach((k, i) => {
+        const x = M + i * (kpiW + 3);
+        pdf.setFillColor(...LIGHT);
+        pdf.setDrawColor(...BORDER);
+        pdf.roundedRect(x, y, kpiW, 22, 2, 2, "FD");
+        pdf.setTextColor(...DARK);
+        pdf.setFontSize(14);
+        pdf.setFont("helvetica", "bold");
+        pdf.text(k.value, x + kpiW / 2, y + 12, { align: "center" });
+        pdf.setTextColor(...GRAY);
+        pdf.setFontSize(7);
+        pdf.setFont("helvetica", "normal");
+        pdf.text(k.label, x + kpiW / 2, y + 18, { align: "center" });
+      });
+      y += 28;
+
+      // ── Scan timeline chart ────────────────────────────────────────
+      sectionTitle("Évolution des scans — 30 derniers jours");
+
+      const timeline = displayData?.scanTimeline ?? [];
+      const chartX = M;
+      const chartY = y;
+      const chartW = W - M * 2;
+      const chartH = 40;
+      const maxCount = Math.max(...timeline.map(d => d.count), 1);
+
+      // Background
+      pdf.setFillColor(...LIGHT);
+      pdf.setDrawColor(...BORDER);
+      pdf.roundedRect(chartX, chartY, chartW, chartH + 8, 2, 2, "FD");
+
+      // Grid lines
+      pdf.setDrawColor(...BORDER);
+      pdf.setLineWidth(0.2);
+      for (let g = 0; g <= 4; g++) {
+        const gy = chartY + 4 + chartH - (g / 4) * chartH;
+        pdf.line(chartX + 4, gy, chartX + chartW - 4, gy);
       }
 
-      pdf.save(`avismaker-analytics-${new Date().toISOString().split("T")[0]}.pdf`);
+      // Line chart
+      if (timeline.length > 1) {
+        pdf.setDrawColor(...AMBER);
+        pdf.setLineWidth(0.8);
+        const pts = timeline.map((d, i) => ({
+          x: chartX + 4 + (i / (timeline.length - 1)) * (chartW - 8),
+          y: chartY + 4 + chartH - (d.count / maxCount) * chartH,
+        }));
+        for (let i = 1; i < pts.length; i++) {
+          pdf.line(pts[i - 1].x, pts[i - 1].y, pts[i].x, pts[i].y);
+        }
+        // Dots
+        pdf.setFillColor(...AMBER);
+        pts.filter((_, i) => i % 5 === 0).forEach(p => {
+          pdf.circle(p.x, p.y, 0.8, "F");
+        });
+      }
+
+      // X-axis labels
+      pdf.setTextColor(...GRAY);
+      pdf.setFontSize(6);
+      pdf.setFont("helvetica", "normal");
+      const labelIdxs = [0, Math.floor(timeline.length / 3), Math.floor(2 * timeline.length / 3), timeline.length - 1];
+      labelIdxs.forEach(i => {
+        if (timeline[i]) {
+          const lx = chartX + 4 + (i / Math.max(timeline.length - 1, 1)) * (chartW - 8);
+          pdf.text(timeline[i].date.slice(5), lx, chartY + chartH + 10, { align: "center" });
+        }
+      });
+      y += chartH + 18;
+
+      // ── Source distribution ─────────────────────────────────────────
+      sectionTitle("Répartition des sources");
+
+      const sources = displayData?.sourceDistribution ?? [];
+      const totalSrc = sources.reduce((s, d) => s + d.value, 0) || 1;
+      const SRC_COLORS: Record<string, [number, number, number]> = {
+        google:      [66, 133, 244],
+        tripadvisor: [52, 168, 83],
+        airbnb:      [255, 56, 92],
+        trustpilot:  [0, 182, 122],
+        other:       [245, 158, 11],
+      };
+
+      sources.slice(0, 5).forEach((s, i) => {
+        const bx = M;
+        const by = y + i * 9;
+        const pct = s.value / totalSrc;
+        const barMaxW = W - M * 2 - 40;
+
+        pdf.setTextColor(...GRAY);
+        pdf.setFontSize(7.5);
+        pdf.setFont("helvetica", "normal");
+        const label = s.name.charAt(0).toUpperCase() + s.name.slice(1);
+        pdf.text(label, bx, by + 5);
+
+        pdf.setFillColor(...LIGHT);
+        pdf.setDrawColor(...BORDER);
+        pdf.roundedRect(bx + 28, by, barMaxW, 6, 1, 1, "FD");
+        const col = SRC_COLORS[s.name] ?? AMBER;
+        pdf.setFillColor(...col);
+        pdf.roundedRect(bx + 28, by, Math.max(barMaxW * pct, 1), 6, 1, 1, "F");
+
+        pdf.setTextColor(...DARK);
+        pdf.setFontSize(7);
+        pdf.setFont("helvetica", "bold");
+        pdf.text(`${s.value} (${Math.round(pct * 100)}%)`, bx + 28 + barMaxW + 3, by + 5);
+      });
+      y += Math.max(sources.length, 1) * 9 + 6;
+
+      // ── Top cards table ─────────────────────────────────────────────
+      if (y > H - 60) { pdf.addPage(); y = 14; }
+      sectionTitle("Tableau de performance des cartes");
+
+      const cols = [
+        { label: "Carte",       w: 58 },
+        { label: "Scans",       w: 22 },
+        { label: "Source",      w: 30 },
+        { label: "Performance", w: 30 },
+      ];
+      let cx = M;
+
+      // Header row
+      pdf.setFillColor(...DARK);
+      pdf.rect(M, y, W - M * 2, 8, "F");
+      cols.forEach(c => {
+        pdf.setTextColor(...AMBER);
+        pdf.setFontSize(7.5);
+        pdf.setFont("helvetica", "bold");
+        pdf.text(c.label, cx + 2, y + 5.5);
+        cx += c.w;
+      });
+      y += 8;
+
+      const topCards = displayData?.topCards ?? [];
+      const PERF_LABEL: Record<string, string> = { high: "Élevé", medium: "Moyen", low: "Faible" };
+      const PERF_COL: Record<string, [number, number, number]> = {
+        high:   [16, 185, 129],
+        medium: [245, 158, 11],
+        low:    [156, 163, 175],
+      };
+
+      topCards.forEach((card, i) => {
+        const rowY = y + i * 9;
+        if (rowY > H - 20) return; // skip if overflows page
+
+        pdf.setFillColor(i % 2 === 0 ? 255 : 249, i % 2 === 0 ? 255 : 250, i % 2 === 0 ? 255 : 251);
+        pdf.rect(M, rowY, W - M * 2, 9, "F");
+        pdf.setDrawColor(...BORDER);
+        pdf.line(M, rowY + 9, W - M, rowY + 9);
+
+        cx = M;
+        const rowData = [
+          card.name.slice(0, 28),
+          String(card.scans),
+          card.platform.charAt(0).toUpperCase() + card.platform.slice(1),
+          PERF_LABEL[card.performance] ?? card.performance,
+        ];
+
+        rowData.forEach((val, ci) => {
+          if (ci === 3) {
+            const pCol = PERF_COL[card.performance] ?? GRAY;
+            pdf.setTextColor(...pCol);
+            pdf.setFont("helvetica", "bold");
+          } else {
+            pdf.setTextColor(...DARK);
+            pdf.setFont("helvetica", "normal");
+          }
+          pdf.setFontSize(7.5);
+          pdf.text(val, cx + 2, rowY + 6);
+          cx += cols[ci].w;
+        });
+      });
+
+      y += topCards.length * 9 + 6;
+
+      // ── Footer ─────────────────────────────────────────────────────
+      const footerY = H - 10;
+      pdf.setFillColor(...DARK);
+      pdf.rect(0, footerY - 4, W, 14, "F");
+      pdf.setTextColor(...AMBER);
+      pdf.setFontSize(7);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("AvisMaker", M, footerY + 2);
+      pdf.setTextColor(150, 150, 150);
+      pdf.setFont("helvetica", "normal");
+      pdf.text("contact@avismaker.com  |  avismaker.com", M + 22, footerY + 2);
+      pdf.text(`Page 1`, W - M, footerY + 2, { align: "right" });
+
+      // ── Save ─────────────────────────────────────────────────────
+      const dateStr = new Date().toISOString().split("T")[0];
+      pdf.save(`avismaker-analytics-${dateStr}.pdf`);
+
     } catch (e) {
       console.error("PDF export error", e);
     } finally {

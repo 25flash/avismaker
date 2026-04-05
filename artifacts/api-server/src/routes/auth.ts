@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import { eq } from "drizzle-orm";
 import { db, usersTable, subscriptionsTable } from "@workspace/db";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { signToken, requireAuth, type AuthRequest } from "../lib/auth";
 import {
   RegisterBody,

@@ -17,7 +17,7 @@ import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from "recharts";
 
-function StatCard({ title, value, icon: Icon, subtitle, loading, accentColor = "#F59E0B", iconBg = "bg-primary/10", iconColor = "text-primary" }: {
+function StatCard({ title, value, icon: Icon, loading, accentColor = "#F59E0B", iconBg = "bg-primary/10", iconColor = "text-primary" }: {
   title: string;
   value: string | number;
   icon: React.ElementType;
@@ -28,21 +28,20 @@ function StatCard({ title, value, icon: Icon, subtitle, loading, accentColor = "
   iconColor?: string;
 }) {
   return (
-    <Card className="bg-white border border-border shadow-sm overflow-hidden" style={{ height: 70, borderLeft: `4px solid ${accentColor}` }}>
-      <CardContent className="h-full flex items-center justify-between" style={{ padding: "8px 12px" }}>
-        <div className="flex flex-col justify-center">
-          <p style={{ fontSize: 11, lineHeight: 1.3 }} className="font-medium text-[#6B7280]">{title}</p>
+    <Card className="bg-white border border-border shadow-sm overflow-hidden" style={{ height: 48, borderLeft: `4px solid ${accentColor}` }}>
+      <CardContent className="h-full flex items-center justify-between gap-2" style={{ padding: "0 12px" }}>
+        <div className="flex items-baseline gap-2 min-w-0">
+          <p style={{ fontSize: 13, lineHeight: 1 }} className="font-medium text-[#6B7280] shrink-0">{title}</p>
           {loading ? (
-            <Skeleton className="h-5 w-12 mt-0.5" />
+            <Skeleton className="h-4 w-8" />
           ) : (
-            <p style={{ fontSize: 20, lineHeight: 1.2 }} className="font-bold text-[#0D1117]" data-testid={`stat-${title.toLowerCase().replace(/\s/g, "-")}`}>
+            <p style={{ fontSize: 15, lineHeight: 1 }} className="font-semibold text-[#0D1117]" data-testid={`stat-${title.toLowerCase().replace(/\s/g, "-")}`}>
               {typeof value === "number" ? value.toLocaleString() : value}
             </p>
           )}
-          {subtitle && <p style={{ fontSize: 10, lineHeight: 1.2 }} className="text-[#6B7280]">{subtitle}</p>}
         </div>
-        <div className={cn("shrink-0 w-6 h-6 rounded-md flex items-center justify-center self-start mt-0.5", iconBg)}>
-          <Icon style={{ width: 14, height: 14 }} className={iconColor} />
+        <div className={cn("shrink-0 w-6 h-6 rounded-md flex items-center justify-center", iconBg)}>
+          <Icon style={{ width: 16, height: 16 }} className={iconColor} />
         </div>
       </CardContent>
     </Card>

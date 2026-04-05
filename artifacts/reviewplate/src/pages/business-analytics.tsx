@@ -506,26 +506,22 @@ export default function BusinessAnalyticsPage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             {loading ? (
               Array(4).fill(0).map((_, i) => (
-                <div key={i} className="h-28 bg-[#F9FAFB] border border-border rounded-xl animate-pulse" />
+                <div key={i} className="h-12 bg-[#F9FAFB] border border-border rounded-xl animate-pulse" />
               ))
             ) : kpiCards.map((kpi, i) => {
               const Icon = kpi.icon;
+              const iconColor = kpi.color.split(" ").find(c => c.startsWith("text-")) ?? "text-gray-500";
+              const borderColor = [
+                "border-l-blue-400", "border-l-green-400", "border-l-amber-400", "border-l-purple-400",
+              ][i] ?? "border-l-gray-300";
               return (
-                <Card key={i} className="bg-white border border-border shadow-sm">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center", kpi.color)}>
-                        <Icon className="w-4 h-4" />
-                      </div>
-                      {kpi.trend === "up" && <ArrowUpRight className="w-4 h-4 text-green-500" />}
-                      {kpi.trend === "down" && <ArrowDownRight className="w-4 h-4 text-red-400" />}
-                      {kpi.trend === "neutral" && <Minus className="w-4 h-4 text-gray-400" />}
+                <Card key={i} className={cn("bg-white border border-border shadow-sm overflow-hidden border-l-4", borderColor)} style={{ height: 48 }}>
+                  <CardContent className="h-full flex items-center justify-between gap-2" style={{ padding: "0 12px" }}>
+                    <div className="flex items-baseline gap-2 min-w-0">
+                      <p style={{ fontSize: 13, lineHeight: 1 }} className="font-medium text-[#6B7280] shrink-0">{kpi.label}</p>
+                      <p style={{ fontSize: 15, lineHeight: 1 }} className="font-semibold text-[#0D1117] truncate">{kpi.value}</p>
                     </div>
-                    <p className="text-2xl font-bold text-[#0D1117]">{kpi.value}</p>
-                    <p className="text-xs text-[#6B7280] mt-0.5">{kpi.label}</p>
-                    {!isBusiness && (
-                      <p className="text-[10px] text-primary/60 mt-1 font-medium">Aperçu</p>
-                    )}
+                    <Icon style={{ width: 16, height: 16 }} className={cn("shrink-0", iconColor)} />
                   </CardContent>
                 </Card>
               );

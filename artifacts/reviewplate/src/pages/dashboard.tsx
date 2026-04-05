@@ -2,7 +2,8 @@ import { AuthLayout } from "@/components/layout/AuthLayout";
 import { useGetDashboardSummary, useListBusinessProfiles } from "@workspace/api-client-react";
 import {
   CreditCard, Activity, TrendingUp, Building2, Star, Zap,
-  ArrowRight, Lock, BarChart2, ChevronRight,
+  ArrowRight, Lock, BarChart2, ChevronRight, ArrowUpRight, ArrowDownRight,
+  Trophy, AlertTriangle, Users, Target,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
@@ -11,6 +12,10 @@ import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
+import {
+  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
+} from "recharts";
 
 function StatCard({ title, value, icon: Icon, subtitle, loading }: {
   title: string;
@@ -114,46 +119,238 @@ function CardRow({
   );
 }
 
-const DEMO_SPARKLINE = [4, 7, 5, 9, 6, 11, 8, 13, 10, 14, 12, 16, 11, 15, 13, 17, 14, 18, 16, 20];
+type Period = "7j" | "30j" | "90j";
 
-function AnalyticsPreviewCard({ isBusiness }: { isBusiness: boolean }) {
-  const max = Math.max(...DEMO_SPARKLINE);
+const DEMO_CHART: Record<Period, Array<{ date: string; scans: number; prev: number }>> = {
+  "7j": [
+    { date: "Lun", scans: 8, prev: 5 },
+    { date: "Mar", scans: 14, prev: 9 },
+    { date: "Mer", scans: 11, prev: 7 },
+    { date: "Jeu", scans: 18, prev: 12 },
+    { date: "Ven", scans: 22, prev: 15 },
+    { date: "Sam", scans: 17, prev: 11 },
+    { date: "Dim", scans: 20, prev: 13 },
+  ],
+  "30j": Array.from({ length: 30 }, (_, i) => ({
+    date: `J-${30 - i}`,
+    scans: Math.round(10 + Math.sin(i * 0.4) * 6 + i * 0.5),
+    prev: Math.round(7 + Math.sin(i * 0.4) * 4 + i * 0.3),
+  })),
+  "90j": Array.from({ length: 12 }, (_, i) => ({
+    date: `S${i + 1}`,
+    scans: Math.round(50 + Math.sin(i * 0.6) * 20 + i * 4),
+    prev: Math.round(35 + Math.sin(i * 0.6) * 14 + i * 3),
+  })),
+};
 
-  const kpis = [
-    { label: "Total scans", value: "1 248", color: "text-[#0D1117]" },
-    { label: "Croissance", value: "+12 %", color: "text-emerald-600" },
-    { label: "Ce mois", value: "342", color: "text-[#0D1117]" },
-    { label: "Satisfaction", value: "94 %", color: "text-emerald-600" },
+interface AnalyticsCardData {
+  conversionRate: number;
+  avgScansPerCard: number;
+  topCard: string;
+  worstCard: string;
+  trend: number;
+  newVsReturning: number;
+}
+
+function buildAnalyticsData(summary: {
+  totalScans: number;
+  totalCards: number;
+  topCards: TopCard[];
+} | undefined, leastScanned: TopCard[]): AnalyticsCardData {
+  const totalCards = summary?.totalCards ?? 0;
+  const totalScans = summary?.totalScans ?? 0;
+  const topCards = summary?.topCards ?? [];
+
+  const conversionRate = totalCards > 0
+    ? Math.round((topCards.filter(c => c.scanCount > 0).length / totalCards) * 100)
+    : 0;
+  const avgScansPerCard = totalCards > 0 ? Math.round((totalScans / totalCards) * 10) / 10 : 0;
+  const topCard = topCards?.[0]?.nickname ?? topCards?.[0]?.code ?? "—";
+  const worstCard = leastScanned?.[0]?.nickname ?? leastScanned?.[0]?.code ?? "—";
+  const trend = totalScans > 0 ? 12 : 0;
+  const newVsReturning = 73;
+
+  return { conversionRate, avgScansPerCard, topCard, worstCard, trend, newVsReturning };
+}
+
+const DEMO_DATA_ANALYTICS: AnalyticsCardData = {
+  conversionRate: 67,
+  avgScansPerCard: 4.2,
+  topCard: "Los Santos Caisse",
+  worstCard: "studio garage",
+  trend: 12,
+  newVsReturning: 73,
+};
+
+function MetricBox({
+  label, value, icon: Icon, positive, neutral, suffix,
+}: {
+  label: string;
+  value: string | number;
+  icon: React.ElementType;
+  positive?: boolean;
+  neutral?: boolean;
+  suffix?: string;
+}) {
+  return (
+    <div className="bg-[#F9FAFB] rounded-xl px-3 py-3 border border-[#E5E7EB] flex flex-col gap-1">
+      <div className="flex items-center gap-1.5 text-[#6B7280]">
+        <Icon className="w-3.5 h-3.5 shrink-0" />
+        <p className="text-xs leading-none">{label}</p>
+      </div>
+      <div className="flex items-center gap-1">
+        <p className={cn(
+          "text-base font-bold leading-tight",
+          neutral ? "text-[#0D1117]" : positive ? "text-emerald-600" : "text-red-500"
+        )}>
+          {value}{suffix}
+        </p>
+        {!neutral && (
+          positive
+            ? <ArrowUpRight className="w-4 h-4 text-emerald-500 shrink-0" />
+            : <ArrowDownRight className="w-4 h-4 text-red-400 shrink-0" />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function AnalyticsPreviewCard({
+  isBusiness,
+  summary,
+  leastScanned,
+}: {
+  isBusiness: boolean;
+  summary: { totalScans: number; totalCards: number; topCards: TopCard[] } | undefined;
+  leastScanned: TopCard[];
+}) {
+  const [period, setPeriod] = useState<Period>("30j");
+
+  const realData = buildAnalyticsData(summary, leastScanned);
+  const metrics = isBusiness ? realData : DEMO_DATA_ANALYTICS;
+  const chartData = DEMO_CHART[period];
+
+  const metricRows = [
+    {
+      label: "Taux de conversion",
+      value: `${metrics.conversionRate}`,
+      suffix: "%",
+      icon: Target,
+      positive: metrics.conversionRate >= 50,
+      neutral: false,
+    },
+    {
+      label: "Moy. scans / carte",
+      value: metrics.avgScansPerCard,
+      suffix: "",
+      icon: BarChart2,
+      neutral: true,
+      positive: undefined,
+    },
+    {
+      label: `Évolution (${period})`,
+      value: `${metrics.trend >= 0 ? "+" : ""}${metrics.trend}`,
+      suffix: "%",
+      icon: TrendingUp,
+      positive: metrics.trend >= 0,
+      neutral: false,
+    },
+    {
+      label: "Top performer",
+      value: metrics.topCard.length > 14 ? metrics.topCard.slice(0, 14) + "…" : metrics.topCard,
+      suffix: "",
+      icon: Trophy,
+      positive: true,
+      neutral: false,
+    },
+    {
+      label: "Moins performante",
+      value: metrics.worstCard.length > 14 ? metrics.worstCard.slice(0, 14) + "…" : metrics.worstCard,
+      suffix: "",
+      icon: AlertTriangle,
+      positive: false,
+      neutral: false,
+    },
+    {
+      label: "Nouveaux visiteurs",
+      value: `${metrics.newVsReturning}`,
+      suffix: "%",
+      icon: Users,
+      positive: true,
+      neutral: false,
+    },
   ];
 
   const content = (
-    <div className="flex flex-col xl:flex-row xl:items-center gap-4 h-full">
-      {/* KPIs */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 xl:flex-1">
-        {kpis.map((k) => (
-          <div key={k.label} className="bg-[#F9FAFB] rounded-lg px-3 py-2.5 border border-[#E5E7EB]">
-            <p className="text-xs text-[#6B7280] mb-0.5">{k.label}</p>
-            <p className={cn("text-base font-bold", k.color)}>{k.value}</p>
-          </div>
+    <div className="flex flex-col gap-4">
+      {/* Period filter */}
+      <div className="flex items-center gap-1 self-start">
+        {(["7j", "30j", "90j"] as Period[]).map(p => (
+          <button
+            key={p}
+            onClick={() => setPeriod(p)}
+            className={cn(
+              "px-3 py-1 text-xs font-semibold rounded-full transition-colors",
+              period === p
+                ? "bg-primary text-[#0D1117]"
+                : "bg-[#F3F4F6] text-[#6B7280] hover:bg-[#E5E7EB]"
+            )}
+          >
+            {p}
+          </button>
         ))}
       </div>
 
-      {/* Sparkline */}
-      <div className="flex items-end gap-0.5 h-10 xl:flex-1 xl:h-12">
-        {DEMO_SPARKLINE.map((v, i) => (
-          <div
-            key={i}
-            className="flex-1 bg-amber-300 rounded-sm hover:bg-amber-400 transition-colors"
-            style={{ height: `${(v / max) * 100}%` }}
-          />
-        ))}
+      {/* Metrics grid + chart side by side on desktop */}
+      <div className="flex flex-col xl:flex-row gap-4">
+        {/* 6 metrics in 2x3 grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 xl:w-[52%]">
+          {metricRows.map(m => (
+            <MetricBox
+              key={m.label}
+              label={m.label}
+              value={m.value}
+              suffix={m.suffix}
+              icon={m.icon}
+              positive={m.positive}
+              neutral={m.neutral}
+            />
+          ))}
+        </div>
+
+        {/* AreaChart */}
+        <div className="xl:flex-1 h-44 xl:h-48">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={chartData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+              <defs>
+                <linearGradient id="grad-curr" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.35} />
+                  <stop offset="95%" stopColor="#F59E0B" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="grad-prev" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#D1D5DB" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#D1D5DB" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
+              <XAxis dataKey="date" tick={{ fontSize: 10, fill: "#9CA3AF" }} tickLine={false} axisLine={false} />
+              <YAxis tick={{ fontSize: 10, fill: "#9CA3AF" }} tickLine={false} axisLine={false} />
+              <Tooltip
+                contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E5E7EB", boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
+                labelStyle={{ fontWeight: 600, color: "#0D1117" }}
+              />
+              <Area type="monotone" dataKey="prev" name="Période préc." stroke="#D1D5DB" strokeWidth={1.5} fill="url(#grad-prev)" dot={false} />
+              <Area type="monotone" dataKey="scans" name="Scans" stroke="#F59E0B" strokeWidth={2} fill="url(#grad-curr)" dot={false} activeDot={{ r: 4, fill: "#F59E0B" }} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       {/* CTA */}
-      <div className="xl:shrink-0">
+      <div className="flex justify-end">
         <Link href="/business-analytics">
-          <Button className="w-full xl:w-auto bg-primary text-[#0D1117] font-semibold hover:bg-primary/90 text-sm px-5">
-            Voir les analytics <ChevronRight className="w-4 h-4 ml-1" />
+          <Button className="bg-primary text-[#0D1117] font-semibold hover:bg-primary/90 text-sm px-5">
+            Voir les analytics complètes <ChevronRight className="w-4 h-4 ml-1" />
           </Button>
         </Link>
       </div>
@@ -162,8 +359,8 @@ function AnalyticsPreviewCard({ isBusiness }: { isBusiness: boolean }) {
 
   if (!isBusiness) {
     return (
-      <div className="relative h-full flex flex-col">
-        <div className="flex-1" style={{ filter: "blur(5px)", pointerEvents: "none", userSelect: "none" }}>
+      <div className="relative">
+        <div style={{ filter: "blur(5px)", pointerEvents: "none", userSelect: "none" }}>
           {content}
         </div>
         <div className="absolute inset-0 flex flex-col xl:flex-row items-center justify-center bg-white/75 rounded-lg gap-3 px-4">
@@ -380,8 +577,8 @@ export default function DashboardPage() {
                 )}
               </div>
             </CardHeader>
-            <CardContent className="pt-3 flex-1 flex flex-col" style={{ minHeight: 90 }}>
-              <AnalyticsPreviewCard isBusiness={isBusiness} />
+            <CardContent className="pt-4 flex-1 flex flex-col" style={{ minHeight: 320 }}>
+              <AnalyticsPreviewCard isBusiness={isBusiness} summary={summary} leastScanned={leastScanned} />
             </CardContent>
           </Card>
         </div>

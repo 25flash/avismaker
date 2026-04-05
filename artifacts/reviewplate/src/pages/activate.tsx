@@ -95,7 +95,7 @@ export default function ActivatePage() {
               <Input
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
-                placeholder="e.g. RP-ABCD-1234"
+                placeholder="e.g. GM-63XPKF"
                 className="h-14 text-center text-2xl font-mono font-bold tracking-widest uppercase"
                 maxLength={16}
                 data-testid="input-activation-code"

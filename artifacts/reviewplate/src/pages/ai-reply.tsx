@@ -27,7 +27,7 @@ export default function AiReplyPage() {
   const handleGenerate = () => {
     if (!review.trim()) return;
     generateMutation.mutate(
-      { data: { reviewText: review, tone, platform } },
+      { data: { originalReview: review, tone, platform } },
       {
         onSuccess: (result) => {
           const r = result as unknown as { reply: string };

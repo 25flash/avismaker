@@ -21,6 +21,7 @@ import SupportPage from "@/pages/support";
 import ActivatePage from "@/pages/activate";
 
 import AdminPage from "@/pages/admin/index";
+import CardAnalyticsPage from "@/pages/analytics/cards/[id]";
 import ScanPage from "@/pages/scan";
 import NotFound from "@/pages/not-found";
 
@@ -57,6 +58,9 @@ function Router() {
       <Route path="/ai-reply" component={AiReplyPage} />
       <Route path="/billing" component={BillingPage} />
       <Route path="/support" component={SupportPage} />
+
+      {/* Analytics */}
+      <Route path="/analytics/cards/:id" component={CardAnalyticsPage} />
 
       {/* Admin */}
       <Route path="/admin" component={AdminPage} />

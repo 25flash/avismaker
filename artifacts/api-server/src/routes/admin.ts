@@ -62,13 +62,16 @@ router.get("/admin/stats", requireAdmin, async (req: AuthRequest, res): Promise<
     }
   }
 
+  const [totalProfilesResult] = await db.select({ count: count() }).from(businessProfilesTable);
+
   res.json({
     totalUsers: Number(totalUsersResult?.count ?? 0),
     totalCards: Number(totalCardsResult?.count ?? 0),
     activeCards: Number(activeCards[0]?.count ?? 0),
     totalScans: Number(totalScansResult?.count ?? 0),
     scansToday: Number(scansTodayResult?.count ?? 0),
-    usersByPlan,
+    totalProfiles: Number(totalProfilesResult?.count ?? 0),
+    planBreakdown: usersByPlan,
     revenueMonthly,
   });
 });

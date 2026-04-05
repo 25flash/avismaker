@@ -26,11 +26,11 @@ export default function AdminPage() {
   );
 
   const adminStats = stats as unknown as {
-    totalUsers: number; totalCards: number; totalScans: number;
-    totalProfiles: number; planBreakdown: Record<string, number>;
+    totalUsers: number; totalCards: number; activeCards: number; totalScans: number;
+    scansToday: number; totalProfiles: number; planBreakdown: Record<string, number>; revenueMonthly: number;
   } | undefined;
 
-  const userList = (users as unknown as { users: Array<{ id: number; name: string; email: string; plan: string; role: string; createdAt: string; cardCount: number }> })?.users ?? [];
+  const userList = (users as unknown as Array<{ id: number; name: string; email: string; plan: string; role: string; createdAt: string; cardCount: number; totalScans: number }>) ?? [];
 
   if (user?.role !== "admin") {
     return (

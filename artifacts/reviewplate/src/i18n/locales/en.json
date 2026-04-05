@@ -240,6 +240,7 @@
     "updateFailed": "Error",
     "updateFailedDesc": "Unable to change plan. Please try again.",
     "mostPopular": "Most popular",
+    "freePrice": "Free",
     "annualLabel": "Annual",
     "annualSavings": "Save 3 months by switching to annual billing",
     "unlimitedCards": "Unlimited active cards",

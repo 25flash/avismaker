@@ -209,7 +209,7 @@ export default function BillingPage() {
                   <div className="mt-2 mb-1">
                     {plan.price === 0 ? (
                       <div className="flex items-baseline gap-1">
-                        <span className="text-3xl font-bold text-[#0D1117]">Free</span>
+                        <span className="text-3xl font-bold text-[#0D1117]">{t("billing.freePrice")}</span>
                       </div>
                     ) : (
                       <div>

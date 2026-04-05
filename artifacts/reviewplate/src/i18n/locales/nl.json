@@ -300,7 +300,7 @@
     "freePrice": "Gratis",
     "annualLabel": "Jaarlijks",
     "annualSavings": "Bespaar 3 maanden door over te stappen op jaarlijkse facturering",
-    "unlimitedCards": "Onbeperkte actieve kaarten",
+    "unlimitedCards": "Onbeperkte kaarten",
     "activeCardsCount_one": "{{count}} kaart",
     "activeCardsCount_other": "{{count}} kaarten",
     "activeCardsCount": "{{count}} actieve kaart(en)",

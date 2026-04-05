@@ -300,7 +300,7 @@
     "freePrice": "Kostenlos",
     "annualLabel": "Jährlich",
     "annualSavings": "Sparen Sie 3 Monate mit jährlicher Abrechnung",
-    "unlimitedCards": "Unbegrenzte aktive Karten",
+    "unlimitedCards": "Unbegrenzte Karten",
     "activeCardsCount_one": "{{count}} Karte",
     "activeCardsCount_other": "{{count}} Karten",
     "activeCardsCount": "{{count}} aktive Karte(n)",

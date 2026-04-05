@@ -300,7 +300,7 @@
     "freePrice": "Gratuito",
     "annualLabel": "Annuale",
     "annualSavings": "Risparmia 3 mesi passando alla fatturazione annuale",
-    "unlimitedCards": "Carte attive illimitate",
+    "unlimitedCards": "Carte illimitate",
     "activeCardsCount_one": "{{count}} carta",
     "activeCardsCount_other": "{{count}} carte",
     "activeCardsCount": "{{count}} carta/e attiva/e",

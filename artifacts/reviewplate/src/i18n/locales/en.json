@@ -300,7 +300,7 @@
     "freePrice": "Free",
     "annualLabel": "Annual",
     "annualSavings": "Save 3 months by switching to annual billing",
-    "unlimitedCards": "Unlimited active cards",
+    "unlimitedCards": "Unlimited cards",
     "activeCardsCount_one": "{{count}} card",
     "activeCardsCount_other": "{{count}} cards",
     "activeCardsCount": "{{count}} active card(s)",

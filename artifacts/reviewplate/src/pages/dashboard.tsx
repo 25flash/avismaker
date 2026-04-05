@@ -65,7 +65,7 @@ export default function DashboardPage() {
     totalScans: number;
     scansThisMonth: number;
     totalProfiles: number;
-    recentScans: Array<{ id: number; cardId: number; cardCode: string; businessProfileId: number | null; timestamp: string; country: string | null; deviceType: string | null; wasNegative: boolean }>;
+    recentScans: Array<{ id: number; cardId: number; cardCode: string; platform: string | null; businessProfileId: number | null; timestamp: string; country: string | null; deviceType: string | null; wasNegative: boolean }>;
     topCards: Array<{ id: number; code: string; status: string; platform: string | null; scanCount: number; smartReviewEnabled: boolean; businessProfileId: number | null }>;
   } | undefined;
 
@@ -213,9 +213,16 @@ export default function DashboardPage() {
                           )}
                           <div>
                             {/* Nom de l'établissement en principal */}
-                            <p className="text-sm font-medium text-[#374151]">
-                              {scanProfile ? scanProfile.name : scan.cardCode}
-                            </p>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className="text-sm font-medium text-[#374151]">
+                                {scanProfile ? scanProfile.name : scan.cardCode}
+                              </p>
+                              {scan.platform && (
+                                <span className={cn("text-xs px-1.5 py-0.5 rounded font-medium", platformColors[scan.platform] ?? "bg-gray-100 text-gray-700")}>
+                                  {scan.platform}
+                                </span>
+                              )}
+                            </div>
                             {/* Code carte + localisation en secondaire */}
                             <p className="text-xs text-[#6B7280]">
                               {scanProfile && <span className="font-mono mr-1">{scan.cardCode} ·</span>}

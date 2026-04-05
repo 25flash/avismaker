@@ -30,7 +30,12 @@
     "saving": "Wird gespeichert…",
     "saved": "Profil aktualisiert",
     "savedDesc": "Deine Änderungen wurden gespeichert.",
-    "saveFailed": "Speichern fehlgeschlagen"
+    "saveFailed": "Speichern fehlgeschlagen",
+    "planTitle": "Plan & Abonnement",
+    "billingCycle": "Abrechnungszeitraum",
+    "planUpdated": "Plan aktualisiert",
+    "planUpdatedDesc": "Ihr Konto wurde auf den {{plan}}-Plan umgestellt.",
+    "viewFullBilling": "Vollständige Abrechnungsseite anzeigen"
   },
   "landing": {
     "getStartedFree": "Kostenlos starten",

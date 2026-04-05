@@ -30,7 +30,12 @@
     "saving": "Saving…",
     "saved": "Profile updated",
     "savedDesc": "Your changes have been saved.",
-    "saveFailed": "Save failed"
+    "saveFailed": "Save failed",
+    "planTitle": "Plan & Subscription",
+    "billingCycle": "Billing cycle",
+    "planUpdated": "Plan updated",
+    "planUpdatedDesc": "Your account has been switched to the {{plan}} plan.",
+    "viewFullBilling": "View full billing page"
   },
   "landing": {
     "getStartedFree": "Get started free",

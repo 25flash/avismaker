@@ -30,7 +30,12 @@
     "saving": "Opslaan…",
     "saved": "Profiel bijgewerkt",
     "savedDesc": "Je wijzigingen zijn opgeslagen.",
-    "saveFailed": "Opslaan mislukt"
+    "saveFailed": "Opslaan mislukt",
+    "planTitle": "Plan & Abonnement",
+    "billingCycle": "Factureringscyclus",
+    "planUpdated": "Plan bijgewerkt",
+    "planUpdatedDesc": "Uw account is overgeschakeld naar het {{plan}}-plan.",
+    "viewFullBilling": "Volledige factureringspagina bekijken"
   },
   "landing": {
     "getStartedFree": "Gratis beginnen",

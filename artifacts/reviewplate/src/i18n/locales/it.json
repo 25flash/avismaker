@@ -30,7 +30,12 @@
     "saving": "Salvataggio…",
     "saved": "Profilo aggiornato",
     "savedDesc": "Le tue modifiche sono state salvate.",
-    "saveFailed": "Salvataggio non riuscito"
+    "saveFailed": "Salvataggio non riuscito",
+    "planTitle": "Piano & Abbonamento",
+    "billingCycle": "Ciclo di fatturazione",
+    "planUpdated": "Piano aggiornato",
+    "planUpdatedDesc": "Il tuo account è stato cambiato al piano {{plan}}.",
+    "viewFullBilling": "Visualizza la pagina di fatturazione completa"
   },
   "landing": {
     "getStartedFree": "Inizia gratis",

@@ -30,7 +30,12 @@
     "saving": "Guardando…",
     "saved": "Perfil actualizado",
     "savedDesc": "Tus cambios han sido guardados.",
-    "saveFailed": "Error al guardar"
+    "saveFailed": "Error al guardar",
+    "planTitle": "Plan y Suscripción",
+    "billingCycle": "Ciclo de facturación",
+    "planUpdated": "Plan actualizado",
+    "planUpdatedDesc": "Tu cuenta ha cambiado al plan {{plan}}.",
+    "viewFullBilling": "Ver página de facturación completa"
   },
   "landing": {
     "getStartedFree": "Empezar gratis",

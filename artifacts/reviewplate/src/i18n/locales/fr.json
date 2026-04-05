@@ -30,7 +30,12 @@
     "saving": "Enregistrement…",
     "saved": "Profil mis à jour",
     "savedDesc": "Vos modifications ont été enregistrées.",
-    "saveFailed": "Échec de la sauvegarde"
+    "saveFailed": "Échec de la sauvegarde",
+    "planTitle": "Plan & Abonnement",
+    "billingCycle": "Cycle de facturation",
+    "planUpdated": "Plan mis à jour",
+    "planUpdatedDesc": "Votre compte est passé au plan {{plan}}.",
+    "viewFullBilling": "Voir la page de facturation complète"
   },
   "landing": {
     "getStartedFree": "Commencer gratuitement",

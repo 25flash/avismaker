@@ -570,7 +570,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   <BarChart2 className="w-4 h-4 text-primary" />
-                  <CardTitle className="text-sm font-semibold text-[#0D1117]">Analytics avancées</CardTitle>
+                  <CardTitle className="text-sm font-semibold text-[#0D1117]">Tendances</CardTitle>
                 </div>
                 {isBusiness && (
                   <span className="text-xs bg-primary/10 text-primary font-semibold px-2 py-0.5 rounded-full">Business</span>

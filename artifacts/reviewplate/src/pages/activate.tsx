@@ -124,8 +124,6 @@ export default function ActivatePage() {
           <h3 className="text-sm font-semibold text-[#92400E] mb-2">{t("activate.whereToFind")}</h3>
           <ul className="text-sm text-[#92400E] space-y-1.5">
             <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">•</span>{t("activate.hint1")}</li>
-            <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">•</span>{t("activate.hint2")}</li>
-            <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">•</span>{t("activate.hint3")}</li>
           </ul>
         </div>
       </div>

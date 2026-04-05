@@ -313,7 +313,7 @@
     "codeLabel": "Aktivierungscode",
     "codeHintAlt": "Der Code ist auf der Rückseite deiner Karte oder in deiner Bestellbestätigungs-E-Mail gedruckt.",
     "whereToFind": "Wo finde ich den Code?",
-    "hint1": "Auf der Rückseite deiner physischen NFC- oder QR-Karte",
+    "hint1": "Auf deiner physischen NFC- oder QR-Karte",
     "hint2": "In deiner Bestellbestätigungs-E-Mail",
     "hint3": "In deiner AvisMaker-Bestellquittung",
     "notFoundTitle": "Code nicht gefunden",

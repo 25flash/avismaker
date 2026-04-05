@@ -313,7 +313,7 @@
     "codeLabel": "Activatiecode",
     "codeHintAlt": "De code staat op de achterkant van je kaart of in je orderbevestigings-e-mail.",
     "whereToFind": "Waar vind je de code?",
-    "hint1": "Op de achterkant van je fysieke NFC- of QR-kaart",
+    "hint1": "Op je fysieke NFC- of QR-kaart",
     "hint2": "In je orderbevestigings-e-mail",
     "hint3": "In je AvisMaker-bestelbon",
     "notFoundTitle": "Code niet gevonden",

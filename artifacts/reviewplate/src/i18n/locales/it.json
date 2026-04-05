@@ -313,7 +313,7 @@
     "codeLabel": "Codice di attivazione",
     "codeHintAlt": "Il codice è stampato sul retro della tua carta o nella tua email di conferma ordine.",
     "whereToFind": "Dove trovare il codice?",
-    "hint1": "Sul retro della tua carta NFC o QR fisica",
+    "hint1": "Sulla tua carta NFC o QR fisica",
     "hint2": "Nella tua email di conferma ordine",
     "hint3": "Nella tua ricevuta ordine AvisMaker",
     "notFoundTitle": "Codice non trovato",

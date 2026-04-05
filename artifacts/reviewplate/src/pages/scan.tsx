@@ -83,7 +83,7 @@ export default function ScanPage() {
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
             <Star className="w-4 h-4 text-[#0D1117]" strokeWidth={2.5} />
           </div>
-          <span className="text-base font-bold text-white">ReviewPlate</span>
+          <span className="text-base font-bold text-white">AvisMakers</span>
         </div>
 
         <div className="bg-white rounded-2xl overflow-hidden shadow-2xl">
@@ -183,7 +183,7 @@ export default function ScanPage() {
         </div>
 
         <p className="text-center text-xs text-white/30 mt-6">
-          Powered by ReviewPlate
+          Powered by AvisMakers
         </p>
       </div>
     </div>

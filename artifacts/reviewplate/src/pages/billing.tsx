@@ -135,7 +135,7 @@ export default function BillingPage() {
                   <h3 className="text-lg font-bold text-[#0D1117] capitalize">{plan.name}</h3>
                   <div className="flex items-baseline gap-1 mt-2 mb-5">
                     <span className="text-3xl font-bold text-[#0D1117]">
-                      {plan.price === 0 ? "Free" : `£${plan.price}`}
+                      {plan.price === 0 ? "Free" : `€${plan.price}`}
                     </span>
                     {plan.price > 0 && <span className="text-sm text-[#6B7280]">/mo</span>}
                   </div>
@@ -175,7 +175,7 @@ export default function BillingPage() {
         </div>
 
         <p className="text-xs text-center text-[#9CA3AF]">
-          All prices shown in GBP and billed monthly. Cancel anytime. Need a custom plan?{" "}
+          All prices shown in EUR and billed monthly. Cancel anytime. Need a custom plan?{" "}
           <a href="/support" className="text-primary hover:underline">Contact us</a>.
         </p>
       </div>

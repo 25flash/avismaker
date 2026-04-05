@@ -10,7 +10,7 @@ function Navbar() {
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
             <Star className="w-4 h-4 text-[#0D1117]" strokeWidth={2.5} />
           </div>
-          <span className="text-lg font-bold text-white">ReviewPlate</span>
+          <span className="text-lg font-bold text-white">AvisMakers</span>
         </div>
         <div className="flex items-center gap-3">
           <Link href="/login">
@@ -48,7 +48,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="text-lg text-white/60 max-w-2xl mx-auto mb-10 leading-relaxed">
-            ReviewPlate smart cards let customers leave reviews on Google, TripAdvisor, Airbnb, and Trustpilot with a single tap or scan — no app required.
+            AvisMakers smart cards let customers leave reviews on Google, TripAdvisor, Airbnb, and Trustpilot with a single tap or scan — no app required.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -96,7 +96,7 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-white mb-4">Everything you need to collect reviews</h2>
-            <p className="text-white/60 max-w-xl mx-auto">No more hoping customers remember to leave a review. ReviewPlate makes it effortless.</p>
+            <p className="text-white/60 max-w-xl mx-auto">No more hoping customers remember to leave a review. AvisMakers makes it effortless.</p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -185,10 +185,10 @@ export default function LandingPage() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
             {[
-              { name: "Free", price: "£0", highlight: false },
-              { name: "Premium", price: "£19", highlight: false },
-              { name: "Pro", price: "£49", highlight: true },
-              { name: "Business", price: "£99", highlight: false },
+              { name: "Free", price: "€0", highlight: false },
+              { name: "Premium", price: "€19", highlight: false },
+              { name: "Pro", price: "€49", highlight: true },
+              { name: "Business", price: "€99", highlight: false },
             ].map((plan) => (
               <div
                 key={plan.name}
@@ -221,7 +221,7 @@ export default function LandingPage() {
       <section className="py-20 px-6 bg-primary/10 border-t border-primary/20">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Ready to get more reviews?</h2>
-          <p className="text-white/60 mb-8">Join 2,400+ businesses using ReviewPlate to grow their online reputation.</p>
+          <p className="text-white/60 mb-8">Join 2,400+ businesses using AvisMakers to grow their online reputation.</p>
           <Link href="/signup">
             <Button
               className="bg-primary text-[#0D1117] font-bold hover:bg-primary/90 h-14 px-10 text-base"
@@ -240,9 +240,9 @@ export default function LandingPage() {
             <div className="w-6 h-6 bg-primary rounded-md flex items-center justify-center">
               <Star className="w-3 h-3 text-[#0D1117]" strokeWidth={2.5} />
             </div>
-            <span>ReviewPlate</span>
+            <span>AvisMakers</span>
           </div>
-          <p>© 2025 ReviewPlate. All rights reserved.</p>
+          <p>© 2025 AvisMakers. All rights reserved.</p>
           <div className="flex gap-4">
             <Link href="/login" className="hover:text-white transition-colors">Login</Link>
             <Link href="/signup" className="hover:text-white transition-colors">Sign up</Link>

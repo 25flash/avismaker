@@ -60,7 +60,7 @@ export default function LoginPage() {
             <div className="w-9 h-9 bg-primary rounded-lg flex items-center justify-center">
               <Star className="w-5 h-5 text-[#0D1117]" strokeWidth={2.5} />
             </div>
-            <span className="text-xl font-bold text-white">ReviewPlate</span>
+            <span className="text-xl font-bold text-white">AvisMakers</span>
           </div>
         </Link>
         <div>
@@ -90,7 +90,7 @@ export default function LoginPage() {
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <Star className="w-4 h-4 text-[#0D1117]" strokeWidth={2.5} />
             </div>
-            <span className="text-lg font-bold text-[#0D1117]">ReviewPlate</span>
+            <span className="text-lg font-bold text-[#0D1117]">AvisMakers</span>
           </div>
 
           <h1 className="text-2xl font-bold text-[#0D1117] mb-2">Welcome back</h1>

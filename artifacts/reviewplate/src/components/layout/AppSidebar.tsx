@@ -33,7 +33,7 @@ export function AppSidebar() {
         <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
           <Star className="w-5 h-5 text-[#0D1117]" strokeWidth={2.5} />
         </div>
-        <span className="text-lg font-bold text-white tracking-tight">ReviewPlate</span>
+        <span className="text-lg font-bold text-white tracking-tight">AvisMakers</span>
       </div>
 
       {/* Navigation */}

@@ -47,7 +47,7 @@ const PLANS = [
     features: [
       "10 business profiles",
       "All Premium features",
-      "Custom branding (remove ReviewPlate badge)",
+      "Custom branding (remove AvisMakers badge)",
       "Live preview editor",
     ],
     maxProfiles: 10,

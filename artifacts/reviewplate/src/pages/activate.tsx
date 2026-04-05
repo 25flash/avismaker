@@ -32,11 +32,11 @@ export default function ActivatePage() {
         onError: (err: unknown) => {
           const apiError = err as { data?: { error?: string }; status?: number };
           if (apiError?.status === 404) {
-            toast({ variant: "destructive", title: "Code not found", description: "This activation code doesn't exist. Check and try again." });
+            toast({ variant: "destructive", title: t("activate.notFoundTitle"), description: t("activate.notFoundDesc") });
           } else if (apiError?.status === 409) {
-            toast({ variant: "destructive", title: "Already activated", description: "This card is already registered to another account." });
+            toast({ variant: "destructive", title: t("activate.alreadyActiveTitle"), description: t("activate.alreadyActiveDesc") });
           } else {
-            toast({ variant: "destructive", title: "Activation failed", description: apiError?.data?.error ?? "Something went wrong." });
+            toast({ variant: "destructive", title: t("activate.failed"), description: apiError?.data?.error ?? t("activate.genericError") });
           }
         },
       }
@@ -88,23 +88,23 @@ export default function ActivatePage() {
           <CardHeader className="border-b border-border pb-4">
             <CardTitle className="text-base font-semibold text-[#0D1117] flex items-center gap-2">
               <CreditCard className="w-5 h-5 text-primary" />
-              Enter Activation Code
+              {t("activate.enterCode")}
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6 space-y-5">
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-[#374151]">Activation Code</Label>
+              <Label className="text-sm font-medium text-[#374151]">{t("activate.codeLabel")}</Label>
               <Input
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
-                placeholder="e.g. GM-63XPKF"
+                placeholder={t("activate.codePlaceholder")}
                 className="h-14 text-center text-2xl font-mono font-bold tracking-widest uppercase"
                 maxLength={16}
                 data-testid="input-activation-code"
                 onKeyDown={(e) => e.key === "Enter" && handleActivate()}
               />
               <p className="text-xs text-[#6B7280] text-center">
-                The code is printed on the back of your card or in your order confirmation email.
+                {t("activate.codeHintAlt")}
               </p>
             </div>
 
@@ -121,11 +121,11 @@ export default function ActivatePage() {
         </Card>
 
         <div className="bg-[#FFF8ED] border border-amber-200 rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-[#92400E] mb-2">Where to find the code?</h3>
+          <h3 className="text-sm font-semibold text-[#92400E] mb-2">{t("activate.whereToFind")}</h3>
           <ul className="text-sm text-[#92400E] space-y-1.5">
-            <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">•</span>On the back of your physical NFC or QR card</li>
-            <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">•</span>In your order confirmation email</li>
-            <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">•</span>In your AvisMaker order receipt</li>
+            <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">•</span>{t("activate.hint1")}</li>
+            <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">•</span>{t("activate.hint2")}</li>
+            <li className="flex items-start gap-2"><span className="text-amber-500 mt-0.5">•</span>{t("activate.hint3")}</li>
           </ul>
         </div>
       </div>

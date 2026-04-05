@@ -309,6 +309,18 @@
     "failed": "Activation failed",
     "notFound": "Card not found. Check your activation code.",
     "alreadyActive": "This card is already activated.",
+    "enterCode": "Enter Activation Code",
+    "codeLabel": "Activation Code",
+    "codeHintAlt": "The code is printed on the back of your card or in your order confirmation email.",
+    "whereToFind": "Where to find the code?",
+    "hint1": "On the back of your physical NFC or QR card",
+    "hint2": "In your order confirmation email",
+    "hint3": "In your AvisMaker order receipt",
+    "notFoundTitle": "Code not found",
+    "notFoundDesc": "This activation code doesn't exist. Check and try again.",
+    "alreadyActiveTitle": "Already activated",
+    "alreadyActiveDesc": "This card is already registered to another account.",
+    "genericError": "Something went wrong. Please try again.",
     "codeHint": "The code is printed on the back of your card in the format XX-XXXXXX"
   },
   "aiReply": {

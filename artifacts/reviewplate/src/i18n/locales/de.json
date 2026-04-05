@@ -309,6 +309,18 @@
     "failed": "Aktivierung fehlgeschlagen",
     "notFound": "Karte nicht gefunden. Überprüfe deinen Aktivierungscode.",
     "alreadyActive": "Diese Karte ist bereits aktiviert.",
+    "enterCode": "Aktivierungscode eingeben",
+    "codeLabel": "Aktivierungscode",
+    "codeHintAlt": "Der Code ist auf der Rückseite deiner Karte oder in deiner Bestellbestätigungs-E-Mail gedruckt.",
+    "whereToFind": "Wo finde ich den Code?",
+    "hint1": "Auf der Rückseite deiner physischen NFC- oder QR-Karte",
+    "hint2": "In deiner Bestellbestätigungs-E-Mail",
+    "hint3": "In deiner AvisMaker-Bestellquittung",
+    "notFoundTitle": "Code nicht gefunden",
+    "notFoundDesc": "Dieser Aktivierungscode existiert nicht. Überprüfe ihn und versuche es erneut.",
+    "alreadyActiveTitle": "Bereits aktiviert",
+    "alreadyActiveDesc": "Diese Karte ist bereits auf einem anderen Konto registriert.",
+    "genericError": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
     "codeHint": "Der Code ist auf der Rückseite deiner Karte im Format XX-XXXXXX aufgedruckt"
   },
   "aiReply": {

@@ -309,6 +309,18 @@
     "failed": "Attivazione fallita",
     "notFound": "Carta non trovata. Controlla il codice di attivazione.",
     "alreadyActive": "Questa carta è già attivata.",
+    "enterCode": "Inserisci il codice di attivazione",
+    "codeLabel": "Codice di attivazione",
+    "codeHintAlt": "Il codice è stampato sul retro della tua carta o nella tua email di conferma ordine.",
+    "whereToFind": "Dove trovare il codice?",
+    "hint1": "Sul retro della tua carta NFC o QR fisica",
+    "hint2": "Nella tua email di conferma ordine",
+    "hint3": "Nella tua ricevuta ordine AvisMaker",
+    "notFoundTitle": "Codice non trovato",
+    "notFoundDesc": "Questo codice di attivazione non esiste. Controlla e riprova.",
+    "alreadyActiveTitle": "Già attivato",
+    "alreadyActiveDesc": "Questa carta è già registrata su un altro account.",
+    "genericError": "Qualcosa è andato storto. Per favore riprova.",
     "codeHint": "Il codice è stampato sul retro della tua carta nel formato XX-XXXXXX"
   },
   "aiReply": {

@@ -309,6 +309,18 @@
     "failed": "Échec de l'activation",
     "notFound": "Carte introuvable. Vérifiez votre code d'activation.",
     "alreadyActive": "Cette carte est déjà activée.",
+    "enterCode": "Saisir le code d'activation",
+    "codeLabel": "Code d'activation",
+    "codeHintAlt": "Le code est imprimé au dos de votre carte ou dans votre email de confirmation de commande.",
+    "whereToFind": "Où trouver le code ?",
+    "hint1": "Au dos de votre carte NFC ou QR physique",
+    "hint2": "Dans votre email de confirmation de commande",
+    "hint3": "Dans votre reçu de commande AvisMaker",
+    "notFoundTitle": "Code introuvable",
+    "notFoundDesc": "Ce code d'activation n'existe pas. Vérifiez et réessayez.",
+    "alreadyActiveTitle": "Déjà activé",
+    "alreadyActiveDesc": "Cette carte est déjà enregistrée sur un autre compte.",
+    "genericError": "Une erreur est survenue. Veuillez réessayer.",
     "codeHint": "Le code est imprimé au dos de votre carte au format XX-XXXXXX"
   },
   "aiReply": {

@@ -66,7 +66,7 @@ export default function DashboardPage() {
     scansThisMonth: number;
     totalProfiles: number;
     recentScans: Array<{ id: number; cardId: number; cardCode: string; platform: string | null; businessProfileId: number | null; timestamp: string; country: string | null; deviceType: string | null; wasNegative: boolean }>;
-    topCards: Array<{ id: number; code: string; status: string; platform: string | null; scanCount: number; smartReviewEnabled: boolean; businessProfileId: number | null }>;
+    topCards: Array<{ id: number; code: string; nickname: string | null; status: string; platform: string | null; scanCount: number; smartReviewEnabled: boolean; businessProfileId: number | null }>;
   } | undefined;
 
   const profileMap = ((profilesData as unknown as DashboardProfile[]) ?? []).reduce<Record<number, DashboardProfile>>(
@@ -146,9 +146,9 @@ export default function DashboardPage() {
                               </div>
                             )}
                             <div>
-                              {/* Nom de l'établissement en principal */}
-                              <p className="text-sm font-semibold text-[#0D1117]">
-                                {profile ? profile.name : card.code}
+                              {/* Surnom si défini, sinon nom du profil, sinon code */}
+                              <p className="text-sm font-semibold text-[#0D1117] truncate max-w-[180px]">
+                                {card.nickname ?? (profile ? profile.name : card.code)}
                               </p>
                               <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                                 {card.platform && (
@@ -156,7 +156,12 @@ export default function DashboardPage() {
                                     {card.platform}
                                   </span>
                                 )}
-                                {profile && (
+                                {/* Affiche le nom du profil en secondaire quand surnom est actif */}
+                                {card.nickname && profile && (
+                                  <span className="text-xs text-[#6B7280] truncate">{profile.name}</span>
+                                )}
+                                {/* Affiche le code si on a un profil ou un surnom */}
+                                {(profile || card.nickname) && (
                                   <span className="text-xs font-mono text-[#9CA3AF]">{card.code}</span>
                                 )}
                               </div>

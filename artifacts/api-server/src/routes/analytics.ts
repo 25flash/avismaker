@@ -58,6 +58,7 @@ router.get("/analytics/dashboard", requireAuth, async (req: AuthRequest, res): P
   const topCards = cards.sort((a, b) => b.scanCount - a.scanCount).slice(0, 5).map(c => ({
     id: c.id,
     code: c.code,
+    nickname: c.nickname ?? null,
     status: c.status,
     platform: c.platform,
     targetUrl: c.targetUrl,

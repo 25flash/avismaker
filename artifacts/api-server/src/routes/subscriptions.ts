@@ -50,8 +50,6 @@ export const PLANS = [
       "billing.features.negativeReviewDetection",
       "billing.features.advancedAnalyticsPdf",
       "billing.features.customBranding",
-      "billing.features.whiteLabel",
-      "billing.features.dedicatedManager",
     ],
     maxProfiles: null,
     maxActiveCards: null,

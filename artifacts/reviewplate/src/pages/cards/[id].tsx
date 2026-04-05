@@ -69,7 +69,7 @@ export default function CardEditorPage() {
   const deactivateMutation = useDeactivateCard();
 
   const cardData = card as unknown as {
-    id: number; code: string; status: string; platform: string | null;
+    id: number; code: string; nickname: string | null; status: string; platform: string | null;
     targetUrl: string | null; businessProfileId: number | null; scanCount: number;
     smartReviewEnabled: boolean; negativeAlertEnabled: boolean;
     createdAt: string; activatedAt: string | null;
@@ -77,12 +77,14 @@ export default function CardEditorPage() {
 
   const profileList = (profiles as unknown as BusinessProfile[]) ?? [];
 
+  const [nickname, setNickname] = useState("");
   const [businessProfileId, setBusinessProfileId] = useState<string>("");
   const [targetUrl, setTargetUrl] = useState("");
   const [smartReview, setSmartReview] = useState(false);
 
   useEffect(() => {
     if (cardData) {
+      setNickname(cardData.nickname ?? "");
       setBusinessProfileId(cardData.businessProfileId != null ? String(cardData.businessProfileId) : "");
       setTargetUrl(cardData.targetUrl ?? "");
       setSmartReview(cardData.smartReviewEnabled);
@@ -96,6 +98,7 @@ export default function CardEditorPage() {
       {
         id: cardId,
         data: {
+          nickname: nickname.trim() || null,
           businessProfileId: businessProfileId ? parseInt(businessProfileId) : null,
           targetUrl: targetUrl || null,
           smartReviewEnabled: smartReview,
@@ -170,7 +173,8 @@ export default function CardEditorPage() {
             </button>
           </Link>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-[#0D1117]">Carte {cardData.code}</h1>
+            <h1 className="text-2xl font-bold text-[#0D1117]">{cardData.nickname || `Carte ${cardData.code}`}</h1>
+            {cardData.nickname && <p className="text-sm text-[#9CA3AF] font-mono mt-0.5">{cardData.code}</p>}
             <div className="flex items-center gap-2 mt-1">
               <span className={cn("text-xs font-semibold px-2.5 py-1 rounded-full", statusClass[cardData.status] ?? "status-pill-inactive")}>
                 {cardData.status}
@@ -211,6 +215,19 @@ export default function CardEditorPage() {
             <CardTitle className="text-base font-semibold text-[#0D1117]">Paramètres de la carte</CardTitle>
           </CardHeader>
           <CardContent className="pt-6 space-y-6">
+
+            {/* Nickname */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-[#374151]">Nom de la carte <span className="text-[#9CA3AF] font-normal">(optionnel)</span></Label>
+              <Input
+                placeholder="ex : Entrée principale, Comptoir, Table VIP…"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                maxLength={80}
+                data-testid="input-nickname"
+              />
+              <p className="text-xs text-[#6B7280]">Un nom personnalisé pour identifier facilement cette carte dans votre tableau de bord.</p>
+            </div>
 
             {/* Business profile selector */}
             <div className="space-y-2">

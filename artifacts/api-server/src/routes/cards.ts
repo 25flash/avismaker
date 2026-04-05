@@ -24,6 +24,7 @@ function formatCard(card: typeof cardsTable.$inferSelect) {
   return {
     id: card.id,
     code: card.code,
+    nickname: card.nickname ?? null,
     status: card.status,
     platform: card.platform,
     targetUrl: card.targetUrl,
@@ -89,6 +90,7 @@ router.patch("/cards/:id", requireAuth, async (req: AuthRequest, res): Promise<v
   }
 
   const updates: Record<string, unknown> = {};
+  if (parsed.data.nickname !== undefined) updates.nickname = parsed.data.nickname;
   if (parsed.data.platform !== undefined) updates.platform = parsed.data.platform;
   if (parsed.data.targetUrl !== undefined) updates.targetUrl = parsed.data.targetUrl;
   if (parsed.data.businessProfileId !== undefined) updates.businessProfileId = parsed.data.businessProfileId;

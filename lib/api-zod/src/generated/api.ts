@@ -215,6 +215,7 @@ export const ListCardsQueryParams = zod.object({
 export const ListCardsResponseItem = zod.object({
   id: zod.number(),
   code: zod.string(),
+  nickname: zod.string().nullish(),
   status: zod.string(),
   platform: zod.string().nullish(),
   targetUrl: zod.string().nullish(),
@@ -238,6 +239,7 @@ export const GetCardParams = zod.object({
 export const GetCardResponse = zod.object({
   id: zod.number(),
   code: zod.string(),
+  nickname: zod.string().nullish(),
   status: zod.string(),
   platform: zod.string().nullish(),
   targetUrl: zod.string().nullish(),
@@ -258,6 +260,7 @@ export const UpdateCardParams = zod.object({
 });
 
 export const UpdateCardBody = zod.object({
+  nickname: zod.string().nullish(),
   platform: zod.string().nullish(),
   targetUrl: zod.string().nullish(),
   businessProfileId: zod.number().nullish(),
@@ -268,6 +271,7 @@ export const UpdateCardBody = zod.object({
 export const UpdateCardResponse = zod.object({
   id: zod.number(),
   code: zod.string(),
+  nickname: zod.string().nullish(),
   status: zod.string(),
   platform: zod.string().nullish(),
   targetUrl: zod.string().nullish(),

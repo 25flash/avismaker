@@ -117,11 +117,17 @@ export default function CardsPage() {
                         </span>
                       </div>
 
-                      {/* Nom de l'établissement en principal */}
-                      {linkedProfile ? (
-                        <p className="text-base font-bold text-[#0D1117] mb-0.5 truncate">{linkedProfile.name}</p>
+                      {/* Nom principal : nickname > nom profil > fallback */}
+                      {card.nickname ? (
+                        <p className="text-base font-bold text-[#0D1117] mb-0 truncate">{card.nickname}</p>
+                      ) : linkedProfile ? (
+                        <p className="text-base font-bold text-[#0D1117] mb-0 truncate">{linkedProfile.name}</p>
                       ) : (
-                        <p className="text-base font-bold text-[#9CA3AF] mb-0.5">Sans profil</p>
+                        <p className="text-base font-bold text-[#9CA3AF] mb-0">Sans nom</p>
+                      )}
+                      {/* Profil en secondaire si nickname défini */}
+                      {card.nickname && linkedProfile && (
+                        <p className="text-xs text-[#9CA3AF] truncate mb-0">{linkedProfile.name}</p>
                       )}
 
                       {/* Plateforme en secondaire */}

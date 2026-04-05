@@ -7,6 +7,7 @@ import { businessProfilesTable } from "./business-profiles";
 export const cardsTable = pgTable("cards", {
   id: serial("id").primaryKey(),
   code: text("code").notNull().unique(),
+  nickname: text("nickname"),
   status: text("status").notNull().default("inactive"),
   platform: text("platform"),
   targetUrl: text("target_url"),

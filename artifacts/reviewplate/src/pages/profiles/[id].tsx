@@ -330,7 +330,10 @@ export default function ProfileEditorPage() {
                     {/* Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-mono font-bold text-sm text-[#0D1117]">{card.code}</span>
+                        {card.nickname && (
+                          <span className="font-semibold text-sm text-[#0D1117]">{card.nickname}</span>
+                        )}
+                        <span className={cn("font-mono text-sm", card.nickname ? "text-[#9CA3AF] text-xs" : "font-bold text-[#0D1117]")}>{card.code}</span>
                         <span className={cn("text-xs font-semibold px-2 py-0.5 rounded-full", statusClass[card.status] ?? "status-pill-inactive")}>
                           {card.status === "active" ? "Active" : card.status === "inactive" ? "Inactive" : "Désactivée"}
                         </span>

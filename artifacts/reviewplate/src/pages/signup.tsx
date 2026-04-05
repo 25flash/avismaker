@@ -60,9 +60,7 @@ export default function SignupPage() {
       <div className="hidden lg:flex flex-col justify-between w-1/2 bg-[#0D1117] p-12">
         <Link href="/">
           <div className="flex items-center gap-2 cursor-pointer">
-            <div className="w-9 h-9 bg-primary rounded-lg flex items-center justify-center">
-              <Star className="w-5 h-5 text-[#0D1117]" strokeWidth={2.5} />
-            </div>
+            <img src="/logo.png" alt="AvisMakers" className="w-9 h-9 object-contain shrink-0" />
             <span className="text-xl font-bold text-white">AvisMakers</span>
           </div>
         </Link>
@@ -89,9 +87,7 @@ export default function SignupPage() {
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-2 mb-8">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <Star className="w-4 h-4 text-[#0D1117]" strokeWidth={2.5} />
-            </div>
+            <img src="/logo.png" alt="AvisMakers" className="w-8 h-8 object-contain shrink-0" />
             <span className="text-lg font-bold text-[#0D1117]">AvisMakers</span>
           </div>
 

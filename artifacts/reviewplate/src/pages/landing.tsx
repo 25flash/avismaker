@@ -10,9 +10,7 @@ function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0D1117]/95 backdrop-blur border-b border-white/10">
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-            <Star className="w-4 h-4 text-[#0D1117]" strokeWidth={2.5} />
-          </div>
+          <img src="/logo.png" alt="AvisMakers" className="w-8 h-8 object-contain shrink-0" />
           <span className="text-lg font-bold text-white">AvisMakers</span>
         </div>
         <div className="flex items-center gap-3">
@@ -164,9 +162,7 @@ export default function LandingPage() {
       <footer className="border-t border-white/10 py-8 px-6">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-white/40">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-primary rounded-md flex items-center justify-center">
-              <Star className="w-3 h-3 text-[#0D1117]" strokeWidth={2.5} />
-            </div>
+            <img src="/logo.png" alt="AvisMakers" className="w-6 h-6 object-contain opacity-80" />
             <span>AvisMakers</span>
           </div>
           <p>© 2025 AvisMakers. {t("landing.allRightsReserved")}</p>

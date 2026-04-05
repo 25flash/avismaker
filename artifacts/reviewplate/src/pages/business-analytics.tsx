@@ -302,44 +302,45 @@ export default function BusinessAnalyticsPage() {
 
           {/* Charts row */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-            {/* Scan timeline — 1 free preview graph */}
-            <Card className="lg:col-span-2 bg-white border border-border shadow-sm">
-              <CardHeader className="pb-2 border-b border-border flex flex-row items-center justify-between">
-                <CardTitle className="text-sm font-semibold text-[#0D1117] flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-primary" />
-                  Évolution des scans (30 jours)
-                </CardTitle>
-                {!isBusiness && (
-                  <Badge variant="outline" className="text-[10px] border-primary/30 text-primary">Aperçu gratuit</Badge>
-                )}
-              </CardHeader>
-              <CardContent className="pt-4">
-                <ResponsiveContainer width="100%" height={200}>
-                  <LineChart data={displayData?.scanTimeline ?? []}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
-                    <XAxis
-                      dataKey="date"
-                      tick={{ fontSize: 10, fill: "#9CA3AF" }}
-                      tickFormatter={v => v.slice(5)}
-                      interval="preserveStartEnd"
-                    />
-                    <YAxis tick={{ fontSize: 10, fill: "#9CA3AF" }} />
-                    <Tooltip
-                      contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E5E7EB" }}
-                      formatter={(v: number) => [v, "Scans"]}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="count"
-                      stroke="#F59E0B"
-                      strokeWidth={2}
-                      dot={false}
-                      activeDot={{ r: 4 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
+            {/* Scan timeline — blurred for non-business */}
+            <div className="lg:col-span-2">
+            <BlurWrapper locked={!isBusiness}>
+              <Card className="bg-white border border-border shadow-sm">
+                <CardHeader className="pb-2 border-b border-border flex flex-row items-center justify-between">
+                  <CardTitle className="text-sm font-semibold text-[#0D1117] flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-primary" />
+                    Évolution des scans (30 jours)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <ResponsiveContainer width="100%" height={200}>
+                    <LineChart data={displayData?.scanTimeline ?? []}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
+                      <XAxis
+                        dataKey="date"
+                        tick={{ fontSize: 10, fill: "#9CA3AF" }}
+                        tickFormatter={v => v.slice(5)}
+                        interval="preserveStartEnd"
+                      />
+                      <YAxis tick={{ fontSize: 10, fill: "#9CA3AF" }} />
+                      <Tooltip
+                        contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #E5E7EB" }}
+                        formatter={(v: number) => [v, "Scans"]}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="count"
+                        stroke="#F59E0B"
+                        strokeWidth={2}
+                        dot={false}
+                        activeDot={{ r: 4 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </BlurWrapper>
+            </div>
 
             {/* Source distribution — blurred for non-business */}
             <BlurWrapper locked={!isBusiness}>

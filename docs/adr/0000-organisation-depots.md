@@ -1,6 +1,6 @@
 # ADR-0000 — Organisation des dépôts Louma vs `avismaker`/ReviewPlate
 
-Statut : **Validé (option "nouveaux dépôts dédiés Louma" retenue) — création des dépôts en attente de confirmation du périmètre exact**
+Statut : **Validé (option "nouveaux dépôts dédiés Louma" retenue, sous le compte `25flash`) — création effective différée : non réalisable depuis cette session (token GitHub scopé à `25flash/avismaker`)**
 
 ## Hypothèse
 Le dépôt `avismaker` actuel héberge un produit sans lien avec Louma ("ReviewPlate", SaaS de cartes NFC/QR pour avis clients, monorepo pnpm/TypeScript). Aucun des 3 documents de référence ne mentionne ce projet. La création de nouveaux dépôts pour Louma est possible côté organisation GitHub.

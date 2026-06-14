@@ -10,7 +10,7 @@
 - Extensions de cartographie : `subscription-svc`, `ops-console`, Comptes Junior (ADR-0007 validé).
 
 ## En cours
-- Précision du périmètre exact de création des dépôts (organisation/compte cible, immédiat vs progressif par lot) avant de lancer la Phase B.
+- Création des ~17 dépôts `louma-*` impossible depuis cette session (token GitHub scopé à `25flash/avismaker`, outils multi-dépôts indisponibles). Reportée : sera réalisée hors session (manuellement ou via une session avec accès élargi).
 
 ## Bloqué
-- Phase B (échafaudage dépôts, CI/CD, IaC, socle Identité/KYC, Ledger, Compte/RIB) en attente de la précision ci-dessus.
+- Phase B (échafaudage dépôts, CI/CD, IaC, socle Identité/KYC, Ledger, Compte/RIB) en attente de la création effective des dépôts `louma-*`. En attendant, le travail préparatoire (squelettes, README, manifests par futur dépôt) peut être poursuivi dans `avismaker/docs/` sur demande.

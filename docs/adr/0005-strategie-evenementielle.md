@@ -1,6 +1,6 @@
 # ADR-0005 — Stratégie événementielle
 
-Statut : **Proposé**
+Statut : **Validé**
 
 ## Hypothèse
 Certaines opérations exigent une réponse immédiate et cohérente (paiement, autorisation), d'autres tolèrent une propagation asynchrone (notifications, fidélité, analytique, scoring).

@@ -1,6 +1,6 @@
 # ADR-0002 — Stack technique par couche
 
-Statut : **Proposé**
+Statut : **Validé**
 
 ## Hypothèse
 Le RAT (qui prime sur le DSE/CDC pour les décisions techniques) recommande une stack polyglotte spécifique par couche. Le dépôt `avismaker` actuel (pnpm/TypeScript) ne préjuge pas de la stack Louma (cf. ADR-0000 : nouveaux dépôts).

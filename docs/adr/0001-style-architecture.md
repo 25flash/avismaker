@@ -1,6 +1,6 @@
 # ADR-0001 — Style d'architecture cible : monolithe modulaire + extraction ciblée
 
-Statut : **Proposé**
+Statut : **Validé**
 
 ## Hypothèse
 L'équipe démarre avec un effectif limité (cf. DSE 3.1) mais doit absorber, au Go-Live, des volumes "banque-grade" sur les domaines critiques (ledger, paiements, mass payout, conformité).

@@ -1,6 +1,6 @@
 # ADR-0004 — Stratégie API
 
-Statut : **Proposé**
+Statut : **Validé**
 
 ## Hypothèse
 Les apps (mobile, web, console), les partenaires régulés et les marchands consommeront des contrats stables, et toute opération financière mutante doit être rejouable sans double effet.

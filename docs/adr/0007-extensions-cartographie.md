@@ -1,6 +1,6 @@
 # ADR-0007 — Extensions de cartographie : `subscription-svc`, `ops-console`, Comptes Junior
 
-Statut : **Proposé**
+Statut : **Validé**
 
 ## Hypothèse
 Le tableau de traçabilité RAT §15 ne couvre pas explicitement : (a) les plans freemium (CDC §2.7/§3.7), (b) le back-office interne (CDC §5.2), (c) les Comptes Junior (CDC §2.6). Le CDC prime sur le RAT pour le périmètre : ces fonctionnalités ne peuvent pas rester orphelines d'architecture.

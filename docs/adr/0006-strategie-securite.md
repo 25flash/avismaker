@@ -1,6 +1,6 @@
 # ADR-0006 — Stratégie de sécurité
 
-Statut : **Proposé**
+Statut : **Validé**
 
 ## Hypothèse
 Louma vise un niveau de sécurité "institution financière systémique" dès le Lot 1 ; un lancement intégral signifie que tous les domaines (y compris cartes, mass payout) sont exposés dès le Go-Live, sans période de rodage à périmètre réduit.

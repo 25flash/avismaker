@@ -1,6 +1,6 @@
 # ADR-0003 — Stratégie de données
 
-Statut : **Proposé**
+Statut : **Validé**
 
 ## Hypothèse
 Le ledger doit rester l'unique source de vérité des soldes (principe non négociable RAT §2), tandis que les besoins analytiques/IA (scoring fraude, crédit, BI) exigent volume et flexibilité.

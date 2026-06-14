@@ -1,13 +1,15 @@
 # ADR-0000 — Organisation des dépôts Louma vs `avismaker`/ReviewPlate
 
-Statut : **Validé (option "nouveaux dépôts dédiés Louma" retenue, sous le compte `25flash`) — création effective différée : non réalisable depuis cette session (token GitHub scopé à `25flash/avismaker`)**
+Statut : **Révisé — workspace dédié `avismaker/louma/` retenu pour démarrer (Lot 1), migration vers dépôts séparés différée**
 
 ## Hypothèse
-Le dépôt `avismaker` actuel héberge un produit sans lien avec Louma ("ReviewPlate", SaaS de cartes NFC/QR pour avis clients, monorepo pnpm/TypeScript). Aucun des 3 documents de référence ne mentionne ce projet. La création de nouveaux dépôts pour Louma est possible côté organisation GitHub.
+Le dépôt `avismaker` actuel héberge un produit sans lien avec Louma ("ReviewPlate", SaaS de cartes NFC/QR pour avis clients, monorepo pnpm/TypeScript). Aucun des 3 documents de référence ne mentionne ce projet. La création de nouveaux dépôts pour Louma n'est pas réalisable depuis cette session (token GitHub scopé à `25flash/avismaker`, outils multi-dépôts indisponibles).
 
 ## Décision
-Créer une nouvelle organisation/un nouvel ensemble de dépôts dédiés à Louma, structurés en polyrepo par plan d'ownership (voir `PHASE_A.md` §A3.1) : dépôts plateforme partagés (`louma-contracts`, `louma-platform`, `louma-design-system`, `louma-infra`) + dépôts par regroupement de services (`louma-core`, `louma-ledger`, `louma-payments`, `louma-masspay`, `louma-identity`, `louma-remit`, `louma-cards`, `louma-gateway`, `louma-mobile`, `louma-web`, `louma-console-business`, `louma-ussd`, `louma-data-platform`).
-`avismaker`/ReviewPlate n'est ni modifié ni supprimé. Tant que les dépôts cibles ne sont pas créés/accessibles, la documentation de cadrage (Phase A, ADR, backlog, journal de décisions) est maintenue dans `avismaker/docs/` comme zone neutre, sans impact sur le code ReviewPlate.
+Option initiale (nouveaux dépôts `louma-*` séparés, polyrepo par tribu — voir `PHASE_A.md` §A3.1) **reste la cible à terme**, mais est différée. Pour permettre un démarrage immédiat de la Phase B (Lot 1), Louma est construit dans un **workspace dédié `avismaker/louma/`**, à la racine du dépôt, totalement séparé de `artifacts/` (ReviewPlate) :
+- `louma/` a sa propre structure (packages/modules par bounded context, conventions ADR-0001/0002), aucune dépendance vers `artifacts/` ou `lib/` ReviewPlate.
+- `avismaker`/ReviewPlate n'est ni modifié ni supprimé.
+- Quand les dépôts `louma-*` seront créés et accessibles, le contenu de `louma/<bc>/` sera extrait tel quel (historique git préservé via `git subtree`/`filter-repo`) vers son dépôt cible — la structure interne de `louma/` est donc alignée 1:1 sur le découpage de dépôts cible de A3.1 pour faciliter cette extraction future.
 
 ## Alternatives rejetées
 1. **Étendre `avismaker`** avec Louma à côté de ReviewPlate : rejetée — mélange un produit fintech régulé (exigences de sécurité, conformité, scope PCI-DSS, gouvernance d'accès strictes) avec une SaaS sans rapport ; complique l'audit et les revues de sécurité ; la stack cible (Go/Kotlin/KMP) n'a rien à voir avec l'outillage pnpm/TS de ReviewPlate.

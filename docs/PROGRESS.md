@@ -10,7 +10,12 @@
 - Extensions de cartographie : `subscription-svc`, `ops-console`, Comptes Junior (ADR-0007 validé).
 
 ## En cours
-- Création des ~17 dépôts `louma-*` impossible depuis cette session (token GitHub scopé à `25flash/avismaker`, outils multi-dépôts indisponibles). Reportée : sera réalisée hors session (manuellement ou via une session avec accès élargi).
+- Création des ~17 dépôts `louma-*` impossible depuis cette session (token GitHub scopé à `25flash/avismaker`, outils multi-dépôts indisponibles). Décision : construire Louma dans `avismaker/louma/` (structure alignée sur la cible polyrepo A3.1, extraction future via git subtree/filter-repo) — ADR-0000 révisé.
 
-## Bloqué
-- Phase B (échafaudage dépôts, CI/CD, IaC, socle Identité/KYC, Ledger, Compte/RIB) en attente de la création effective des dépôts `louma-*`. En attendant, le travail préparatoire (squelettes, README, manifests par futur dépôt) peut être poursuivi dans `avismaker/docs/` sur demande.
+## Fait (Lot 1)
+- `louma/ledger-svc` (Go, architecture hexagonale) : domaine (Money, Account, LedgerEntry, Transaction, RIB), application (`AccountService`, `TransferService` avec verrouillage ordonné des comptes et virement idempotent par `Idempotency-Key`), adaptateur Postgres (pgx, migrations SQL `migrations/0001_init.sql`), adaptateur HTTP `/v1/ledger/*` (RFC 7807), `cmd/server`.
+- Tests : unitaires du domaine + tests d'intégration Postgres (`go test ./...` OK contre une base Postgres locale) + vérification manuelle de l'API via `curl` (ouverture de comptes, virement, rejeu idempotent, comptes erronés).
+
+## Bloqué / à suivre
+- Format BCEAO définitif du RIB à confirmer avec la banque de cantonnement avant le Go-Live (voir `docs/OPEN_QUESTIONS.md`).
+- Prochaine étape Lot 1 : `identity-svc` (auth/KYC stub), puis `payments-svc`, API gateway, squelette mobile (KMP + iOS/Android natifs).

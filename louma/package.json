@@ -1,0 +1,23 @@
+{
+  "name": "louma",
+  "private": true,
+  "version": "0.1.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "argon2",
+      "esbuild",
+      "prisma"
+    ]
+  },
+  "scripts": {
+    "api:dev": "pnpm --filter @louma/api dev",
+    "api:build": "pnpm --filter @louma/api build",
+    "api:test": "pnpm --filter @louma/api test",
+    "mobile:start": "pnpm --filter @louma/mobile start"
+  }
+}

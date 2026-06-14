@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AccountStatus {
+  ACTIVE
+  FROZEN
+  CLOSED
+}
+
+enum AccountType {
+  STANDARD
+  JUNIOR
+  SYSTEM
+}
+
+enum EntryDirection {
+  DEBIT
+  CREDIT
+}
+
+enum TransactionType {
+  TRANSFER
+  DEPOSIT
+}
+
+enum TransactionStatus {
+  SETTLED
+}
+
+model AccountSeq {
+  id    Int   @id @default(1)
+  value BigInt @default(0)
+}
+
+model User {
+  id        String   @id @default(uuid())
+  phone     String   @unique
+  pinHash   String
+  fullName  String
+  kycLevel  Int      @default(1)
+  createdAt DateTime @default(now())
+
+  accounts      Account[]
+  refreshTokens RefreshToken[]
+}
+
+model Account {
+  id        String        @id @default(uuid())
+  userId    String?
+  user      User?         @relation(fields: [userId], references: [id])
+  rib       String        @unique
+  currency  String
+  status    AccountStatus @default(ACTIVE)
+  type      AccountType   @default(STANDARD)
+  balance   BigInt        @default(0)
+  createdAt DateTime      @default(now())
+
+  ledgerEntries      LedgerEntry[]
+  sourceTransactions Transaction[] @relation("SourceAccount")
+  destTransactions   Transaction[] @relation("DestAccount")
+}
+
+model Transaction {
+  id              String            @id @default(uuid())
+  type            TransactionType
+  status          TransactionStatus @default(SETTLED)
+  idempotencyKey  String            @unique
+  sourceAccountId String
+  sourceAccount   Account           @relation("SourceAccount", fields: [sourceAccountId], references: [id])
+  destAccountId   String
+  destAccount     Account           @relation("DestAccount", fields: [destAccountId], references: [id])
+  currency        String
+  amount          BigInt
+  reference       String?
+  createdAt       DateTime          @default(now())
+
+  ledgerEntries LedgerEntry[]
+}
+
+model LedgerEntry {
+  id        String         @id @default(uuid())
+  accountId String
+  account   Account        @relation(fields: [accountId], references: [id])
+  direction EntryDirection
+  currency  String
+  amount    BigInt
+  txId      String
+  tx        Transaction    @relation(fields: [txId], references: [id])
+  seq       BigInt         @default(autoincrement())
+  createdAt DateTime       @default(now())
+
+  @@index([accountId])
+  @@index([txId])
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+}
